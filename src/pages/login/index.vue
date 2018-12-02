@@ -54,6 +54,11 @@ export default {
                 console.log(res)
                 if(res.code === 200){
                     globe.message(res.msg,'success')
+                    setTimeout(() => {
+                        wx.navigateTo({
+                            url: '../../pages/index/main'
+                        })
+                    }, 3000)
                 }else{
                     globe.message(res.msg,'warning')
                 }
@@ -110,8 +115,8 @@ export default {
             .form_other{
                 display: flex;
                 flex-direction: row;
-                height: 90rpx;
-                line-height: 90rpx;
+                height: 100rpx;
+                line-height: 100rpx;
                 a{
                     display: block;
                     width: 50%;
