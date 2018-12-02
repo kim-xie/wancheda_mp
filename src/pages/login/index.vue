@@ -1,21 +1,23 @@
 <template>
     <div class="container">
+        <!-- iview 全局提示组件 -->
+        <i-message id="message"/>
         <div class="login_box">
             <div class="login_logo">
                 <p class="logo"><h3>万车达</h3></p>
             </div>
             <div class="login_form">
-                <form action="javascript:;">
+                <form>
                     <div class="form-item form_username">
                         <i class="iconfont icon-user"></i>
-                        <input :v-model="form.username" class="form-input" type="text" placeholder="请输入用户名">
+                        <input v-model="form.username" class="form-input" type="text" @keyup.enter.native="login" placeholder="请输入用户名">
                     </div>
                     <div class="form-item form_password mt40">
                         <i class="iconfont icon-password"></i>
-                        <input :v-model="form.password" class="form-input" type="password" placeholder="请输入密码">
+                        <input v-model="form.password" class="form-input" type="password"  @keyup.enter.native="login" placeholder="请输入密码">
                     </div>
                     <div class="form_btn mt60">
-                        <a href="javascript:;" @tap="login">登 录</a>
+                        <div @tap="login">登 录</div>
                     </div>
                     <div class="form_other">
                         <a href="javascript:;" class="text-left">立即注册</a>
@@ -28,10 +30,15 @@
 </template>
 
 <script>
+import globe from '../../utils/globe'
+
 export default {
     data () {
         return {
-            form: {}
+            form: {
+                username: 'kim',
+                password: '123456'
+            }
         }
     },
     created () {
@@ -40,8 +47,19 @@ export default {
     methods: {
         // 登录
         login(){
-            const username = this.form.username;
-            const password = this.form.password;
+            const username = this.form.username
+            const password = this.form.password
+            console.log(username +"--" + password )
+            this.$http.post('/login',{username,password}).then(res => {
+                console.log(res)
+                if(res.code === 200){
+                    globe.message(res.msg,'success')
+                }else{
+                    globe.message(res.msg,'warning')
+                }
+            }).catch(err => {
+                globe.message('网络请求错误，请稍后重试!','error')
+            })
         }
     },
 }
@@ -52,11 +70,11 @@ export default {
         display: flex;
         height: 84rpx;
         line-height: 84rpx;
-        border-bottom: 4rpx solid #c8e4fe;
+        border-bottom: 4rpx solid $--color-text-placeholder;
     }
     .iconfont{
         font-size: 60rpx;
-        color: #c8e4fe;
+        color: $--color-text-placeholder;
     }
     .form-input{
         flex-grow: 1;
@@ -72,7 +90,7 @@ export default {
             line-height: 200rpx;
             text-align: center;
             font-size: 60rpx;
-            color: #a5aeff;
+            color: $--color-primary;
         }
         .login_form{
             width: 100%;
@@ -82,10 +100,10 @@ export default {
                 line-height: 80rpx;
                 border-radius: 12rpx;
                 text-align: center;
-                background-color: #6b76ff;
-                box-shadow:0 0 10rpx #6b76ff;
-                a{
-                    color: #fff;
+                background-color: $--color-primary;
+                box-shadow:0 0 10rpx $--color-primary;
+                div{
+                    color: $--color-white;
                     font-size: 36rpx;
                 }
             }
@@ -98,7 +116,7 @@ export default {
                     display: block;
                     width: 50%;
                     font-size: 32rpx;
-                    color: #c0c0c0;
+                    color: $--color-text-placeholder;
                 }
             }
         }

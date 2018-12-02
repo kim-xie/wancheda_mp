@@ -1,47 +1,59 @@
-
-import axios from 'axios'
+import Fly from 'flyio/dist/npm/wx'
 
 // 根路径
 let baseURL = ''
 
-// 环境的切换
+// 环境地址配置
 if (process.env.NODE_ENV === 'development') {
-  baseURL = 'https://www.apiopen.top/'
+  console.log('development')
+  baseURL = 'https://easy-mock.com/mock/5bfc161b791edf0246129e75/v1/'
 } else if (process.env.NODE_ENV === 'debug') {
+  console.log('debug')
   baseURL = ''
 } else if (process.env.NODE_ENV === 'production') {
+  console.log('production')
   baseURL = 'https://easy-mock.com/mock/5bfc161b791edf0246129e75/v1/'
 }
 
-// 当创建实例的时候配置默认配置
-let instance = axios.create({
-  baseURL: baseURL,
-  timeout: 3000,
-  withCredentials: true // 支持跨域访问
+// 初始化fly实例
+const fly = new Fly
+
+// fly全局配置
+fly.config = {
+  // 定义公共headers
+  headers: {
+    'X-Tag': 'flyio'
+  },
+  // 设置超时
+  timeout: 10000,
+  // 允许携带cookie信息
+  withCredentials: true,
+  // 设置请求基地址
+  baseURL: baseURL
+}
+
+//添加请求拦截器
+fly.interceptors.request.use((request) => {
+  //打印出请求体
+  console.log(request)
+  //终止请求
+  //var err = new Error("xxx")
+  //err.request = request
+  //return Promise.reject(new Error(""))
+
+  //可以显式返回request, 也可以不返回，没有返回值时拦截器中默认返回request
+  return request
 })
 
-// 当实例创建时候修改配置
-const AUTH_TOKEN = 'abcd'
-instance.defaults.headers.common['Authorization'] = AUTH_TOKEN
-instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
-
-// 添加一个请求拦截器
-instance.interceptors.request.use(config => {
-  // 在请求发出之前进行一些操作
-  return config
-}, err => {
-  // Do something with request error
-  return Promise.reject(err)
-})
-
-// 添加一个响应拦截器
-instance.interceptors.response.use(res => {
-  // 在这里对返回的数据进行处理
-  return res
-}, err => {
-  // Do something with response error
-  return Promise.reject(err)
-})
+//添加响应拦截器，响应拦截器会在then/catch处理之前执行
+fly.interceptors.response.use((res) => {
+    //只将请求结果的data字段返回
+    return res.data
+  }, (err) => {
+    //发生网络错误后会走到这里
+    //return Promise.resolve("ssss")
+  }
+)
 
 // 自定义判断元素类型JS
 function toType(obj) {
@@ -66,48 +78,22 @@ function filterNull(o) {
 }
 
 /**
- * axios封装
+ * flyio封装
  * @param {*} method
  * @param {*} url
  * @param {*} params
  * @param {*} succes
  * @param {*} failure
  */
-function apiAxios(method, url, params) {
+function apiFly(method, url, params) {
   return new Promise((resolve, reject) => {
     if (params) {
       params = filterNull(params)
     }
-    instance({
-      method: method,
-      url: url,
-      data: method === 'POST' || method === 'PUT' ? params : null,
-      params: method === 'GET' || method === 'DELETE' ? params : null
-    }).then(res => {
-      if (res.data.code === 200) {
-        Message({
-          message: res.data.msg,
-          type: 'success',
-          showClose: true
-        })
-        resolve(res.data)
-      } else {
-        Message({
-          message: res.data.msg,
-          type: 'warning',
-          showClose: true
-        })
-        reject(res.data)
-      }
+    // fly api
+    fly.request(url, params, {method}).then(res => {
+      resolve(res)
     }).catch(err => {
-      let res = err.response
-      if (err) {
-        Message({
-          message: 'api error, HTTP CODE: ' + res.status,
-          type: 'error',
-          showClose: true
-        })
-      }
       reject(err)
     })
   })
@@ -116,15 +102,15 @@ function apiAxios(method, url, params) {
 // 返回在vue模板中的调用接口
 export default {
   get: (url, params) => {
-    return apiAxios('GET', url, params)
+    return apiFly('GET', url, params)
   },
   post: (url, params) => {
-    return apiAxios('POST', url, params)
+    return apiFly('POST', url, params)
   },
   put: (url, params) => {
-    return apiAxios('PUT', url, params)
+    return apiFly('PUT', url, params)
   },
   delete: (url, params) => {
-    return apiAxios('DELETE', url, params)
+    return apiFly('DELETE', url, params)
   }
 }

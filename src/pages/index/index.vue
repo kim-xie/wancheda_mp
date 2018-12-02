@@ -10,7 +10,6 @@
 
     <div class="usermotto">
       <div class="user-motto">
-        <card :text="motto"></card>
       </div>
     </div>
 
@@ -23,7 +22,6 @@
 </template>
 
 <script>
-import card from '@/components/card'
 
 export default {
   data () {
@@ -32,11 +30,6 @@ export default {
       userInfo: {}
     }
   },
-
-  components: {
-    card
-  },
-
   methods: {
     bindViewTap () {
       const url = '../logs/main'
