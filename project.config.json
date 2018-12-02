@@ -11,7 +11,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "touristappid",
+	"appid": "wxd17ff0bb03f04cee",
 	"projectname": "wancheda_mp",
 	"libVersion": "2.4.1",
 	"condition": {
