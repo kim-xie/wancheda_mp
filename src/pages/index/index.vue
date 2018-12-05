@@ -18,7 +18,34 @@
         </div>
       </div>
       <div v-if="current === 'order'" class="transition tab_order">
-        <div>order</div>
+        <div>
+          <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
+            <i-tab key="tab1" title="维修中" count="3"></i-tab>
+            <i-tab key="tab2" title="待付款" count="0"></i-tab>
+            <i-tab key="tab3" title="已完成" count="100"></i-tab>
+          </i-tabs>
+          <div class="tab_repaire">
+            <div class="tab_list" v-for="(item, index) in repaires" :key="index">
+              <ul>
+                <li class="ellipsis">
+                  <span>{{item.carNo}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>{{item.type}}</span>
+                </li>
+                <li class="line"></li>
+                <li class="ellipsis">
+                  <span>工单号: {{item.order}}</span>
+                  <span class="float-right">{{item.status}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>进厂时间: {{item.time}}</span>
+                  <span class="float-right">{{item.user}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
       <div v-if="current === 'workplace'" class="transition tab_workplace">
         <div>
@@ -107,6 +134,7 @@
       return {
         current: 'index',
         company: '深圳分店',
+        tab_current: 'tab1',
         visible: false,
         actions: [
             {
@@ -118,6 +146,35 @@
               name: '洗车',
             }
         ],
+        repaires: [
+          {
+            id: 1,
+            carNo: '粤B09286',
+            type: '迈腾2017 1.4TSI 双离合 280TSI领先型',
+            order: 'No20181205000001',
+            time: '2018-12-05 12:30',
+            status: '在修',
+            user: 'kim'
+          },
+          {
+            id: 2,
+            carNo: '桂M09286',
+            type: '迈腾2018 1.4TSI 双离合 280TSI领先型',
+            order: 'No20181205000002',
+            time: '2018-12-05 10:30',
+            status: '在修',
+            user: 'kim'
+          },
+          {
+            id: 3,
+            carNo: '桂B09286',
+            type: '迈腾2019 1.4TSI 双离合 280TSI领先型',
+            order: 'No20181205000003',
+            time: '2018-12-05 10:30',
+            status: '在修',
+            user: 'kim'
+          }
+        ]
       }
     },
     created () {
@@ -127,6 +184,9 @@
       // 切换tab-bar
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
+      },
+      handleChangeTab (data) {
+        this.tab_current = data.mp.detail.key
       },
       // 选择下拉框
       select(){
@@ -176,4 +236,21 @@
 .tab_bar{
   width: 100vw;
 }
+.tab_list{
+  background-color: $--background-color-base;
+  font-size: 30rpx;
+  padding: 20rpx 20rpx;
+  margin-bottom: 30rpx;
+  ul {
+    li{
+      margin: 10rpx 0;
+      color: $--color-text-secondary;
+    }
+    .line{
+      height: 3rpx;
+      background-color: $--color-text-secondary;
+    }
+  }
+}
+
 </style>

@@ -54,17 +54,18 @@ export default {
                 console.log(res)
                 if(res.code === 200){
                     globe.message(res.msg,'success')
-                    setTimeout(() => {
-                        wx.navigateTo({
-                            url: '../../pages/index/main'
-                        })
-                    }, 3000)
+
                 }else{
                     globe.message(res.msg,'warning')
                 }
             }).catch(err => {
                 globe.message('网络请求错误，请稍后重试!','error')
             })
+            setTimeout(() => {
+                wx.navigateTo({
+                    url: '../../pages/index/main'
+                })
+            }, 3000)
         }
     },
 }

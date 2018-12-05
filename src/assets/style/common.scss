@@ -21,3 +21,10 @@
 .mt60 {
     margin-top: 60rpx;
 }
+.ellipsis {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
