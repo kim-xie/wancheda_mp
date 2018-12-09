@@ -36,8 +36,8 @@ export default {
     data () {
         return {
             form: {
-                username: 'kim',
-                password: '123456'
+                username: '',
+                password: ''
             }
         }
     },
@@ -49,23 +49,23 @@ export default {
         login(){
             const username = this.form.username
             const password = this.form.password
-            console.log(username +"--" + password )
-            this.$http.post('/login',{username,password}).then(res => {
-                console.log(res)
-                if(res.code === 200){
-                    globe.message(res.msg,'success')
+            console.log(username + '-----' + password)
+            // this.$http.post('/login',{username,password}).then(res => {
+            //     console.log(res)
+            //     if(res.code === 200){
+            //         globe.message(res.msg,'success')
 
-                }else{
-                    globe.message(res.msg,'warning')
-                }
-            }).catch(err => {
-                globe.message('网络请求错误，请稍后重试!','error')
-            })
+            //     }else{
+            //         globe.message(res.msg,'warning')
+            //     }
+            // }).catch(err => {
+            //     globe.message('网络请求错误，请稍后重试!','error')
+            // })
             setTimeout(() => {
                 wx.navigateTo({
                     url: '../../pages/index/main'
                 })
-            }, 3000)
+            }, 1000)
         }
     },
 }

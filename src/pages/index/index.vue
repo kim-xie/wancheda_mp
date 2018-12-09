@@ -54,19 +54,25 @@
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="activity" />
-                        <i-grid-label i-class="grid-label">报表</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                          <navigator url="/pages/company/main" hover-class="navigator-hover">公司</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="addressbook" />
-                        <i-grid-label i-class="grid-label">库存</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                          <navigator url="/pages/product/main" hover-class="navigator-hover">库存</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="barrage" />
-                        <i-grid-label i-class="grid-label">入库</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/product/main" hover-class="navigator-hover">入库</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
             </i-row>
@@ -74,19 +80,25 @@
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="collection" />
-                        <i-grid-label i-class="grid-label">收货</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/role/main" hover-class="navigator-hover">角色</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="computer" />
-                        <i-grid-label i-class="grid-label">配件</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/product/main" hover-class="navigator-hover">配件</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="coupons" />
-                        <i-grid-label i-class="grid-label">套餐</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/client/main" hover-class="navigator-hover">客户</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
             </i-row>
@@ -94,19 +106,25 @@
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="flag" />
-                        <i-grid-label i-class="grid-label">商城</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/lookup/main" hover-class="navigator-hover">字典</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="interactive" />
-                        <i-grid-label i-class="grid-label">挂账</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/account/main" hover-class="navigator-hover">账号</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
                 <i-grid-item i-class="grid-item">
                     <i-grid-icon>
                         <i-icon size="24" type="mail" />
-                        <i-grid-label i-class="grid-label">客户</i-grid-label>
+                        <i-grid-label i-class="grid-label">
+                        <navigator url="/pages/client/main" hover-class="navigator-hover">客户</navigator>
+                        </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>
             </i-row>
@@ -114,7 +132,13 @@
         </div>
       </div>
       <div v-if="current === 'mine'" class="transition tab_mine">
-        <div>mine</div>
+        <div>
+          <i-cell-group>
+            <i-cell title="个人信息" is-link link-type="navigateTo" url="/pages/userInfo/main"></i-cell>
+            <i-cell title="修改密码" is-link link-type="navigateTo" url="/pages/changePwd/main"></i-cell>
+            <i-cell i-class="logout" title="退出当前账号"></i-cell>
+          </i-cell-group>
+        </div>
       </div>
     </div>
     <div class="tab_bar">
@@ -216,6 +240,13 @@
 }
 .grid-label{
   margin-top: 0!important;
+}
+.logout{
+  text-align: center;
+  color: brown;
+}
+.navigator-hover {
+  color:blue;
 }
 </style>
 

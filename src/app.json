@@ -1,10 +1,20 @@
 {
   "pages": [
-    "pages/login/main",
     "pages/index/main",
-    "pages/order/main",
-    "pages/workplace/main",
-    "pages/mine/main",
+    "pages/userInfo/main",
+    "pages/changePwd/main",
+    "pages/login/main",
+    "pages/company/main",
+    "pages/companyDetail/main",
+    "pages/account/main",
+    "pages/acconutDetail/main",
+    "pages/role/main",
+    "pages/roleDetail/main",
+    "pages/lookup/main",
+    "pages/lookupDetail/main",
+    "pages/client/main",
+    "pages/clientDetail/main",
+    "pages/product/main",
     "pages/logs/main"
   ],
   "window": {
