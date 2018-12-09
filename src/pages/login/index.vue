@@ -31,7 +31,8 @@
 
 <script>
 import globe from '../../utils/globe'
-
+import CryptoJS from 'crypto-js/core'
+import MD5 from 'crypto-js/md5'
 export default {
     data () {
         return {
@@ -49,23 +50,24 @@ export default {
         login(){
             const username = this.form.username
             const password = this.form.password
-            console.log(username + '-----' + password)
-            // this.$http.post('/login',{username,password}).then(res => {
-            //     console.log(res)
-            //     if(res.code === 200){
-            //         globe.message(res.msg,'success')
-
-            //     }else{
-            //         globe.message(res.msg,'warning')
-            //     }
-            // }).catch(err => {
-            //     globe.message('网络请求错误，请稍后重试!','error')
-            // })
-            setTimeout(() => {
-                wx.navigateTo({
-                    url: '../../pages/index/main'
-                })
-            }, 1000)
+            const hashPwd = CryptoJS.MD5(password).toString()
+            this.$http.get('/user/login',{username,password: hashPwd}).then(res => {
+                console.log(res)
+                if(res.success){
+                    globe.message(res.errorMsg,'success')
+                    const userinfo = res.data.entity
+                    this.$store.dispatch('setUserInfo', userinfo)
+                    setTimeout(() => {
+                        wx.navigateTo({
+                            url: '../../pages/index/main'
+                        })
+                    }, 1000)
+                }else{
+                    globe.message(res.errorMsg,'warning')
+                }
+            }).catch(err => {
+                globe.message('网络请求错误，请稍后重试!','error')
+            })
         }
     },
 }

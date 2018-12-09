@@ -6,7 +6,7 @@ let baseURL = ''
 // 环境地址配置
 if (process.env.NODE_ENV === 'development') {
   console.log('development')
-  baseURL = 'https://easy-mock.com/mock/5bfc161b791edf0246129e75/v1/'
+  baseURL = 'http://127.0.0.1:8081'
 } else if (process.env.NODE_ENV === 'debug') {
   console.log('debug')
   baseURL = ''

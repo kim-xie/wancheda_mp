@@ -1,9 +1,9 @@
 {
   "pages": [
+    "pages/login/main",
     "pages/index/main",
     "pages/userInfo/main",
     "pages/changePwd/main",
-    "pages/login/main",
     "pages/company/main",
     "pages/companyDetail/main",
     "pages/account/main",

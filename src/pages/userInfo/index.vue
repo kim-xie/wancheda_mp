@@ -3,27 +3,27 @@
     <div class="userInfo">
       <p class="input_wrap">
         <span class="input_label">用户名</span>
-        <input v-model="form.username"/>
+        <input v-model="userInfo.username"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">真实姓名</span>
-        <input v-model="form.realname"/>
+        <input v-model="userInfo.fullname"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">联系电话</span>
-        <input v-model="form.phone"/>
+        <input v-model="userInfo.mobile"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">邮箱</span>
-        <input v-model="form.email"/>
+        <input v-model="userInfo.email"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">所属公司</span>
-        <input v-model="form.company"/>
+        <input v-model="userInfo.date.company.name"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">角色</span>
-        <input v-model="form.role"/>
+        <input v-model="userInfo.date.role.value"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>
@@ -31,25 +31,25 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
-        form: {
-          username: 'kim',
-          realname: '顶金',
-          phone: '18576648902',
-          email: '18576648902@163.com',
-          company: '深圳分店',
-          role: '管理员'
-        }
+
       }
     },
     created () {
 
     },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
+    },
     methods: {
+      // 修改用户信息
       handleSave(){
-        console.log(JSON.stringify(this.form))
+        console.log(JSON.stringify(this.userInfo))
       }
     }
   }
