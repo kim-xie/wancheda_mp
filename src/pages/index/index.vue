@@ -153,9 +153,12 @@
 </template>
 
 <script>
+  import checkPermission from '../../utils/permission'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        hasPermission: false,
         current: 'index',
         company: '深圳分店',
         tab_current: 'tab1',
@@ -201,10 +204,16 @@
         ]
       }
     },
-    created () {
-
+    mounted() {
+      this.hasPermission = this.checkPermission()
+    },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
     },
     methods: {
+      checkPermission,
       // 切换tab-bar
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key

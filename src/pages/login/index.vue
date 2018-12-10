@@ -31,6 +31,7 @@
 
 <script>
 import globe from '../../utils/globe'
+import api from '../../api/api'
 import CryptoJS from 'crypto-js/core'
 import MD5 from 'crypto-js/md5'
 export default {
@@ -51,7 +52,7 @@ export default {
             const username = this.form.username
             const password = this.form.password
             const hashPwd = CryptoJS.MD5(password).toString()
-            this.$http.get('/user/login',{username,password: hashPwd}).then(res => {
+            this.$http.get(api.login, {username,password: hashPwd}).then(res => {
                 console.log(res)
                 if(res.success){
                     globe.message(res.errorMsg,'success')
