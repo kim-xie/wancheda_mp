@@ -1,6 +1,7 @@
 const api = {
   login: '/user/login',
-  company_list: '/lookup/pageByDefineCode?lookupDefineCode=company_type'
+  company_list: '/company/page',
+  account_list: '/user/page'
 }
 
 export default api
