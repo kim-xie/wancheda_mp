@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/lookupdf/main",
     "pages/login/main",
     "pages/index/main",
     "pages/userInfo/main",

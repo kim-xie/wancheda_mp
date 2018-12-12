@@ -32,6 +32,7 @@
 
 <script>
   import globe from '../../utils/globe'
+  import bus from '../../utils/bus'
   export default {
     data () {
       return {
@@ -44,6 +45,9 @@
       const urlParams = globe.getCurrentPageUrlArgs()
       this.companyId = urlParams.split('=')[1]
       this.getCompanyDetail(this.companyId)
+      bus.$on('getAccountDetail', (item) => {
+        console.log(item)
+      })
     },
     methods: {
       // 获取公司详情

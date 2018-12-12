@@ -107,7 +107,7 @@
                     <i-grid-icon>
                         <i-icon size="24" type="flag" />
                         <i-grid-label i-class="grid-label">
-                        <navigator url="/pages/lookup/main" hover-class="navigator-hover">字典</navigator>
+                        <navigator url="/pages/lookupdf/main" hover-class="navigator-hover">字典</navigator>
                         </i-grid-label>
                     </i-grid-icon>
                 </i-grid-item>

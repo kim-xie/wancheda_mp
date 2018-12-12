@@ -3,7 +3,7 @@
     <div class="account">
       <i-panel title="账号列表">
         <i-cell-group>
-          <i-cell v-for="(item,index) in accountData" :key="index" :title="item.username" value="详细信息" is-link :url="'/pages/accountDetail/main?id='+item.id"></i-cell>
+          <i-cell v-for="(item,index) in accountData" @tap="lookAccountDetail(item)" :key="index" :title="item.username" value="详细信息" is-link :url="'/pages/accountDetail/main?id='+item.id"></i-cell>
         </i-cell-group>
       </i-panel>
     </div>
@@ -12,6 +12,7 @@
 
 <script>
   import api from '../../api/api'
+  import bus from '../../utils/bus'
   export default {
     data () {
       return {
@@ -23,6 +24,11 @@
       this.getAccountList()
     },
     methods: {
+      // 查看账号详情
+      lookAccountDetail(item){
+        console.log(item)
+        bus.$emit('getAccountDetail', item)
+      },
       // 获取账号列表
       getAccountList(pageNo, pageSize){
         const params = {
