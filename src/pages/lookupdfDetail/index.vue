@@ -1,17 +1,17 @@
 <template>
   <div class="container">
-    <div class="lookup">
+    <div class="lookupdfDetail">
       <p class="input_wrap">
         <span class="input_label">名称</span>
-        <input v-model="form.value"/>
+        <input v-model="form.name"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">代码</span>
         <input v-model="form.code"/>
       </p>
       <p class="input_wrap">
-        <span class="input_label">父节点</span>
-        <input v-model="form.parentId"/>
+        <span class="input_label">类型</span>
+        <input v-model="form.type"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">描述</span>
@@ -28,18 +28,18 @@
     data () {
       return {
         form: {},
-        lookupId: ''
+        lookupdfId: ''
       }
     },
     mounted(data) {
       console.log(globe.getCurrentPageUrlArgs())
       const urlParams = globe.getCurrentPageUrlArgs()
-      this.lookupId = urlParams.split('=')[1]
-      this.getlookupDetail(this.lookupId)
+      this.lookupdfId = urlParams.split('=')[1]
+      this.getLookUpDetail(this.lookupdfId)
     },
     methods: {
-      // 获取数据字典详情
-      getlookupDetail(id){
+      // 获取数据字典定义详情
+      getLookUpDetail(id){
         console.log(id)
       }
     }
@@ -47,7 +47,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .lookup{
+  .lookupdfDetail{
     width: 100%;
     .input_wrap{
       width: 90%;

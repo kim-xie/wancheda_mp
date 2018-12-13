@@ -3,7 +3,7 @@
     <div class="client">
       <i-panel title="数据字典">
         <i-cell-group>
-          <i-cell v-for="(item,index) in clientData" @tap="lookDetail(item)" :key="index" :title="item.carNo" value="详细信息" is-link :url="'/pages/clientDetail/main?id='+item.id"></i-cell>
+          <i-cell v-for="(item,index) in listData" :key="index" :title="item.value" is-link :url="'/pages/lookupDetail/main?id='+item.id"></i-cell>
         </i-cell-group>
       </i-panel>
     </div>
@@ -13,15 +13,19 @@
 <script>
   import api from '../../api/api'
   import bus from '../../utils/bus'
+  import globe from '../../utils/globe'
   export default {
     data () {
       return {
-        clientData: [],
+        lookupdfCode: '',
+        listData: [],
         totalData: 0
       }
     },
     mounted() {
-      this.getClientList()
+      const urlParams = globe.getCurrentPageUrlArgs()
+      this.lookupdfCode = urlParams.split('=')[1]
+      this.getClientList(1, 10)
     },
     methods: {
       getClientList(pageNo, pageSize){
@@ -29,10 +33,10 @@
           pageNo,
           pageSize
         }
-        this.$http.get(api.client_list, params).then( res => {
+        this.$http.get(api.lookup_list + this.lookupdfCode, params).then( res => {
           console.log(res)
           if(res.success){
-            this.clientData = res.data.page.content
+            this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements
           }
         })

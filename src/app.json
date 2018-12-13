@@ -13,6 +13,7 @@
     "pages/roleDetail/main",
     "pages/lookup/main",
     "pages/lookupDetail/main",
+    "pages/lookupdfDetail/main",
     "pages/client/main",
     "pages/clientDetail/main",
     "pages/product/main",

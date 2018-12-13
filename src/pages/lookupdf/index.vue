@@ -15,24 +15,30 @@
             </i-collapse-item>
         </i-collapse> -->
 
-        <i-action-sheet :visible="actionVisible" :actions="actions" show-cancel @cancel="handleCancel" @click="handleClickItem" :mask-closable="false">
-          <view slot="header" style="padding: 16px">
-            <view style="color: #444;font-size: 16px">确定吗？</view>
-            <text>删除后无法恢复哦</text>
-          </view>
+        <i-action-sheet :visible="actionVisible" :actions="actions" show-cancel @cancel="handleCancel" @click="handleClickItem">
+          <div slot="header" style="padding: 16px">
+            <div style="color: #444;font-size: 16px">确定要删除此数据吗？</div>
+            <p>删除后无法恢复哦</p>
+          </div>
         </i-action-sheet>
 
-        <i-swipeout v-for="(item,index) in listData" :key="index" :operateWidth="180" :unclosable="true" :toggle="toggle">
-          <view slot="content">
-            <view class="i-swipeout-des">
-              <view class="i-swipeout-des-h2">{{item.name}} -- {{item.code}}</view>
-              <view class="i-swipeout-des-detail">{{item.description}}</view>
-            </view>
-          </view>
-          <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-              <view class="i-swipeout-button" @tap="actionsTap"><i-icon size="32" type="like_fill"></i-icon></view>
-              <view class="i-swipeout-button" @tap="actionsTap"><i-icon size="32" type="share_fill"></i-icon></view>
-              <view class="i-swipeout-button" @tap="actionsTap"><i-icon size="32" type="delete_fill"></i-icon></view>
+        <i-swipeout v-for="(item,index) in listData" :key="index" :operateWidth="160" :unclosable="true" :toggle="toggle">
+          <div slot="content">
+            <div class="i-swipeout-des">
+              <div class="i-swipeout-des-h2">{{item.name}} _ <span class="code">{{item.code}}</span> </div>
+              <div class="i-swipeout-des-detail">{{item.description}}</div>
+            </div>
+          </div>
+          <view slot="button" class="i-swipeout-button-group">
+              <view class="i-swipeout-button" @tap="actionsTap('dictionary',item.code)">
+                <i class="iconfont icon-i-order"></i>
+              </view>
+              <view class="i-swipeout-button" @tap="actionsTap('edit',item.id)">
+                <i class="iconfont icon-edit"></i>
+              </view>
+              <view class="i-swipeout-button" @tap="actionsTap('delete',item.id)">
+                <i class="iconfont icon-delete"></i>
+              </view>
           </view>
         </i-swipeout>
 
@@ -64,6 +70,7 @@
       this.getList()
     },
     methods: {
+      // 获取列表数据
       getList(pageNo, pageSize){
         const params = {
           pageNo,
@@ -78,14 +85,28 @@
           }
         })
       },
+      // 点击action sheet
       handleClickItem(){
-
+        console.log('handleClickItem')
       },
+      // 点击取消action sheet
       handleCancel(){
-
+        this.actionVisible = false
       },
-      actionsTap(){
-
+      // 操作
+      actionsTap(type, id){
+        console.log(type)
+        if(type === 'dictionary'){
+          wx.navigateTo({
+            url: '/pages/lookup/main?id='+id
+          })
+        }else if(type === 'edit'){
+          wx.navigateTo({
+            url: '/pages/lookupdfDetail/main?id='+id
+          })
+        }else{
+          this.actionVisible = true
+        }
       }
     }
   }
@@ -101,7 +122,7 @@
   .lookupdf{
     width: 100%;
     .i-swipeout-des{
-      height: 120rpx;
+      height: 100rpx;
       .i-swipeout-des-detail{
         height: 60rpx;
         line-height: 60rpx;
@@ -109,11 +130,26 @@
         font-size: 12px;
         color: $--color-text-placeholder;
       }
+      .code{
+        color: $--color-text-secondary;
+      }
     }
     .i-swipeout-button{
       float: left;
       width: 60px;
       text-align: center;
+      background-color: $--color-primary-light-1;
+      height: 100%;
+      line-height: 170rpx;
+    }
+    .i-swipeout-button-group{
+      i{
+        font-size: 30px;
+        color: $--color-white;
+      }
+      .icon-delete{
+        color: $--color-danger;
+      }
     }
   }
 </style>

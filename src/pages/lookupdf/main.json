@@ -4,6 +4,7 @@
         "i-swipeout": "../../dist/swipeout/index",
         "i-panel": "../../dist/panel/index",
         "i-collapse": "../../dist/collapse/index",
-        "i-collapse-item": "../../dist/collapse-item/index"
+        "i-collapse-item": "../../dist/collapse-item/index",
+        "i-action-sheet": "../../dist/action-sheet/index"
     }
 }
