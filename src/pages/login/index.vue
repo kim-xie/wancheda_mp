@@ -53,7 +53,7 @@ export default {
             const password = this.form.password
             const hashPwd = CryptoJS.MD5(password).toString()
             this.$http.get(api.login, {username,password: hashPwd}).then(res => {
-                console.log(res)
+                //console.log(res)
                 if(res.success){
                     globe.message(res.errorMsg,'success')
                     const userinfo = res.data.entity

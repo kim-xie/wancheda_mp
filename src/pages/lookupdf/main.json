@@ -6,5 +6,6 @@
         "i-collapse": "../../dist/collapse/index",
         "i-collapse-item": "../../dist/collapse-item/index",
         "i-action-sheet": "../../dist/action-sheet/index"
-    }
+    },
+    "enablePullDownRefresh": true
 }

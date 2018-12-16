@@ -23,11 +23,13 @@
 
 // 校验角色
 function checkPermission(){
-  const role = this.$store.getters.userInfo.date.role.code
-  if (role === 'super_admin') {
-    return true
-  } else {
-    return false
+  if (this.$store.getters.userInfo.date) {
+    const role = this.$store.getters.userInfo.date.role.code
+    if (role === 'super_admin') {
+      return true
+    } else {
+      return false
+    }
   }
 }
 

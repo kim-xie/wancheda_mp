@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <div class="product">
-      <div class="product_header">
+    <div class="repair">
+      <div class="repair_header">
         <span class="search">
-          <input type="text" placeholder="按名称或编号搜索">
+          <input type="text" placeholder="按名称或代码搜索">
           <i class="iconfont icon-search"></i>
         </span>
         <span class="add_button float-left mr10">分类</span>
-        <span class="add_button float-left">状态</span>
+        <span class="add_button float-left">工种</span>
         <span class="add_button float-right">新增</span>
       </div>
-      <div class="product_item" v-for="(item,index) in listData" :key="index">
+      <div class="repair_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
             <span class="name">{{item.name}}</span>
@@ -20,43 +20,22 @@
         <div class="item_detail">
           <p class="detail">
             <p class="">
-              <span class="label">批发价:</span>
-              <span class="value">{{item.wholeSale}}</span>
+              <span class="label">数量/工时:</span>
+              <span class="value">{{item.workHour}}</span>
             </p>
             <p class="">
-              <span class="label">销售价:</span>
-              <span class="value">{{item.sale}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">单位:</span>
-              <span class="value">{{item.date.unitLK.value}}</span>
-            </p>
-            <p class="">
-              <span class="label">产地:</span>
-              <span class="value">{{item.produceArea}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">适用车型:</span>
-              <span class="value">{{item.carModel}}</span>
-            </p>
-            <p class="">
-              <span class="label">配件规格:</span>
-              <span class="value">{{item.date.specificationLK.value}}</span>
+              <span class="label">单价:</span>
+              <span class="value">{{item.sum}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
               <span class="label">所属分类:</span>
-              <span class="value">{{item.date.pCategoryLK.value}}</span>
+              <span class="value">{{item.date.typeLK.value}}</span>
             </p>
             <p class="">
-              <span class="label">状态:</span>
-              <span v-if="item.isDisable == false" class="value">启用</span>
-              <span v-if="item.isDisable == true" class="value">禁用</span>
+              <span class="label">所属工种:</span>
+              <span class="value">{{item.date.workTypeLK.value}}</span>
             </p>
           </p>
           <p class="detail">
@@ -66,10 +45,7 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span v-if="item.isDisable == false" class="button">禁用</span>
-            <span v-if="item.isDisable == true" class="button">启用</span>
-            <span v-if="item.isDisable == false" class="button edit">编辑</span>
-            <span v-if="item.isDisable == false" class="button">入库</span>
+            <span class="button edit">编辑</span>
             <span class="button delete">删除</span>
           </p>
         </div>
@@ -118,7 +94,7 @@
           'page.pn': pageNo,
           'page.size': pageSize
         }
-        this.$http.get(api.product_list, params).then( res => {
+        this.$http.get(api.repair_list, params).then( res => {
           console.log(res)
           if(res.success){
             this.listData = res.data.page.content
@@ -134,9 +110,9 @@
 </script>
 
 <style lang="scss" scoped>
-.product{
+.repair{
   width: 100%;
-  .product_header{
+  .repair_header{
     width: 90%;
     padding: 6px;
     background-color: #f2f4fb;
@@ -165,7 +141,7 @@
       }
     }
   }
-  .product_item{
+  .repair_item{
     width: 90%;
     background-color: #f2f4fb;
     margin: 20px auto;

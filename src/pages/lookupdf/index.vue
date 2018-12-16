@@ -25,7 +25,14 @@
         <i-swipeout v-for="(item,index) in listData" :key="index" :operateWidth="160" :unclosable="true" :toggle="toggle">
           <div slot="content">
             <div class="i-swipeout-des">
-              <div class="i-swipeout-des-h2">{{item.name}} _ <span class="code">{{item.code}}</span> </div>
+              <div class="i-swipeout-des-h2">
+                <div class="item_name">
+                  {{item.name}} _ <span class="code">{{item.code}}</span>
+                </div>
+                <!-- <div class="item_time">
+                  <span class="">创建时间: {{item.createTime}}</span>
+                </div> -->
+              </div>
               <div class="i-swipeout-des-detail">{{item.description}}</div>
             </div>
           </div>
@@ -41,7 +48,6 @@
               </view>
           </view>
         </i-swipeout>
-
       </i-panel>
     </div>
   </div>
@@ -55,6 +61,8 @@
       return {
         listData: [],
         totalData: 0,
+        pageNo: 1,
+        pageSize: 8,
         collapseName: '',
         actionVisible: false,
         toggle: false,
@@ -67,14 +75,32 @@
       }
     },
     mounted() {
-      this.getList()
+      this.getList(this.pageNo, this.pageSize)
+    },
+    // 下拉刷新
+    onPullDownRefresh() {
+      console.log('下拉刷新')
+      console.log(this.pageNo)
+      if(this.pageNo > 1){
+        this.pageNo = this.pageNo-1
+        this.getList(this.pageNo, this.pageSize, function(){
+          wx.stopPullDownRefresh()
+        })
+      }
+    },
+    // 上拉加载，拉到底部触发
+    onReachBottom() {
+      // 到这底部在这里需要做什么事情
+      console.log('上拉加载')
+      this.pageNo = this.pageNo+1
+      this.getList(this.pageNo, this.pageSize)
     },
     methods: {
       // 获取列表数据
-      getList(pageNo, pageSize){
+      getList(pageNo, pageSize, callback){
         const params = {
-          pageNo,
-          pageSize
+          'page.pn': pageNo,
+          'page.size': pageSize
         }
         this.$http.get(api.lookupdf_list, params).then( res => {
           console.log(res)
@@ -82,6 +108,9 @@
             this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements
             this.collapseName = this.listData[0].id
+            if(callback && typeof callback == 'function'){
+              callback()
+            }
           }
         })
       },
@@ -121,6 +150,13 @@
 <style lang="scss" scoped>
   .lookupdf{
     width: 100%;
+    .item_name{
+      width: 50%;
+    }
+    .item_time{
+      width: 50%;
+      text-align: right;
+    }
     .i-swipeout-des{
       height: 100rpx;
       .i-swipeout-des-detail{

@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/index/main",
     "pages/lookupdf/main",
     "pages/login/main",
-    "pages/index/main",
     "pages/userInfo/main",
     "pages/changePwd/main",
     "pages/company/main",
@@ -17,6 +17,8 @@
     "pages/client/main",
     "pages/clientDetail/main",
     "pages/product/main",
+    "pages/repair/main",
+    "pages/finance/main",
     "pages/logs/main"
   ],
   "window": {
