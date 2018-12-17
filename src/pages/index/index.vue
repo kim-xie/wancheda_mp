@@ -33,6 +33,7 @@
                 </view>
             </i-step>
           </i-steps>
+          <!-- 客户信息 -->
           <div class="clientForm" v-if="stepCurrent===0">
             <div class="item">
               <span class="label">车牌号:</span>
@@ -119,6 +120,44 @@
               <input class="input" v-model="clientForm.description" type="textarea" placeholder="请输入备注">
             </div>
           </div>
+
+          <!-- 工单信息 -->
+          <div class="repairForm" v-if="stepCurrent===1">
+            <div class="item">
+              <span class="label">维修性质:</span>
+              <input class="input" v-model="repairTypeLK" type="text" @tap="selectRepair" placeholder="请选择维修性质">
+            </div>
+            <div class="item">
+              <span class="label">送修人:</span>
+              <input class="input" v-model="repairForm.sendMan" type="text" placeholder="请输入送修人">
+            </div>
+            <div class="item">
+              <span class="label">进店油表:</span>
+              <input class="input" v-model="carOilmeter" type="text" @tap="selectOil" placeholder="请选择进店油表">
+            </div>
+            <div class="item">
+              <span class="label">进店里程:</span>
+              <input class="input" v-model="repairForm.carMileage" type="text" placeholder="请输入进店里程">
+            </div>
+            <div class="item">
+              <span class="label">交车时间:</span>
+              <picker
+                mode="date"
+                :value="endTimeVal"
+                @change="handleDateChange($event, 'endTime')">
+                <input class="input" v-model="endTimeVal" type="text" readonly placeholder="请选择交车时间">
+              </picker>
+            </div>
+            <div class="item">
+              <span class="label">服务顾问:</span>
+              <input class="input" v-model="clerk" type="text" readonly @tap="selectReciever" placeholder="请选择服务顾问">
+            </div>
+            <div class="item">
+              <span class="label">车主嘱咐:</span>
+              <input class="input" v-model="repairForm.clentRemind" type="text" placeholder="请输入车主嘱咐">
+            </div>
+          </div>
+
           <!-- 按钮 -->
           <div class="step_button">
             <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" shape="circle" size="small">下一步</i-button>
@@ -246,6 +285,11 @@
         clientSex: '',
         insuranceEndtime: '',
         registrationDate: '',
+        repairForm: {},
+        repairTypeLK: '',
+        carOilmeter: '',
+        endTimeVal: '',
+        clerk: '',
         stepCurrent: 0,
         spinShow: true,
         hasPermission: false,
@@ -301,15 +345,20 @@
       handleChangeTab (data) {
         this.tab_current = data.mp.detail.key
       },
-      // 保险到期时间
+      // 日期选择器
       handleDateChange(data, type) {
         console.log('picker发送选择改变，携带值为', data.mp.detail.value)
+        const id = data.mp.detail.value
+        const value = data.mp.detail.value
         if(type === 'reg'){
-          this.clientForm.registrationDate = data.mp.detail.value
-          this.registrationDate = data.mp.detail.value
+          this.clientForm.registrationDate = id
+          this.registrationDate = value
+        }else if(type === 'endTime'){
+          this.repairForm.endTime = id
+          this.endTimeVal = value
         }else{
-          this.clientForm.insuranceEndtime = data.mp.detail.value
-          this.insuranceEndtime = data.mp.detail.value
+          this.clientForm.insuranceEndtime = id
+          this.insuranceEndtime = value
         }
       },
       // 下单上一步
@@ -359,6 +408,30 @@
           }
         })
       },
+      // 选择维修性质
+      selectRepair(){
+        const _this = this
+        this.getLookupByCodeAndShowSheet('work_type', function(id, value){
+          _this.repairForm.repairTypeLK = id
+          _this.repairTypeLK = value
+        })
+      },
+      // 选择进店油表
+      selectOil(){
+        const _this = this
+        this.getLookupByCodeAndShowSheet('carOilmeter', function(id, value){
+          _this.repairForm.carOilmeter = id
+          _this.carOilmeter = value
+        })
+      },
+      // 选择服务顾问
+      selectReciever(){
+        const _this = this
+        this.getUserList(function(id, value){
+          _this.repairForm.clerk = id
+          _this.clerk = value
+        })
+      },
       // 获取数据字典并且弹出选择框
       getLookupByCodeAndShowSheet(code, successBack){
         const _this = this
@@ -388,6 +461,33 @@
             if(callback && typeof callback == 'function'){
               callback(res.data.page.content, res.data.page.totalElements)
             }
+          }
+          this.spinShow = false
+        })
+      },
+      // 获取用户列表
+      getUserList(callback){
+        const _this = this
+        const params = {
+          'search.company_eq': '',
+          'page.pn': 1,
+          'page.size': 1000
+        }
+        this.spinShow = true
+        this.$http.get(api.account_list, params).then( res => {
+          if(res.success){
+            let data = res.data.page.content
+            let dataArry = []
+            let idArry = []
+            for(let i=0; i<data.length; i++){
+              dataArry.push(data[i].fullname)
+              idArry.push(data[i].id)
+            }
+            _this.showActionSheet(dataArry, function(index){
+              if(callback && typeof callback == 'function'){
+                callback(idArry[index], dataArry[index])
+              }
+            })
           }
           this.spinShow = false
         })
