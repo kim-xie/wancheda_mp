@@ -237,7 +237,25 @@
             <div class="menu">
               <navigator url="/pages/product/main" hover-class="navigator-hover">
                 <i class="iconfont icon-qichepeijian"></i>
-                <span>配件管理</span>
+                <span>配件维护</span>
+              </navigator>
+            </div>
+            <div class="menu">
+              <navigator url="/pages/inventory/main" hover-class="navigator-hover">
+                <i class="iconfont icon-qichepeijian"></i>
+                <span>库存管理</span>
+              </navigator>
+            </div>
+            <div class="menu">
+              <navigator url="/pages/inpart/main" hover-class="navigator-hover">
+                <i class="iconfont icon-qichepeijian"></i>
+                <span>配件入库</span>
+              </navigator>
+            </div>
+            <div class="menu">
+              <navigator url="/pages/outpart/main" hover-class="navigator-hover">
+                <i class="iconfont icon-qichepeijian"></i>
+                <span>配件出库</span>
               </navigator>
             </div>
             <div class="menu">

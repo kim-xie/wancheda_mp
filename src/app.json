@@ -17,6 +17,10 @@
     "pages/client/main",
     "pages/clientDetail/main",
     "pages/product/main",
+    "pages/productDetail/main",
+    "pages/inventory/main",
+    "pages/inpart/main",
+    "pages/outpart/main",
     "pages/repair/main",
     "pages/finance/main",
     "pages/logs/main"

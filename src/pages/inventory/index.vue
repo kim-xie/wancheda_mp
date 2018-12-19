@@ -13,64 +13,52 @@
       <div class="product_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
-            <span class="name">{{item.name}}</span>
-            <span class="code float-right">{{item.code}}</span>
+            <span class="name">{{extendInfo.partId[item.partId].name}}</span>
+            <span class="code float-right">{{extendInfo.partId[item.partId].code}}</span>
           </p>
         </div>
         <div class="item_detail">
           <p class="detail">
             <p class="">
               <span class="label">批发价:</span>
-              <span class="value">{{item.wholeSale}}</span>
+              <span class="value">{{extendInfo.partId[item.partId].wholeSale}}</span>
             </p>
             <p class="">
               <span class="label">销售价:</span>
-              <span class="value">{{item.sale}}</span>
+              <span class="value">{{extendInfo.partId[item.partId].sale}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
-              <span class="label">单位:</span>
-              <span class="value">{{item.date.unitLK.value}}</span>
+              <span class="label">库存量:</span>
+              <span class="value">{{item.count}}</span>
             </p>
             <p class="">
-              <span class="label">产地:</span>
-              <span class="value">{{item.produceArea}}</span>
+              <span class="label">单位:</span>
+              <span class="value">{{extendInfo.unitLK[extendInfo.partId[item.partId].unitLK].value}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
               <span class="label">适用车型:</span>
-              <span class="value">{{item.carModel}}</span>
+              <span class="value">{{extendInfo.partId[item.partId].carModel}}</span>
             </p>
             <p class="">
-              <span class="label">配件规格:</span>
-              <span class="value">{{item.date.specificationLK.value}}</span>
+              <span class="label">产地:</span>
+              <span class="value">{{extendInfo.partId[item.partId].produceArea}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
-              <span class="label">所属分类:</span>
-              <span class="value">{{item.date.pCategoryLK.value}}</span>
+              <span class="label">库位号:</span>
+              <span class="value">{{extendInfo.repCodeLK[item.repCodeLK].value}}</span>
             </p>
-            <p class="">
-              <span class="label">状态:</span>
-              <span v-if="item.isDisable == false" class="value">启用</span>
-              <span v-if="item.isDisable == true" class="value">禁用</span>
-            </p>
-          </p>
-          <p class="detail">
-            <span class="label">备注:</span>
-            <span class="value">{{item.description}}</span>
           </p>
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span v-if="item.isDisable == false" class="button">禁用</span>
-            <span v-if="item.isDisable == true" class="button">启用</span>
-            <span v-if="item.isDisable == false" class="button edit">编辑</span>
-            <span v-if="item.isDisable == false" class="button">入库</span>
-            <span class="button delete">删除</span>
+            <span class="button">入库</span>
+            <span class="button">出库</span>
           </p>
         </div>
       </div>
@@ -84,6 +72,7 @@
     data () {
       return {
         listData: [],
+        extendInfo: {},
         totalData: 0,
         pageNo: 1,
         pageSize: 8,
@@ -118,11 +107,14 @@
           'page.pn': pageNo,
           'page.size': pageSize
         }
-        this.$http.get(api.product_list, params).then( res => {
+        this.$http.get(api.inventory_list, params).then( res => {
           console.log(res)
           if(res.success){
-            this.listData = res.data.page.content
-            this.totalData = res.data.page.totalElements
+            this.listData = res.data.entitys
+            this.totalData = res.data.entitys.length
+            this.extendInfo = res.extendInfo
+            console.log(this.listData)
+            console.log(this.extendInfo)
             if(callback && typeof callback == 'function'){
               callback()
             }

@@ -7,7 +7,8 @@ const api = {
   lookup_list: '/lookup/pageByDefineCode?lookupDefineCode=',
   repair_list: '/repairItem/page',
   product_list: '/part/page',
-  getLookupByCode: '/lookup/pageByDefineCode?lookupDefineCode='
+  getLookupByCode: '/lookup/pageByDefineCode?lookupDefineCode=',
+  inventory_list: '/inventory/listInventory'
 }
 
 export default api
