@@ -19,6 +19,7 @@
     "pages/product/main",
     "pages/productDetail/main",
     "pages/inventory/main",
+    "pages/inventoryDetail/main",
     "pages/inpart/main",
     "pages/outpart/main",
     "pages/repair/main",

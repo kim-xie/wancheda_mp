@@ -6,9 +6,7 @@
           <input type="text" placeholder="按名称或编号搜索">
           <i class="iconfont icon-search"></i>
         </span>
-        <span class="add_button float-left mr10">分类</span>
-        <span class="add_button float-left">状态</span>
-        <span class="add_button float-right">新增</span>
+        <span class="add_button float-left mr10">公司</span>
       </div>
       <div class="product_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
@@ -57,11 +55,13 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button">入库</span>
-            <span class="button">出库</span>
+            <span class="button" @tap="inpart(item.id)">入库</span>
+            <span class="button" @tap="outpart(item.id)">出库</span>
           </p>
         </div>
       </div>
+      <!-- 页底加载 -->
+      <i-load-more :tip="tipmessage" :loading="loading" />
     </div>
   </div>
 </template>
@@ -71,6 +71,8 @@
   export default {
     data () {
       return {
+        tipmessage: '我也是有底线的',
+        loading: false,
         listData: [],
         extendInfo: {},
         totalData: 0,
@@ -97,8 +99,16 @@
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
-      this.pageNo = this.pageNo+1
-      this.getList(this.pageNo, this.pageSize)
+      const that = this
+      if(this.pageNo < this.totalData/this.pageSize){
+        this.loading = true
+        this.tipmessage = '玩命加载中'
+        this.pageNo = this.pageNo+1
+        this.getList(this.pageNo, this.pageSize, function(){
+          that.loading = false
+          that.tipmessage = '我也是有底线的'
+        })
+      }
     },
     methods: {
       // 获取列表数据
@@ -119,6 +129,18 @@
               callback()
             }
           }
+        })
+      },
+      // 入库
+      inpart(id){
+        wx.navigateTo({
+          url: '/pages/inventoryDetail/main?type=inpart&id='+id
+        })
+      },
+      // 出库
+      outpart(id){
+        wx.navigateTo({
+          url: '/pages/inventoryDetail/main?type=outpart&id='+id
         })
       }
     }

@@ -168,9 +168,9 @@
       <div v-if="current === 'order'" class="transition tab_order">
         <div>
           <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
-            <i-tab key="tab1" title="维修中" count="3"></i-tab>
-            <i-tab key="tab2" title="待付款" count="0"></i-tab>
-            <i-tab key="tab3" title="已完成" count="100"></i-tab>
+            <i-tab key="tab1" title="维修中" :count="repairItemCount"></i-tab>
+            <i-tab key="tab2" title="待付款" :count="repairItemCount"></i-tab>
+            <i-tab key="tab3" title="已完成(100)"></i-tab>
           </i-tabs>
           <div class="tab_repaire">
             <div class="tab_list" v-for="(item, index) in repaires" :key="index">
@@ -247,16 +247,20 @@
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/inpart/main" hover-class="navigator-hover">
-                <i class="iconfont icon-qichepeijian"></i>
-                <span>配件入库</span>
-              </navigator>
+              <i-badge :count="inpartCount">
+                <navigator url="/pages/inpart/main" hover-class="navigator-hover">
+                  <i class="iconfont icon-qichepeijian"></i>
+                  <span>配件入库</span>
+                </navigator>
+              </i-badge>
             </div>
             <div class="menu">
-              <navigator url="/pages/outpart/main" hover-class="navigator-hover">
-                <i class="iconfont icon-qichepeijian"></i>
-                <span>配件出库</span>
-              </navigator>
+              <i-badge :count="outpartCount">
+                <navigator url="/pages/outpart/main" hover-class="navigator-hover">
+                  <i class="iconfont icon-qichepeijian"></i>
+                  <span>配件出库</span>
+                </navigator>
+              </i-badge>
             </div>
             <div class="menu">
               <navigator url="/pages/repair/main" hover-class="navigator-hover">
@@ -351,7 +355,10 @@
     },
     computed: {
       ...mapGetters([
-        'userInfo'
+        'userInfo',
+        'inpartCount',
+        'outpartCount',
+        'repairItemCount'
       ])
     },
     methods: {
