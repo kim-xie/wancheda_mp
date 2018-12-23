@@ -49,15 +49,21 @@
             </div>
             <div class="item">
               <span class="label">客户级别:</span>
-              <input class="input" v-model="clientLevelVal" type="text" readonly @tap="selectLevel" placeholder="请选择客户级别">
+              <picker @change="bindPickerChange($event, 'clientForm', 'level')" :range="levels">
+                <input class="input" v-model="level" type="text" readonly placeholder="请选择客户级别">
+              </picker>
             </div>
             <div class="item">
               <span class="label">客户类型:</span>
-              <input class="input" v-model="clientTypeVal" type="text" readonly @tap="selectType" placeholder="请选择客户类型">
+              <picker @change="bindPickerChange($event, 'clientForm', 'type')" :range="types">
+                <input class="input" v-model="type" type="text" readonly placeholder="请选择客户类型">
+              </picker>
             </div>
             <div class="item">
               <span class="label">汽车品牌:</span>
-              <input class="input" v-model="clientCarBrand" type="text" readonly @tap="selectBrand" placeholder="请选择汽车品牌">
+              <picker @change="bindPickerChange($event, 'clientForm', 'carBrand')" :range="carBrands">
+                <input class="input" v-model="carBrand" type="text" readonly placeholder="请选择汽车品牌">
+              </picker>
             </div>
             <div class="item">
               <span class="label">汽车车型:</span>
@@ -125,7 +131,9 @@
           <div class="repairForm" v-if="stepCurrent===1">
             <div class="item">
               <span class="label">维修性质:</span>
-              <input class="input" v-model="repairTypeLK" type="text" @tap="selectRepair" placeholder="请选择维修性质">
+              <picker @change="bindPickerChange($event, 'repairForm', 'repairTypeLK')" :range="repairTypeLKs">
+                <input class="input" v-model="repairTypeLK" type="text" placeholder="请选择维修性质">
+              </picker>
             </div>
             <div class="item">
               <span class="label">送修人:</span>
@@ -133,11 +141,13 @@
             </div>
             <div class="item">
               <span class="label">进店油表:</span>
-              <input class="input" v-model="carOilmeter" type="text" @tap="selectOil" placeholder="请选择进店油表">
+              <picker @change="bindPickerChange($event, 'repairForm', 'carOilmeter')" :range="carOilmeters">
+                <input class="input" v-model="carOilmeter" type="text" placeholder="请选择进店油表">
+              </picker>
             </div>
             <div class="item">
               <span class="label">进店里程:</span>
-              <input class="input" v-model="repairForm.carMileage" type="text" placeholder="请输入进店里程">
+              <input class="input" v-model="repairForm.carMileage" type="number" placeholder="请输入进店里程">
             </div>
             <div class="item">
               <span class="label">交车时间:</span>
@@ -150,7 +160,9 @@
             </div>
             <div class="item">
               <span class="label">服务顾问:</span>
-              <input class="input" v-model="clerk" type="text" readonly @tap="selectReciever" placeholder="请选择服务顾问">
+              <picker @change="bindPickerChange($event, 'repairForm', 'clerk')" :range="clerks">
+                <input class="input" v-model="clerk" type="text" readonly placeholder="请选择服务顾问">
+              </picker>
             </div>
             <div class="item">
               <span class="label">车主嘱咐:</span>
@@ -301,9 +313,9 @@
     data () {
       return {
         clientForm: {},
-        clientLevelVal: '',
-        clientTypeVal: '',
-        clientCarBrand: '',
+        level: '',
+        type: '',
+        carBrand: '',
         clientSex: '',
         insuranceEndtime: '',
         registrationDate: '',
@@ -314,6 +326,18 @@
         clerk: '',
         stepCurrent: 0,
         spinShow: true,
+        levels: [],
+        levelIds: [],
+        types: [],
+        carBrands: [],
+        carBrandIds: [],
+        typeIds: [],
+        repairTypeLKs: [],
+        repairTypeLKIds: [],
+        carOilmeters: [],
+        carOilmeterIds: [],
+        clerks: [],
+        clerkIds: [],
         hasPermission: false,
         current: 'index',
         company: '深圳分店',
@@ -352,6 +376,22 @@
     mounted() {
       this.hasPermission = this.checkPermission(),
       this.spinShow = false
+      const that = this
+      // 客户级别
+      this.getLookupByCodeAndPicker('client_level', 'level')
+      // 客户类型
+      this.getLookupByCodeAndPicker('client_type', 'type')
+      // 汽车品牌
+      this.getLookupByCodeAndPicker('car_brand', 'carBrand')
+      // 维修性质
+      this.getLookupByCodeAndPicker('work_type','repairTypeLK')
+      // 进店油表
+      this.getLookupByCodeAndPicker('carOilmeter', 'carOilmeter')
+      // 获取用户列表
+      this.getUserList(function(valueArray, idArray){
+        that.clerks = valueArray
+        that.clerkIds = idArray
+      })
     },
     computed: {
       ...mapGetters([
@@ -367,8 +407,17 @@
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
       },
+      // 切换tab
       handleChangeTab (data) {
         this.tab_current = data.mp.detail.key
+      },
+      // 普通选择器
+      bindPickerChange(data, formName, type){
+        const index = data.mp.detail.value
+        // 显示的值
+        this[type] = this[type+'s'][index]
+        // 对应的id
+        this[formName][type] = this[type+'Ids'][index]
       },
       // 日期选择器
       handleDateChange(data, type) {
@@ -396,30 +445,6 @@
         const stepCurrent = this.stepCurrent + 1
         this.stepCurrent = stepCurrent > 3 ? 3 : stepCurrent
       },
-      // 选择用户级别
-      selectLevel(){
-        const _this = this
-        this.getLookupByCodeAndShowSheet('client_level', function(id, value){
-          _this.clientForm.level = id
-          _this.clientLevelVal = value
-        })
-      },
-      // 选择用户类型
-      selectType(){
-        const _this = this
-        this.getLookupByCodeAndShowSheet('client_type', function(id, value){
-          _this.clientForm.type = id
-          _this.clientTypeVal = value
-        })
-      },
-      // 选择汽车品牌
-      selectBrand(){
-        const _this = this
-        this.getLookupByCodeAndShowSheet('car_brand', function(id, value){
-          _this.clientForm.carBrand = id
-          _this.clientCarBrand = value
-        })
-      },
       // 选择性别
       selectSex(){
         const _this = this
@@ -433,28 +458,23 @@
           }
         })
       },
-      // 选择维修性质
-      selectRepair(){
+      // 获取数据字典并且弹出选择框
+      getLookupByCodeAndPicker(code, type, successBack){
         const _this = this
-        this.getLookupByCodeAndShowSheet('work_type', function(id, value){
-          _this.repairForm.repairTypeLK = id
-          _this.repairTypeLK = value
-        })
-      },
-      // 选择进店油表
-      selectOil(){
-        const _this = this
-        this.getLookupByCodeAndShowSheet('carOilmeter', function(id, value){
-          _this.repairForm.carOilmeter = id
-          _this.carOilmeter = value
-        })
-      },
-      // 选择服务顾问
-      selectReciever(){
-        const _this = this
-        this.getUserList(function(id, value){
-          _this.repairForm.clerk = id
-          _this.clerk = value
+        this.getLookupByCode(code, 1, 1000, function(data, total){
+          let dataArry = []
+          let idArry = []
+          for(let i=0; i<data.length; i++){
+            dataArry.push(data[i].value)
+            idArry.push(data[i].id)
+          }
+
+          _this[type+'s'] = dataArry
+          _this[type+'Ids'] = idArry
+
+          if(successBack && typeof successBack == 'function'){
+            successBack(dataArry, idArry)
+          }
         })
       },
       // 获取数据字典并且弹出选择框
@@ -483,6 +503,7 @@
         this.spinShow = true
         this.$http.get(api.getLookupByCode + code, params).then( res => {
           if(res.success){
+            this.spinShow = false
             if(callback && typeof callback == 'function'){
               callback(res.data.page.content, res.data.page.totalElements)
             }
@@ -501,6 +522,7 @@
         this.spinShow = true
         this.$http.get(api.account_list, params).then( res => {
           if(res.success){
+            this.spinShow = false
             let data = res.data.page.content
             let dataArry = []
             let idArry = []
@@ -508,11 +530,9 @@
               dataArry.push(data[i].fullname)
               idArry.push(data[i].id)
             }
-            _this.showActionSheet(dataArry, function(index){
-              if(callback && typeof callback == 'function'){
-                callback(idArry[index], dataArry[index])
-              }
-            })
+            if(callback && typeof callback == 'function'){
+              callback(dataArry, idArry)
+            }
           }
           this.spinShow = false
         })
