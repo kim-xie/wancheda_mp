@@ -150,7 +150,7 @@
           </div>
         </div>
         <!-- 页底加载 -->
-        <i-load-more :tip="tipmessage" :loading="loading" />
+        <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
       </div>
 
     </div>

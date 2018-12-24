@@ -23,6 +23,7 @@
     "pages/inpart/main",
     "pages/outpart/main",
     "pages/repair/main",
+    "pages/repairDetail/main",
     "pages/finance/main",
     "pages/logs/main"
   ],

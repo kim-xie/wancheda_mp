@@ -8,8 +8,13 @@
         </span>
         <span class="add_button float-left mr10">分类</span>
         <span class="add_button float-left">工种</span>
-        <span class="add_button float-right">新增</span>
+        <span class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
+      <!-- iview 全局提示组件 -->
+      <i-message id="message"/>
+      <!-- 加载中组件 -->
+      <i-spin size="large" fix v-if="spinShow"></i-spin>
+
       <div class="repair_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
@@ -45,20 +50,26 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button edit">编辑</span>
-            <span class="button delete">删除</span>
+            <span class="button edit" @tap="handleEdit(item.id)">编辑</span>
+            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
+      <!-- 页底加载 -->
+      <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
     </div>
   </div>
 </template>
 
 <script>
+  import global from '../../utils/globe'
   import api from '../../api/api'
   export default {
     data () {
       return {
+        spinShow: true,
+        tipmessage: '我也是有底线的',
+        loading: false,
         listData: [],
         totalData: 0,
         pageNo: 1,
@@ -67,6 +78,7 @@
       }
     },
     mounted() {
+      this.spinShow = false
       this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
@@ -84,8 +96,16 @@
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
-      this.pageNo = this.pageNo+1
-      this.getList(this.pageNo, this.pageSize)
+      const that = this
+      if(this.pageNo < this.totalData/this.pageSize){
+        this.loading = true
+        this.tipmessage = '玩命加载中'
+        this.pageNo = this.pageNo+1
+        this.getList(this.pageNo, this.pageSize, function(){
+          that.loading = false
+          that.tipmessage = '我也是有底线的'
+        })
+      }
     },
     methods: {
       // 获取列表数据
@@ -94,7 +114,9 @@
           'page.pn': pageNo,
           'page.size': pageSize
         }
+        this.spinShow = true
         this.$http.get(api.repair_list, params).then( res => {
+          this.spinShow = false
           console.log(res)
           if(res.success){
             this.listData = res.data.page.content
@@ -102,6 +124,31 @@
             if(callback && typeof callback == 'function'){
               callback()
             }
+          }
+        })
+      },
+      // 新增维修项目
+      handleAdd(){
+        wx.navigateTo({
+          url: '/pages/repairDetail/main'
+        })
+      },
+      // 编辑维修项目
+      handleEdit(id){
+        wx.navigateTo({
+          url: '/pages/repairDetail/main?id='+id
+        })
+      },
+      // 删除维修项目
+      handleDelete(id){
+        this.spinShow = true
+        this.$http.delete(api.repair_delete+"?id="+id,null).then( res => {
+          this.spinShow = false
+          if(res.success){
+            global.message(res.errorMsg,'success')
+            this.getList(this.pageNo, this.pageSize)
+          }else{
+            global.message(res.errorMsg,'warning')
           }
         })
       }

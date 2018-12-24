@@ -22,7 +22,8 @@ const fly = new Fly
 fly.config = {
   // 定义公共headers
   headers: {
-    'X-Tag': 'flyio'
+    'X-Tag': 'flyio',
+    'Content-Type': 'application/x-www-form-urlencoded'
   },
   // 设置超时
   timeout: 10000,

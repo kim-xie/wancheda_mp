@@ -37,7 +37,7 @@
           <div class="clientForm" v-if="stepCurrent===0">
             <div class="item">
               <span class="label">车牌号:</span>
-              <input class="input" v-model="clientForm.carNo" type="text" placeholder="请输入车牌号">
+              <input class="input" v-model="clientForm.carNo" type="text" placeholder="输入车牌号进行搜索" @blur="searchCar">
             </div>
             <div class="item">
               <span class="label">客户姓名:</span>
@@ -69,39 +69,39 @@
               <span class="label">汽车车型:</span>
               <input class="input" v-model="clientForm.carModel" type="text" placeholder="请输入汽车车型">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">车身颜色:</span>
               <input class="input" v-model="clientForm.carColor" type="text" placeholder="请输入车身颜色">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">客户邮箱:</span>
               <input class="input" v-model="clientForm.email" type="text" placeholder="请输入客户邮箱">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">客户性别:</span>
               <input class="input" v-model="clientSex" type="text" @tap="selectSex" placeholder="请选择客户性别">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">证件号码:</span>
               <input class="input" v-model="clientForm.idcard" type="text" placeholder="请输入证件号码">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">客户地址:</span>
               <input class="input" v-model="clientForm.address" type="text" placeholder="请输入客户地址">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">发动机号:</span>
               <input class="input" v-model="clientForm.engineNo" type="text" placeholder="请输入发动机号">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">车架号:</span>
               <input class="input" v-model="clientForm.carVIN" type="text" placeholder="请输入车架号">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">保险公司:</span>
               <input class="input" v-model="clientForm.insurer" type="text" placeholder="请输入保险公司">
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">保险到期日期:</span>
               <picker
                 mode="date"
@@ -111,7 +111,7 @@
                 <input class="input" v-model="insuranceEndtime" type="text" readonly placeholder="请选择保险到期时间">
               </picker>
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">上牌日期:</span>
               <picker
                 mode="date"
@@ -121,9 +121,15 @@
                 <input class="input" v-model="registrationDate" type="text" readonly placeholder="请选择上牌日期">
               </picker>
             </div>
-            <div class="item">
+            <div class="item" v-if="showMore">
               <span class="label">备注:</span>
               <input class="input" v-model="clientForm.description" type="textarea" placeholder="请输入备注">
+            </div>
+
+            <div class="button_wrap">
+              <span class="item_button" v-if="showMore === false" @tap="showMore = true">更多</span>
+              <span class="item_button" v-if="showMore" @tap="showMore = false">收起</span>
+              <span class="item_button" @tap="resetInput">重置</span>
             </div>
           </div>
 
@@ -312,6 +318,7 @@
   export default {
     data () {
       return {
+        showMore: false,
         clientForm: {},
         level: '',
         type: '',
@@ -403,6 +410,46 @@
     },
     methods: {
       checkPermission,
+      // 搜索客户信息
+      searchCar(){
+        if(this.clientForm.carNo){
+          const _this = this
+          const params = {
+            'search.carNo_eq': this.clientForm.carNo,
+            'page.pn': 1,
+            'page.size': 10
+          }
+          this.spinShow = true
+          this.$http.get(api.client_list, params).then( res => {
+            if(res.success){
+              this.spinShow = false
+              let clientData = res.data.page.content
+              console.log(clientData)
+              for(var i=0;i<clientData.length;i++){
+                _this.level = clientData[i].date.level.value
+                _this.type = clientData[i].date.type.value
+                _this.carBrand = clientData[i].date.level.value
+                _this.clientSex = clientData[i].sex === true ? '男':'女'
+                _this.insuranceEndtime = clientData[i].insuranceEndtime
+                _this.registrationDate = clientData[i].registrationDate
+                clientData[i].date = ''
+                _this.clientForm = clientData[i]
+              }
+            }
+            this.spinShow = false
+          })
+        }
+      },
+      // 表单重值
+      resetInput(){
+        this.clientForm = {}
+        this.level = ''
+        this.type = ''
+        this.carBrand = ''
+        this.clientSex = ''
+        this.insuranceEndtime = ''
+        this.registrationDate = ''
+      },
       // 切换tab-bar
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
@@ -442,6 +489,30 @@
       },
       // 下单下一步
       handleNext(){
+        if(this.stepCurrent === 0){
+          if(!this.clientForm.carNo){
+            globe.message('车牌号不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.name){
+            globe.message('客户名称不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.level){
+            globe.message('客户级别不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.mobile){
+            globe.message('客户手机不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.type){
+            globe.message('客户类型不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.carBrand){
+            globe.message('汽车品牌不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.carModel){
+            globe.message('汽车车型不能为空', 'warning')
+            return false
+          }
+        }
         const stepCurrent = this.stepCurrent + 1
         this.stepCurrent = stepCurrent > 3 ? 3 : stepCurrent
       },
@@ -652,6 +723,23 @@
     line-height: 30px;
   }
 }
+.button_wrap{
+  width: 90%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  .item_button{
+    background: #ccc;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    cursor: pointer;
+    text-align: center;
+  }
+}
+
 .step_button{
   width: 100%;
   margin: 0 auto;
