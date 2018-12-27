@@ -45,7 +45,8 @@
 <script>
   import globe from '../../utils/globe'
   import api from '../../api/api'
-import { setTimeout } from 'timers';
+  import { setTimeout } from 'timers'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -66,7 +67,9 @@ import { setTimeout } from 'timers';
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
-        this.getDetail(this.id)
+        if(this.id){
+          this.getDetail()
+        }
       }
       // 所属分类
       this.getLookupByCodeAndPicker('repair_type', 'typeLK')
@@ -75,8 +78,11 @@ import { setTimeout } from 'timers';
     },
     methods: {
       // 获取详情
-      getDetail(id){
-        console.log(id)
+      getDetail(){
+        let item = this.$store.getters.editItem
+        this.workTypeLK = item.date.workTypeLK.value
+        this.typeLK = item.date.typeLK.value
+        this.form = item
       },
       // 普通选择器
       bindPickerChange(data, formName, type){
@@ -159,6 +165,7 @@ import { setTimeout } from 'timers';
         let url = ''
         if(this.id){
           url = api.repair_edit
+          delete this.form.date
         }else{
           url = api.repair_add
         }
@@ -186,15 +193,15 @@ import { setTimeout } from 'timers';
           if(res.success){
             globe.message(res.errorMsg, 'success')
             setTimeout(function(){
+              this.spinShow = false
               wx.navigateTo({
                 url: '/pages/repair/main'
               })
-            },2000)
-            this.spinShow = false
+            },1000)
           }else{
             globe.message(res.errorMsg, 'warning')
+            this.spinShow = false
           }
-          this.spinShow = false
         })
       }
     }

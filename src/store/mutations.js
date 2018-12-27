@@ -50,4 +50,9 @@ export default {
   //   state.repairItemCount = newRepairItemCount
   // }
 
+  // 保存编辑对象
+  [types.SET_EDITITEM](state, editItem) {
+    state.editItem = editItem
+  }
+
 }

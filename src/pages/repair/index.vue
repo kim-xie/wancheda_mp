@@ -3,11 +3,12 @@
     <div class="repair">
       <div class="repair_header">
         <span class="search">
-          <input type="text" placeholder="按名称或代码搜索">
-          <i class="iconfont icon-search"></i>
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或代码搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-left mr10">分类</span>
-        <span class="add_button float-left">工种</span>
+        <!-- <span class="add_button float-left mr10">分类</span>
+        <span class="add_button float-left">工种</span> -->
         <span class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <!-- iview 全局提示组件 -->
@@ -15,7 +16,7 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
-      <div class="repair_item" v-for="(item,index) in listData" :key="index">
+      <div class="repair_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
             <span class="name">{{item.name}}</span>
@@ -50,13 +51,21 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button edit" @tap="handleEdit(item.id)">编辑</span>
+            <span class="button edit" @tap="handleEdit(item)">编辑</span>
             <span class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
+
+      <!-- 暂无数据 -->
+      <i-divider v-if="totalData===0 && searchVal !== ''" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+
       <!-- 页底加载 -->
       <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
+
+      <i-modal title="删除确认" :visible="modalVisible" :actions="actions" @tap="handleClick($event)">
+        <view>删除后数据将无法恢复哦</view>
+      </i-modal>
     </div>
   </div>
 </template>
@@ -64,9 +73,11 @@
 <script>
   import global from '../../utils/globe'
   import api from '../../api/api'
+  import * as utils from '../../assets/js/utils'
   export default {
     data () {
       return {
+        modalVisible: false,
         spinShow: true,
         tipmessage: '我也是有底线的',
         loading: false,
@@ -74,11 +85,31 @@
         totalData: 0,
         pageNo: 1,
         pageSize: 8,
-        form: {}
+        form: {},
+        search: {
+          name: '',
+          code: '',
+          workTypeLK: ''
+        },
+        searchVal: '',
+        deleteId: '',
+        actions: [
+            {
+                name: '取消'
+            },
+            {
+                name: '删除',
+                color: '#ed3f14',
+                loading: false
+            }
+        ]
       }
     },
     mounted() {
       this.spinShow = false
+    },
+    onLoad(){
+      this.listData = []
       this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
@@ -108,9 +139,32 @@
       }
     },
     methods: {
+      // 搜索
+      goSearch(){
+        console.log(this.searchVal)
+        const searchVal = this.searchVal
+        this.search.name = ''
+        this.search.code = ''
+        if(utils.isChinese(searchVal)){
+          this.search.name = searchVal
+        }else{
+          this.search.code = searchVal
+        }
+        this.getList(this.pageNo, this.pageSize)
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.name = ''
+        this.search.code = ''
+        this.search.workTypeLK = ''
+        this.getList(this.pageNo, this.pageSize)
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          'search.name_like': this.search.name,
+          'search.code_like': this.search.code,
+          'search.workTypeLK_eq': this.search.workTypeLK,
           'page.pn': pageNo,
           'page.size': pageSize
         }
@@ -134,19 +188,40 @@
         })
       },
       // 编辑维修项目
-      handleEdit(id){
-        wx.navigateTo({
-          url: '/pages/repairDetail/main?id='+id
+      handleEdit(item){
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/repairDetail/main?id='+item.id
+          })
         })
+      },
+      // 删除确认
+      handleClick(data){
+        const type = data.mp._relatedInfo.anchorTargetText
+        const that = this
+        if(type === '删除'){
+          that.deleteApi(that.deleteId,function(){
+            that.modalVisible = false
+          })
+        }else{
+          that.modalVisible = false
+        }
       },
       // 删除维修项目
       handleDelete(id){
+        this.deleteId = id
+        this.modalVisible = true
+      },
+      deleteApi(id,callback){
         this.spinShow = true
         this.$http.delete(api.repair_delete+"?id="+id,null).then( res => {
           this.spinShow = false
           if(res.success){
             global.message(res.errorMsg,'success')
             this.getList(this.pageNo, this.pageSize)
+            if(callback && typeof callback == 'function'){
+              callback()
+            }
           }else{
             global.message(res.errorMsg,'warning')
           }

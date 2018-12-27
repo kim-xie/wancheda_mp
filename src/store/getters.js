@@ -17,3 +17,8 @@ export const repairItemCount = (state) => {
   console.log(state.repairItemCount)
   return state.repairItemCount
 }
+
+export const editItem = (state) => {
+  console.log(state.editItem)
+  return state.editItem
+}

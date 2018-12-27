@@ -31,5 +31,15 @@ export default {
   }, data) {
     // console.log(data)
     commit(types.SET_OUTPARTFORM, data)
+  },
+  // 保存更新对象
+  saveEditItem({
+    commit
+  }, data) {
+    return new Promise((resolve, reject) => {
+      commit(types.SET_EDITITEM, '')
+      commit(types.SET_EDITITEM, data)
+      resolve()
+    })
   }
 }
