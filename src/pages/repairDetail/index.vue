@@ -61,8 +61,12 @@
         spinShow: true
       }
     },
-    mounted(data) {
+    onLoad() {
+      this.workTypeLK = ''
+      this.typeLK = ''
+      this.form = {}
       this.spinShow = false
+      this.id = ''
       console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()

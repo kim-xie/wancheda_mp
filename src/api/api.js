@@ -1,6 +1,9 @@
 const api = {
   login: '/user/login',
   company_list: '/company/page',
+  company_delete: '/company/removeById',
+  company_edit: '/company/edit',
+  company_add: '/company/new',
   account_list: '/user/page',
   client_list: '/client/page',
   lookupdf_list: '/lookup_definition/page',
