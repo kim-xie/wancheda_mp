@@ -16,6 +16,8 @@
     "pages/lookupdfDetail/main",
     "pages/client/main",
     "pages/clientDetail/main",
+    "pages/coupon/main",
+    "pages/couponDetail/main",
     "pages/product/main",
     "pages/productDetail/main",
     "pages/inventory/main",

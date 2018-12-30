@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div class="lookup">
-      <div class="lookup_header">
+    <div class="coupon">
+      <div class="coupon_header">
         <span class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <!-- iview 全局提示组件 -->
@@ -9,24 +9,15 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
-      <div class="lookup_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
+      <div class="coupon_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
-            <span class="name">{{item.value}}</span>
-            <span class="code float-right">{{item.code}}</span>
-          </p>
-        </div>
-        <div class="item_detail">
-          <p class="detail">
-            <p class="">
-              <span class="label">描述:</span>
-              <span class="value">{{item.description}}</span>
-            </p>
+            <span class="name" v-if="item.date">{{item.date.couponId.value}}</span>
+            <span class="code float-right">{{item.num}}</span>
           </p>
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button edit" @tap="handleEdit(item)">编辑</span>
             <span class="button delete" @tap="handleDelete(item)">删除</span>
           </p>
         </div>
@@ -52,7 +43,7 @@
   export default {
     data () {
       return {
-        lookupdfCode: '',
+        clientId: '',
         modalVisible: false,
         firstLoad: false,
         spinShow: true,
@@ -64,7 +55,7 @@
         pageSize: 8,
         form: {},
         deleteId: '',
-        definitionId: '',
+        deleteItem: {},
         actions: [
             {
                 name: '取消'
@@ -76,16 +67,16 @@
         ]
       }
     },
+    mounted() {
+      this.spinShow = false
+    },
     onLoad(){
       this.firstLoad = false
-      this.spinShow = false
-      this.definitionId = ''
-      this.deleteId = ''
       console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
-        this.lookupdfCode = urlParams.split('=')[1]
-        if(this.lookupdfCode){
+        this.clientId = urlParams.split('=')[1]
+        if(this.clientId){
           this.listData = []
           this.getList(this.pageNo, this.pageSize)
         }
@@ -124,15 +115,15 @@
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
-          pageNo,
-          pageSize
+          'search.clientId_eq': this.clientId,
+          'page.pn': pageNo,
+          'page.size': pageSize
         }
         this.spinShow = true
-        this.$http.get(api.lookup_list + this.lookupdfCode, params).then( res => {
+        this.$http.get(api.coupon_list, params).then( res => {
           if(res.success){
             this.spinShow = false
             this.listData = res.data.page.content
-            this.definitionId = this.listData[0].definitionId
             this.totalData = res.data.page.totalElements
             if(callback && typeof callback == 'function'){
               callback()
@@ -141,20 +132,10 @@
           this.firstLoad = true
         })
       },
-      // 新增
+      // 新增维修项目
       handleAdd(){
-        this.$store.dispatch('saveEditItem', '').then(() => {
-          wx.navigateTo({
-            url: '/pages/lookupDetail/main?id='+this.definitionId
-          })
-        })
-      },
-      // 编辑
-      handleEdit(item){
-        this.$store.dispatch('saveEditItem', item).then(() => {
-          wx.navigateTo({
-            url: '/pages/lookupDetail/main?id='+item.definitionId
-          })
+        wx.navigateTo({
+          url: '/pages/couponDetail/main?id='+this.clientId
         })
       },
       // 删除确认
@@ -162,7 +143,7 @@
         const type = data.mp._relatedInfo.anchorTargetText
         const that = this
         if(type === '删除'){
-          that.deleteApi(that.deleteId,function(){
+          that.deleteApi(that.deleteItem,function(){
             that.modalVisible = false
           })
         }else{
@@ -171,12 +152,14 @@
       },
       // 删除维修项目
       handleDelete(item){
+        this.deleteItem = item
         this.deleteId = item.id
         this.modalVisible = true
       },
-      deleteApi(deleteId,callback){
+      deleteApi(deleteItem,callback){
         this.spinShow = true
-        this.$http.delete(api.lookup_delete+'?id='+deleteId,null).then( res => {
+        delete deleteItem.date
+        this.$http.post(api.coupon_delete,deleteItem).then( res => {
           if(res.success){
             this.spinShow = false
             globe.message(res.errorMsg,'success')
@@ -201,9 +184,9 @@
 .undisable{
   color: green!important;
 }
-.lookup{
+.coupon{
   width: 100%;
-  .lookup_header{
+  .coupon_header{
     width: 90%;
     padding: 6px;
     height: 22px;
@@ -231,7 +214,7 @@
       }
     }
   }
-  .lookup_item{
+  .coupon_item{
     width: 90%;
     background-color: #f2f4fb;
     margin: 20px auto;

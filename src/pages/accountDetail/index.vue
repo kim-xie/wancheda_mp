@@ -241,14 +241,6 @@
         font-size: 18px;
         color: $--color-info;
       }
-      .radio_group{
-        width: calc(100% - 106px);
-        height: 100%;
-        line-height: 70rpx;
-        .radio{
-          float: left;
-        }
-      }
       input{
         width: calc(100% - 106px);
         height: 100%;
