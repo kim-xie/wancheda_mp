@@ -1,6 +1,10 @@
 {
     "usingComponents": {
-        
+        "i-load-more": "../../dist/load-more/index",
+        "i-spin": "../../dist/spin/index",
+        "i-message": "../../dist/message/index",
+        "i-modal": "../../dist/modal/index",
+        "i-divider": "../../dist/divider/index"
     },
     "enablePullDownRefresh": true
 }

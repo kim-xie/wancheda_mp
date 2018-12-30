@@ -1,14 +1,18 @@
 <template>
   <div class="container">
     <div class="product">
+      <!-- iview 全局提示组件 -->
+      <i-message id="message"/>
+      <!-- 加载中组件 -->
+      <i-spin size="large" fix v-if="spinShow"></i-spin>
+
       <div class="product_header">
         <span class="search">
-          <input type="text" placeholder="按名称或编号搜索">
-          <i class="iconfont icon-search"></i>
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或编号搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-left mr10">分类</span>
-        <span class="add_button float-left">状态</span>
-        <span class="add_button float-right"><navigator url="/pages/productDetail/main">新增</navigator></span>
+        <span class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <div class="product_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
@@ -31,7 +35,7 @@
           <p class="detail">
             <p class="">
               <span class="label">单位:</span>
-              <span class="value">{{item.date.unitLK.value}}</span>
+              <span class="value" v-if="item.date.unitLK">{{item.date.unitLK.value}}</span>
             </p>
             <p class="">
               <span class="label">产地:</span>
@@ -45,18 +49,18 @@
             </p>
             <p class="">
               <span class="label">配件规格:</span>
-              <span class="value">{{item.date.specificationLK.value}}</span>
+              <span class="value" v-if="item.date.specificationLK">{{item.date.specificationLK.value}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
               <span class="label">所属分类:</span>
-              <span class="value">{{item.date.pCategoryLK.value}}</span>
+              <span class="value" v-if="item.date.pCategoryLK">{{item.date.pCategoryLK.value}}</span>
             </p>
             <p class="">
               <span class="label">状态:</span>
-              <span v-if="item.isDisable == false" class="value">启用</span>
-              <span v-if="item.isDisable == true" class="value">禁用</span>
+              <span v-if="item.isDisable == false" class="value undisable">启用</span>
+              <span v-if="item.isDisable == true" class="value disable">禁用</span>
             </p>
           </p>
           <p class="detail">
@@ -66,31 +70,66 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span v-if="item.isDisable == false" class="button">禁用</span>
-            <span v-if="item.isDisable == true" class="button">启用</span>
-            <span v-if="item.isDisable == false" class="button edit">编辑</span>
-            <span v-if="item.isDisable == false" class="button">入库</span>
-            <span class="button delete">删除</span>
+            <span v-if="item.isDisable == false" class="button disable" @tap="handleStatus(item)">禁用</span>
+            <span v-if="item.isDisable == true" class="button undisable" @tap="handleStatus(item)">启用</span>
+            <span v-if="item.isDisable == false" class="button edit" @tap="handleEdit(item)">编辑</span>
+            <span v-if="item.isDisable == false" class="button" @tap="handleInpart(item)">入库</span>
+            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
+
+      <!-- 暂无数据 -->
+      <i-divider v-if="totalData===0 && firstLoad" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+
+      <!-- 页底加载 -->
+      <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
+
+      <i-modal title="删除确认" :visible="modalVisible" :actions="actions" @tap="handleClick($event)">
+        <view>删除后数据将无法恢复哦</view>
+      </i-modal>
     </div>
   </div>
 </template>
 
 <script>
+  import globe from '../../utils/globe'
   import api from '../../api/api'
+  import * as utils from '../../assets/js/utils'
   export default {
     data () {
       return {
+        modalVisible: false,
+        firstLoad: false,
+        spinShow: true,
+        tipmessage: '我也是有底线的',
+        loading: false,
         listData: [],
         totalData: 0,
         pageNo: 1,
         pageSize: 8,
-        form: {}
+        form: {},
+        search: {
+          name: '',
+          code: ''
+        },
+        searchVal: '',
+        deleteId: '',
+        actions: [
+            {
+                name: '取消'
+            },
+            {
+                name: '删除',
+                color: '#ed3f14',
+            }
+        ]
       }
     },
-    mounted() {
+    onLoad() {
+      this.firstLoad = false
+      this.spinShow = false
+      this.listData = []
       this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
@@ -108,24 +147,127 @@
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
-      this.pageNo = this.pageNo+1
-      this.getList(this.pageNo, this.pageSize)
+      const that = this
+      if(this.pageNo < this.totalData/this.pageSize){
+        this.loading = true
+        this.tipmessage = '玩命加载中'
+        this.pageNo = this.pageNo+1
+        this.getList(this.pageNo, this.pageSize, function(){
+          that.loading = false
+          that.tipmessage = '我也是有底线的'
+        })
+      }
     },
     methods: {
+      // 搜索
+      goSearch(){
+        console.log(this.searchVal)
+        const searchVal = this.searchVal
+        this.search.name = ''
+        this.search.code = ''
+        if(utils.isChinese(searchVal)){
+          this.search.name = searchVal
+        }else{
+          this.search.code = searchVal
+        }
+        this.getList(this.pageNo, this.pageSize)
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.name = ''
+        this.search.code = ''
+        this.getList(this.pageNo, this.pageSize)
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          'search_name_like': this.search.name,
+          'search_code_like': this.search.code,
           'page.pn': pageNo,
           'page.size': pageSize
         }
+        this.spinShow = true
         this.$http.get(api.product_list, params).then( res => {
           console.log(res)
           if(res.success){
             this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements
+            this.spinShow = false
             if(callback && typeof callback == 'function'){
               callback()
             }
+          }else{
+            this.spinShow = false
+          }
+        })
+      },
+      // 新增
+      handleAdd(){
+        wx.navigateTo({
+          url: '/pages/productDetail/main'
+        })
+      },
+      // 编辑
+      handleEdit(item){
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/productDetail/main?id='+item.id
+          })
+        })
+      },
+      // 启用禁用
+      handleStatus(item){
+        const params = {
+          id: item.id,
+          isDisable: item.isDisable===false ? true : false
+        }
+        this.spinShow = true
+        this.$http.post(api.product_edit, params).then( res => {
+          console.log(res.success)
+          if(res.success){
+            globe.message(res.errorMsg, 'success')
+            this.getList(this.pageNo, this.pageSize)
+            this.spinShow = false
+          }else{
+            globe.message(res.errorMsg, 'warning')
+            this.spinShow = false
+          }
+        })
+      },
+      // 入库
+      handleInpart(item){
+
+      },
+      // 删除确认
+      handleClick(data){
+        const type = data.mp._relatedInfo.anchorTargetText
+        const that = this
+        if(type === '删除'){
+          that.deleteApi(that.deleteId,function(){
+            that.modalVisible = false
+          })
+        }else{
+          that.modalVisible = false
+        }
+      },
+      // 删除维修项目
+      handleDelete(id){
+        this.deleteId = id
+        this.modalVisible = true
+      },
+      deleteApi(id,callback){
+        this.spinShow = true
+        this.$http.delete(api.product_delete+"?id="+id,null).then( res => {
+          if(res.success){
+            globe.message(res.errorMsg,'success')
+            this.getList(this.pageNo, this.pageSize)
+            if(callback && typeof callback == 'function'){
+              callback()
+            }
+            this.spinShow = false
+          }else{
+            globe.message(res.errorMsg,'warning')
+            this.spinShow = false
           }
         })
       }
@@ -134,6 +276,12 @@
 </script>
 
 <style lang="scss" scoped>
+.disable{
+  color: red!important;
+}
+.undisable{
+  color: green!important;
+}
 .product{
   width: 100%;
   .product_header{

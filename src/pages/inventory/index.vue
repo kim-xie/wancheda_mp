@@ -3,11 +3,16 @@
     <div class="product">
       <div class="product_header">
         <span class="search">
-          <input type="text" placeholder="按名称或编号搜索">
-          <i class="iconfont icon-search"></i>
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或编号搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-left mr10">公司</span>
+        <!-- <span class="add_button float-left mr10">公司</span> -->
       </div>
+      <!-- iview 全局提示组件 -->
+      <i-message id="message"/>
+      <!-- 加载中组件 -->
+      <i-spin size="large" fix v-if="spinShow"></i-spin>
       <div class="product_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
@@ -60,6 +65,9 @@
           </p>
         </div>
       </div>
+      <!-- 暂无数据 -->
+      <i-divider v-if="totalData===0 && searchVal !== ''" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+
       <!-- 页底加载 -->
       <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
     </div>
@@ -67,10 +75,13 @@
 </template>
 
 <script>
+  import globe from '../../utils/globe'
   import api from '../../api/api'
+  import * as utils from '../../assets/js/utils'
   export default {
     data () {
       return {
+        spinShow: true,
         tipmessage: '我也是有底线的',
         loading: false,
         listData: [],
@@ -78,10 +89,16 @@
         totalData: 0,
         pageNo: 1,
         pageSize: 8,
-        form: {}
+        form: {},
+        search: {
+          partName: '',
+          partCode: ''
+        },
+        searchVal: ''
       }
     },
-    mounted() {
+    onLoad() {
+      this.spinShow = false
       this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
@@ -111,12 +128,35 @@
       }
     },
     methods: {
+      // 搜索
+      goSearch(){
+        console.log(this.searchVal)
+        const searchVal = this.searchVal
+        this.search.partName = ''
+        this.search.partCode = ''
+        if(utils.isChinese(searchVal)){
+          this.search.partName = searchVal
+        }else{
+          this.search.partCode = searchVal
+        }
+        this.getList(this.pageNo, this.pageSize)
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.partCode = ''
+        this.search.partName = ''
+        this.getList(this.pageNo, this.pageSize)
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          'partCode': this.search.partCode,
+          'partName': this.search.partName,
+          'search.isDeleted_eq': false,
           'page.pn': pageNo,
           'page.size': pageSize
         }
+        this.spinShow = true
         this.$http.get(api.inventory_list, params).then( res => {
           console.log(res)
           if(res.success){
@@ -125,9 +165,12 @@
             this.extendInfo = res.extendInfo
             console.log(this.listData)
             console.log(this.extendInfo)
+            this.spinShow = false
             if(callback && typeof callback == 'function'){
               callback()
             }
+          }else{
+            this.spinShow = false
           }
         })
       },
@@ -154,7 +197,7 @@
     width: 90%;
     padding: 6px;
     background-color: #f2f4fb;
-    height: 140rpx;
+    height: 80rpx;
     margin: 0 auto;
     .add_button{
       padding: 3px 10px;
