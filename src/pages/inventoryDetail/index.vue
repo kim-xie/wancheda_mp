@@ -8,15 +8,15 @@
 
       <p class="input_wrap" v-if="type === 'inpart'">
         <span class="input_label">进货价:</span>
-        <input v-model="form.cost"/>
+        <input type="number" v-model="form.cost"/>
       </p>
       <p class="input_wrap" v-if="type === 'outpart'">
         <span class="input_label">销售价:</span>
-        <input v-model="form.sale"/>
+        <input type="number" v-model="form.sale"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">配件数量:</span>
-        <input v-model="form.count"/>
+        <input type="number" v-model="form.count"/>
       </p>
       <button class="save" v-if="type === 'outpart'" @click="handleSave">出 库</button>
       <button class="save" v-if="type === 'inpart'" @click="handleSave">入 库</button>
@@ -32,12 +32,13 @@ import { setTimeout } from 'timers';
     data () {
       return {
         form: {},
+        maxCount: 0,
         spinShow: true,
         type: '',
         inventoryId: ''
       }
     },
-    mounted(data) {
+    onLoad() {
       this.spinShow = false
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
@@ -47,12 +48,17 @@ import { setTimeout } from 'timers';
         this.inventoryId = ids.split('=')[1]
         console.log(this.type)
         console.log(this.inventoryId)
+        this.getDetail()
       }
     },
     methods: {
       // 获取详情
-      getDetail(id){
-        console.log(id)
+      getDetail(){
+        let item = this.$store.getters.editItem
+        if(this.type === 'outpart'){
+          this.maxCount = item.count
+        }
+        this.form = item
       },
       // 根据数据字典code获取数据字典
       getLookupByCode(code, pageNo, pageSize, callback){
@@ -73,41 +79,50 @@ import { setTimeout } from 'timers';
       // 保存
       handleSave(){
         const _this = this
+        // 校验
+        if(this.type === 'inpart' && !this.form.cost){
+          globe.message('进货价不能为空','warning')
+          return false
+        }else if(this.type === 'inpart' && !this.form.count){
+          globe.message('配件数量不能为空','warning')
+          return false
+        }
+        if(this.type === 'outpart' && !this.form.sale){
+          globe.message('销售价不能为空','warning')
+          return false
+        }else if(this.type === 'outpart' && !this.form.count){
+          globe.message('配件数量不能为空','warning')
+          return false
+        }else if(this.type === 'outpart' && this.form.count > this.maxCount){
+          globe.message('出库配件数量不能大于库存','warning')
+          return false
+        }
         if(!this.isLocked){
           this.isLocked = true
-          // 校验
-          if(this.type === 'inpart' && !this.form.cost){
-            globe.message('进货价不能为空','warning')
-            return false
-          }else if(this.type === 'inpart' && !this.form.count){
-            globe.message('配件数量不能为空','warning')
-            return false
-          }
-          if(this.type === 'outpart' && !this.form.sale){
-            globe.message('销售价不能为空','warning')
-            return false
-          }else if(this.type === 'outpart' && !this.form.count){
-            globe.message('配件数量不能为空','warning')
-            return false
-          }
+          this.spinShow = true
           // 分发数据到vuex
           if(this.type === 'inpart'){
-            this.$store.dispatch('updateInpartFormParam', this.form)
-            setTimeout(function(){
-              _this.isLocked = false
-              wx.navigateTo({
-                url: '/pages/inpart/main'
-              })
-            }, 1000)
+            console.log(this.form)
+            this.$store.dispatch('updateInpartFormParam', this.form).then(() => {
+              setTimeout(function(){
+                _this.isLocked = false
+                this.spinShow = false
+                wx.navigateTo({
+                  url: '/pages/inpart/main'
+                })
+              }, 1000)
+            })
           }else{
             console.log(this.form)
-            this.$store.dispatch('updateOutpartFormParam', this.form)
-            setTimeout(function(){
-              _this.isLocked = false
-              wx.navigateTo({
-                url: '/pages/outpart/main'
-              })
-            }, 1000)
+            this.$store.dispatch('updateOutpartFormParam', this.form).then(() => {
+              setTimeout(function(){
+                _this.isLocked = false
+                this.spinShow = false
+                wx.navigateTo({
+                  url: '/pages/outpart/main'
+                })
+              }, 1000)
+            })
           }
         }
       }

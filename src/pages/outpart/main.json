@@ -2,7 +2,11 @@
     "usingComponents": {
         "i-tabs": "../../dist/tabs/index",
         "i-tab": "../../dist/tab/index",
-        "i-load-more": "../../dist/load-more/index"
+        "i-load-more": "../../dist/load-more/index",
+        "i-spin": "../../dist/spin/index",
+        "i-message": "../../dist/message/index",
+        "i-modal": "../../dist/modal/index",
+        "i-divider": "../../dist/divider/index"
     },
     "enablePullDownRefresh": true,
     "backgroundTextStyle": "dark"

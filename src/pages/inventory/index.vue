@@ -16,19 +16,19 @@
       <div class="product_item" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
-            <span class="name">{{extendInfo.partId[item.partId].name}}</span>
-            <span class="code float-right">{{extendInfo.partId[item.partId].code}}</span>
+            <span class="name">{{item.name}}</span>
+            <span class="code float-right">{{item.code}}</span>
           </p>
         </div>
         <div class="item_detail">
           <p class="detail">
             <p class="">
               <span class="label">批发价:</span>
-              <span class="value">{{extendInfo.partId[item.partId].wholeSale}}</span>
+              <span class="value">{{item.wholeSale}}</span>
             </p>
             <p class="">
               <span class="label">销售价:</span>
-              <span class="value">{{extendInfo.partId[item.partId].sale}}</span>
+              <span class="value">{{item.sale}}</span>
             </p>
           </p>
           <p class="detail">
@@ -38,30 +38,30 @@
             </p>
             <p class="">
               <span class="label">单位:</span>
-              <span class="value">{{extendInfo.unitLK[extendInfo.partId[item.partId].unitLK].value}}</span>
+              <span class="value">{{item.unitLKVal}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
               <span class="label">适用车型:</span>
-              <span class="value">{{extendInfo.partId[item.partId].carModel}}</span>
+              <span class="value">{{item.carModel}}</span>
             </p>
             <p class="">
               <span class="label">产地:</span>
-              <span class="value">{{extendInfo.partId[item.partId].produceArea}}</span>
+              <span class="value">{{item.produceArea}}</span>
             </p>
           </p>
           <p class="detail">
             <p class="">
               <span class="label">库位号:</span>
-              <span class="value">{{extendInfo.repCodeLK[item.repCodeLK].value}}</span>
+              <span class="value">{{item.repCodeLKVal}}</span>
             </p>
           </p>
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button" @tap="inpart(item.id)">入库</span>
-            <span class="button" @tap="outpart(item.id)">出库</span>
+            <span class="button" @tap="inpart(item)">入库</span>
+            <span class="button" @tap="outpart(item)">出库</span>
           </p>
         </div>
       </div>
@@ -163,6 +163,7 @@
             this.listData = res.data.entitys
             this.totalData = res.data.entitys.length
             this.extendInfo = res.extendInfo
+            this.getInventoryList(this.listData,this.extendInfo)
             console.log(this.listData)
             console.log(this.extendInfo)
             this.spinShow = false
@@ -174,16 +175,69 @@
           }
         })
       },
+      getInventoryList(tableData,extendInfo){
+        for(var i=0; i<tableData.length;i++){
+          tableData[i].repCodeLKVal = extendInfo.repCodeLK[tableData[i].repCodeLK].value
+          tableData[i].name = extendInfo.partId[tableData[i].partId].name
+          tableData[i].code = extendInfo.partId[tableData[i].partId].code
+          tableData[i].unitLK = extendInfo.partId[tableData[i].partId].unitLK
+          tableData[i].sale = extendInfo.partId[tableData[i].partId].sale
+          tableData[i].wholeSale = extendInfo.partId[tableData[i].partId].wholeSale
+          tableData[i].produceArea = extendInfo.partId[tableData[i].partId].produceArea
+          tableData[i].carModel = extendInfo.partId[tableData[i].partId].carModel
+          tableData[i].createTime = extendInfo.partId[tableData[i].partId].createTime
+          tableData[i].updateTime = extendInfo.partId[tableData[i].partId].updateTime
+          tableData[i].isDisable = extendInfo.partId[tableData[i].partId].isDisable
+          tableData[i].unitLKVal = extendInfo.unitLK[tableData[i].unitLK].value
+        }
+      },
       // 入库
-      inpart(id){
-        wx.navigateTo({
-          url: '/pages/inventoryDetail/main?type=inpart&id='+id
+      inpart(item){
+        const inpartForm = {
+          partId: item.partId,
+          supplierLK: item.supplierLK,
+          count: item.count,
+          repCodeLK: item.repCodeLK,
+          cost: item.cost,
+          company: item.company,
+          code: item.code,
+          name: item.name,
+          carModel: item.carModel,
+          wholeSale: item.wholeSale,
+          sale: item.sale,
+          produceArea: item.produceArea,
+          unitLK: item.unitLK,
+          unitLKVal: item.unitLKVal,
+          repCodeLKVal: item.repCodeLKVal
+        }
+        this.$store.dispatch('saveEditItem', inpartForm).then(() => {
+          wx.navigateTo({
+            url: '/pages/inventoryDetail/main?type=inpart&id='+item.id
+          })
         })
       },
       // 出库
-      outpart(id){
-        wx.navigateTo({
-          url: '/pages/inventoryDetail/main?type=outpart&id='+id
+      outpart(item){
+        const outpartForm = {
+          inventoryId: item.id,
+          supplierLK: item.supplierLK,
+          count: item.count,
+          repCodeLK: item.repCodeLK,
+          company: item.company,
+          code: item.code,
+          name: item.name,
+          carModel: item.carModel,
+          wholeSale: item.wholeSale,
+          sale: item.sale,
+          produceArea: item.produceArea,
+          unitLK: item.unitLK,
+          unitLKVal: item.unitLKVal,
+          repCodeLKVal: item.repCodeLKVal
+        }
+        this.$store.dispatch('saveEditItem', outpartForm).then(() => {
+          wx.navigateTo({
+            url: '/pages/inventoryDetail/main?type=outpart&id='+item.id
+          })
         })
       }
     }

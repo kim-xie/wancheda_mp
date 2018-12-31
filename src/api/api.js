@@ -34,7 +34,9 @@ const api = {
   getLookupByCode: '/lookup/pageByDefineCode?lookupDefineCode=',
   inventory_list: '/inventory/listInventory',
   inpartInfo_list: '/inPartInfo/extendPage',
+  inpart_add: '/inPart/newInPart',
   outpartInfo_list: '/outPartInfo/extendPage',
+  outPart_add: '/outPart/newOutPart',
   getLookupById: '/lookup/getById'
 }
 

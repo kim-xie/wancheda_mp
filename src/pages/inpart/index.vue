@@ -3,12 +3,18 @@
     <div class="inpart">
       <div class="inpart_header">
         <span class="search">
-          <input type="text" placeholder="按名称或编号搜索">
-          <i class="iconfont icon-search"></i>
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按订单编号搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-left mr10">公司</span>
-        <span class="add_button float-left">供应商</span>
+        <!-- <span class="add_button float-left mr10">公司</span>
+        <span class="add_button float-left">供应商</span> -->
       </div>
+
+      <!-- iview 全局提示组件 -->
+      <i-message id="message"/>
+      <!-- 加载中组件 -->
+      <i-spin size="large" fix v-if="spinShow"></i-spin>
 
       <i-tabs :current="currentTab" @change="handleChange($event)">
         <i-tab key="tab1" title="待入库" :count="inpartCount"></i-tab>
@@ -20,11 +26,15 @@
         <div class="inpart_total">
           <p class="item">
             <span class="label">支付方式</span>
-            <input type="text">
+            <picker @change="bindPickerChange($event, 'inpartingForm', 'payMethhodLKVal')" :range="payMethhodLKVals">
+              <input v-model="payMethhodLKVal" readonly/>
+            </picker>
           </p>
           <p class="item">
             <span class="label">供应商</span>
-            <input type="text">
+            <picker @change="bindPickerChange($event, 'inpartingForm', 'supplierLK')" :range="supplierLKs">
+              <input v-model="supplierLK" readonly/>
+            </picker>
           </p>
           <p class="item">
             <span class="label">支付金额</span>
@@ -143,19 +153,33 @@
             </p>
           </div>
         </div>
-        <!-- 页底加载 -->
-        <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
       </div>
+
+      <!-- 暂无数据 -->
+      <i-divider v-if="totalData===0 && firstLoad" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+
+      <!-- 页底加载 -->
+      <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
+
+      <i-modal title="删除确认" :visible="modalVisible" :actions="actions" @tap="handleClick($event)">
+        <view>删除后数据将无法恢复哦</view>
+      </i-modal>
+
     </div>
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex'
+  import globe from '../../utils/globe'
   import api from '../../api/api'
   export default {
     data () {
       return {
+        usercompany: '',
+        searchVal: '',
+        spinShow: true,
+        modalVisible: false,
         tipmessage: '我也是有底线的',
         loading: false,
         inpartsTotal: 0,
@@ -165,17 +189,44 @@
         selectTableData: [],
         pageNo: 1,
         pageSize: 8,
-        form: {},
-        isLocked: false
+        inpartingForm: {},
+        payMethhodLKVal: '',
+        payMethhodLKVals: [],
+        payMethhodLKValIds: [],
+        supplierLK: '',
+        supplierLKs: [],
+        supplierLKIds: [],
+        search: {
+          workOrderNo: ''
+        },
+        isLocked: false,
+        actions: [
+            {
+                name: '取消'
+            },
+            {
+                name: '删除',
+                color: '#ed3f14',
+            }
+        ]
       }
     },
     mounted() {
+      // 已入库配件
       this.loadInpartFormData()
+      // 供应商
+      this.getLookupByCodeAndPicker('supplier','supplierLK')
+      // 支付方式
+      this.getLookupByCodeAndPicker('pay_type','payMethhodLKVal')
+      // 加载列表数据
       this.getList(this.pageNo, this.pageSize)
+      // 获取公司
+      this.usercompany = this.userInfo.company
     },
     computed: {
       ...mapGetters([
-        'inpartCount'
+        'inpartCount',
+        'userInfo'
       ])
     },
     // 下拉刷新
@@ -205,9 +256,26 @@
       }
     },
     methods: {
+      // 搜索
+      goSearch(){
+        console.log(this.searchVal)
+        const searchVal = this.searchVal
+        this.search.workOrderNo = ''
+        this.search.workOrderNo = searchVal
+        this.getList(this.pageNo, this.pageSize)
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.workOrderNo = ''
+        this.getList(this.pageNo, this.pageSize)
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          //'search.supplierLK_eq': this.search.supplierLK,
+          'search.workOrderNo_eq': this.search.workOrderNo,
+          //'search.company_eq': this.search.company,
+          'search.isDeleted_eq': false,
           'page.pn': pageNo,
           'page.size': pageSize
         }
@@ -219,6 +287,49 @@
               callback()
             }
           }
+        })
+      },
+      // 普通选择器
+      bindPickerChange(data, formName, type){
+        const index = data.mp.detail.value
+        // 显示的值
+        this[type] = this[type+'s'][index]
+        // 对应的id
+        this[formName][type] = this[type+'Ids'][index]
+      },
+      // 获取数据字典并且弹出选择框
+      getLookupByCodeAndPicker(code, type, successBack){
+        const _this = this
+        this.getLookupByCode(code, 1, 1000, function(data, total){
+          let dataArry = []
+          let idArry = []
+          for(let i=0; i<data.length; i++){
+            dataArry.push(data[i].value)
+            idArry.push(data[i].id)
+          }
+
+          _this[type+'s'] = dataArry
+          _this[type+'Ids'] = idArry
+
+          if(successBack && typeof successBack == 'function'){
+            successBack(dataArry, idArry)
+          }
+        })
+      },
+      // 根据数据字典code获取数据字典
+      getLookupByCode(code, pageNo, pageSize, callback){
+        const params = {
+          pageNo,
+          pageSize
+        }
+        this.spinShow = true
+        this.$http.get(api.getLookupByCode + code, params).then( res => {
+          if(res.success){
+            if(callback && typeof callback == 'function'){
+              callback(res.data.page.content, res.data.page.totalElements)
+            }
+          }
+          this.spinShow = false
         })
       },
       // 加载待入库配件
@@ -249,6 +360,15 @@
       },
       // 结算
       saveProduction(){
+        // 校验
+        if(!this.inpartingForm.payMethhodLKVal){
+          globe.message('支付方式不能为空','warning')
+          return false
+        }
+        if(!this.inpartingForm.supplierLK){
+          globe.message('供应商不能为空','warning')
+          return false
+        }
         if(!this.isLocked){
           this.isLocked = true
           let _this = this
@@ -278,35 +398,21 @@
             "inpartInfos": inpartInfos
           }
           if(_this.selectTableData.length>0){
-            this.$http.post('/supercar/inPart/newInPart',formObj).then((response) => {
-              if(response.body.success){
-                this.$message({
-                type: 'success',
-                message: '入库成功',
-                duration: 2000,
-                showClose: true
-              })
+            this.$http.post(api.inpart_add, formObj, true).then( res => {
+              if(res.success){
+                globe.message('入库成功', 'success')
                 this.selectTableData.splice(0,this.selectTableData.length)
                 this.inpartsTotal = 0
-                this.loadData(1,this.pageSize)
-                this.$store.commit('updateInPartCount', 0)
-                $('.el-tabs__item').first().trigger('click')
+                this.supplierLK = ''
+                this.payMethhodLKVal = ''
+                this.getList(1, this.pageSize)
+                this.currentTab = 'tab2'
+                this.$store.dispatch('updateInPartCount', 0)
               }
-            }, response => {
-              this.$message({
-                type: 'error',
-                message: '网络连接失败，请重试！',
-                duration: 2000,
-                showClose: true
-              })
+              this.spinShow = false
             })
           }else{
-            this.$message({
-              type: 'error',
-              message: '出库信息为空，请选择配件！',
-              duration: 2000,
-              showClose: true
-            })
+            globe.message('入库信息为空，请选择配件！','error')
           }
           this.isLocked = false
         }
@@ -322,7 +428,7 @@
     width: 90%;
     padding: 6px;
     background-color: #f2f4fb;
-    height: 140rpx;
+    height: 80rpx;
     margin: 0 auto;
     .add_button{
       padding: 3px 10px;

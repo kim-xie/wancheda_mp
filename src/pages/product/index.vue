@@ -236,7 +236,21 @@
       },
       // 入库
       handleInpart(item){
-
+        const partsForm = {
+          partId: item.id,
+          code: item.code,
+          name: item.name,
+          carModel: item.carModel,
+          wholeSale: item.wholeSale,
+          produceArea: item.produceArea,
+          unitLK: item.unitLK,
+          unitLKVal: item.date.unitLK.value
+        }
+        this.$store.dispatch('saveEditItem', partsForm).then(() => {
+          wx.navigateTo({
+            url: '/pages/productInpartDetail/main?id='+item.id
+          })
+        })
       },
       // 删除确认
       handleClick(data){

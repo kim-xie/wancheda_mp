@@ -23,7 +23,7 @@ fly.config = {
   // 定义公共headers
   headers: {
     'X-Tag': 'flyio',
-    'Content-Type': 'application/x-www-form-urlencoded'
+    // 'Content-Type': 'application/x-www-form-urlencoded'
   },
   // 设置超时
   timeout: 10000,
@@ -86,13 +86,18 @@ function filterNull(o) {
  * @param {*} succes
  * @param {*} failure
  */
-function apiFly(method, url, params) {
+function apiFly(method, url, params, json) {
   return new Promise((resolve, reject) => {
     if (params) {
       params = filterNull(params)
     }
     // fly api
-    fly.request(url, params, {method}).then(res => {
+    fly.request(url, params, {
+        method,
+        headers: {
+          'Content-Type': json ? 'application/json' : 'application/x-www-form-urlencoded'
+        }
+      }).then(res => {
       resolve(res)
     }).catch(err => {
       reject(err)
@@ -105,8 +110,12 @@ export default {
   get: (url, params) => {
     return apiFly('GET', url, params)
   },
-  post: (url, params) => {
-    return apiFly('POST', url, params)
+  post: (url, params, json) => {
+    if (json) {
+      return apiFly('POST', url, params, json)
+    }else{
+      return apiFly('POST', url, params)
+    }
   },
   put: (url, params) => {
     return apiFly('PUT', url, params)

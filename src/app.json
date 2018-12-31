@@ -20,6 +20,7 @@
     "pages/couponDetail/main",
     "pages/product/main",
     "pages/productDetail/main",
+    "pages/productInpartDetail/main",
     "pages/inventory/main",
     "pages/inventoryDetail/main",
     "pages/inpart/main",
