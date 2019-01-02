@@ -186,31 +186,59 @@
       <div v-if="current === 'order'" class="transition tab_order">
         <div>
           <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
-            <i-tab key="tab1" title="维修中" :count="repairItemCount"></i-tab>
-            <i-tab key="tab2" title="待付款" :count="repairItemCount"></i-tab>
-            <i-tab key="tab3" title="已完成(100)"></i-tab>
+            <i-tab key="tab1" title="维修中" :count="repairWorkorderTotal"></i-tab>
+            <i-tab key="tab2" title="待付款" :count="repairWorkorderTotal"></i-tab>
+            <i-tab key="tab3" :title="'已完成('+repairWorkorderAllTotal+')'"></i-tab>
           </i-tabs>
-          <div class="tab_repaire">
-            <div class="tab_list" v-for="(item, index) in repaires" :key="index">
+          <!-- 待完成订单 -->
+          <div class="tab_repaire" v-if="tab_current!=='tab3'">
+            <div class="tab_list" v-for="(item, index) in repairWorkorders" :key="index">
               <ul>
                 <li class="ellipsis">
-                  <span>{{item.carNo}}</span>
+                  <span>{{item.date.clientId.carNo}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>{{item.type}}</span>
+                  <span>{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="line"></li>
                 <li class="ellipsis">
-                  <span>工单号: {{item.order}}</span>
-                  <span class="float-right">{{item.status}}</span>
+                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="float-right">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进厂时间: {{item.time}}</span>
-                  <span class="float-right">{{item.user}}</span>
+                  <span>进厂时间: {{item.sendTime}}</span>
+                  <span class="float-right">{{item.sendMan}}</span>
                 </li>
               </ul>
             </div>
           </div>
+          <!-- 已完成订单 -->
+          <div class="tab_repaire" v-if="tab_current==='tab3'">
+            <div class="tab_list" v-for="(item, index) in repairWorkorderAlls" :key="index">
+              <ul>
+                <li class="ellipsis" v-if="item.date.clientId">
+                  <span>{{item.date.clientId.carNo}}</span>
+                </li>
+                <li class="ellipsis" v-if="item.date.clientId">
+                  <span>{{item.date.clientId.carModel}}</span>
+                </li>
+                <li class="line"></li>
+                <li class="ellipsis">
+                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="float-right">{{item.workorderState}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>进厂时间: {{item.sendTime}}</span>
+                  <span class="float-right">{{item.sendMan}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- 暂无数据 -->
+          <i-divider v-if="repairWorkorderAllTotal===0" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+
+          <!-- 页底加载 -->
+          <i-load-more v-if="repairWorkorderAllTotal>allPageSize" :tip="tipmessage" :loading="loading" />
         </div>
       </div>
       <div v-if="current === 'workplace'" class="transition tab_workplace">
@@ -318,6 +346,8 @@
   export default {
     data () {
       return {
+        tipmessage: '我也是有底线的',
+        loading: false,
         showMore: false,
         clientForm: {},
         level: '',
@@ -349,35 +379,12 @@
         current: 'index',
         company: '深圳分店',
         tab_current: 'tab1',
-        repaires: [
-          {
-            id: 1,
-            carNo: '粤B09286',
-            type: '迈腾2017 1.4TSI 双离合 280TSI领先型',
-            order: 'No20181205000001',
-            time: '2018-12-05 12:30',
-            status: '在修',
-            user: 'kim'
-          },
-          {
-            id: 2,
-            carNo: '桂M09286',
-            type: '迈腾2018 1.4TSI 双离合 280TSI领先型',
-            order: 'No20181205000002',
-            time: '2018-12-05 10:30',
-            status: '在修',
-            user: 'kim'
-          },
-          {
-            id: 3,
-            carNo: '桂B09286',
-            type: '迈腾2019 1.4TSI 双离合 280TSI领先型',
-            order: 'No20181205000003',
-            time: '2018-12-05 10:30',
-            status: '在修',
-            user: 'kim'
-          }
-        ]
+        repairWorkorders: [],
+        repairWorkorderAlls: [],
+        repairWorkorderTotal: 0,
+        repairWorkorderAllTotal: 0,
+        allPageNo: 1,
+        allPageSize: 2,
       }
     },
     mounted() {
@@ -407,6 +414,32 @@
         'outpartCount',
         'repairItemCount'
       ])
+    },
+    // 下拉刷新
+    onPullDownRefresh() {
+      console.log('下拉刷新')
+      console.log(this.allPageNo)
+      if(this.allPageNo > 1){
+        this.allPageNo = this.allPageNo-1
+        this.getRepairWorkorder(this.allPageNo, this.allPageSize, '',function(){
+          wx.stopPullDownRefresh()
+        })
+      }
+    },
+    // 上拉加载，拉到底部触发
+    onReachBottom() {
+      // 到这底部在这里需要做什么事情
+      console.log('上拉加载')
+      const that = this
+      if(this.allPageNo < this.repairWorkorderAllTotal/this.allPageSize){
+        this.loading = true
+        this.tipmessage = '玩命加载中'
+        this.allPageNo = this.allPageNo+1
+        this.getRepairWorkorder(this.allPageNo, this.allPageSize, '', function(){
+          that.loading = false
+          that.tipmessage = '我也是有底线的'
+        })
+      }
     },
     methods: {
       checkPermission,
@@ -453,6 +486,10 @@
       // 切换tab-bar
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
+        if(this.current === 'order'){
+          this.getRepairWorkorder(1,1000,'维修中')
+          this.getRepairWorkorder(this.allPageNo,this.allPageSize,'')
+        }
       },
       // 切换tab
       handleChangeTab (data) {
@@ -608,6 +645,32 @@
           this.spinShow = false
         })
       },
+      // 获取维修记录
+      getRepairWorkorder(pageNo,pageSize,status,callback){
+        const params = {
+          'search.company_eq': '',
+          'search.workorderState_eq': status,
+          'page.pn': pageNo,
+          'page.size': pageSize
+        }
+        this.spinShow = true
+        this.$http.get(api.repairWorkorder, params).then( res => {
+          if(res.success){
+            this.spinShow = false
+            if(status === '维修中'){
+              this.repairWorkorders = res.data.page.content
+              this.repairWorkorderTotal = res.data.page.totalElements
+            }else{
+              this.repairWorkorderAlls = res.data.page.content
+              this.repairWorkorderAllTotal = res.data.page.totalElements
+            }
+            if(callback && typeof callback === 'function'){
+              callback()
+            }
+          }
+          this.spinShow = false
+        })
+      },
       // 显示选择栏
       showActionSheet(dataArry, successCallBack){
         wx.showActionSheet({
@@ -661,6 +724,7 @@
 }
 .tab_content{
   width: 100%;
+  padding-bottom: 40px;
 }
 .tab_bar{
   width: 100vw;
@@ -743,7 +807,6 @@
 .step_button{
   width: 100%;
   margin: 0 auto;
-  margin-bottom: 70px;
 }
 
 </style>

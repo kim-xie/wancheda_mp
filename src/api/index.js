@@ -6,13 +6,13 @@ let baseURL = ''
 // 环境地址配置
 if (process.env.NODE_ENV === 'development') {
   console.log('development')
-  baseURL = 'http://127.0.0.1:8081'
+  baseURL = 'https://www.kimshare.club:8843/supercar'
 } else if (process.env.NODE_ENV === 'debug') {
   console.log('debug')
   baseURL = ''
 } else if (process.env.NODE_ENV === 'production') {
   console.log('production')
-  baseURL = 'https://easy-mock.com/mock/5bfc161b791edf0246129e75/v1/'
+  baseURL = 'https://www.kimshare.club:8843/supercar'
 }
 
 // 初始化fly实例

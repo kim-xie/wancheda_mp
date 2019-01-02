@@ -46,10 +46,10 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/supercar': {
-        target: 'http://127.0.0.1:8081',
+        target: 'https://www.kimshare.club:8843/supercar',
         changeOrigin: true,
         pathRewrite: {
-          '^/supercar': '/'
+          '^/supercar': '/supercar'
         }
       }
     },

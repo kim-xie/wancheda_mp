@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/login/main",
     "pages/index/main",
     "pages/lookupdf/main",
-    "pages/login/main",
     "pages/userInfo/main",
     "pages/changePwd/main",
     "pages/company/main",

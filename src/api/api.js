@@ -37,6 +37,7 @@ const api = {
   inpart_add: '/inPart/newInPart',
   outpartInfo_list: '/outPartInfo/extendPage',
   outPart_add: '/outPart/newOutPart',
+  repairWorkorder: '/repairWorkorder/page',
   getLookupById: '/lookup/getById'
 }
 

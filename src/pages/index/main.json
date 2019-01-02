@@ -1,7 +1,6 @@
 {
     "navigationBarTitleText": "万车达",
     "usingComponents": {
-        "i-spin": "../../dist/spin/index",
         "i-tab-bar": "../../dist/tab-bar/index",
         "i-tab-bar-item": "../../dist/tab-bar-item/index",
         "i-notice-bar": "../../dist/notice-bar/index",
@@ -21,8 +20,13 @@
         "i-step": "../../dist/step/index",
         "i-radio-group": "../../dist/radio-group/index",
         "i-radio": "../../dist/radio/index",
-        "i-message": "../../dist/message/index",
         "i-button": "../../dist/button/index",
-        "i-badge": "../../dist/badge/index"
-    }
+        "i-badge": "../../dist/badge/index",
+        "i-load-more": "../../dist/load-more/index",
+        "i-spin": "../../dist/spin/index",
+        "i-message": "../../dist/message/index",
+        "i-modal": "../../dist/modal/index",
+        "i-divider": "../../dist/divider/index"
+    },
+    "enablePullDownRefresh": true
 }
