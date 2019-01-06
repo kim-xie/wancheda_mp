@@ -22,3 +22,18 @@ export const editItem = (state) => {
   console.log(state.editItem)
   return state.editItem
 }
+
+export const client = (state) => {
+  console.log('client',state.client)
+  return state.client
+}
+
+export const repairItems = (state) => {
+  console.log('repairItems', state.repairItems)
+  return state.repairItems
+}
+
+export const repairItemIds = (state) => {
+  console.log('repairItems', state.repairItemIds)
+  return state.repairItemIds.join(',')
+}

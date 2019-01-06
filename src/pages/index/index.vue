@@ -186,44 +186,44 @@
 
           <!-- 维修领料 -->
           <div class="productForm" v-if="stepCurrent===2">
-            <i-button @click="handleClick" inline shape="circle" size="small">添加服务项目</i-button>
-            <i-button @click="handleClick" inline shape="circle" size="small">添加维修配件</i-button>
+            <i-button @click="handleRepair" inline shape="circle" size="small">添加服务项目</i-button>
+            <i-button @click="handleProduct" inline shape="circle" size="small">添加维修配件</i-button>
 
             <!-- 服务项目列表 -->
             <div class="repairList">
               <div class="repairItems">
-                <div class="repairItem">
+                <div class="repairItem" v-for="(item, index) in repairItems" :key="index">
                   <div class="repair_item">
                     <div class="item_label">项目名称</div>
-                    <div class="item_value">保养</div>
+                    <div class="item_value">{{item.name}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">单价(元)</div>
-                    <div class="item_value">100</div>
+                    <div class="item_value">{{item.sum}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">折扣(折)</div>
-                    <div class="item_value">9</div>
+                    <div class="item_value">{{item.discount}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">工时/数量</div>
-                    <div class="item_value">1</div>
+                    <div class="item_value">{{item.workHour}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">小计(元)</div>
-                    <div class="item_value">90</div>
+                    <div class="item_value">{{item.subtotal}}/{{item.total}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">技师</div>
-                    <div class="item_value">kim</div>
+                    <div class="item_value">{{item.mechanicVal}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">备注</div>
-                    <div class="item_value">备注</div>
+                    <div class="item_value">{{item.description}}</div>
                   </div>
                   <div class="item_button">
-                    <div class="button" @tap="handleEdit('repair')">编辑</div>
-                    <div class="button delete_button" @tap="handleDelete('repair')">删除</div>
+                    <div class="button" @tap="handleEditRepair(item,index)">编辑</div>
+                    <div class="button delete_button" @tap="handleDeleteRepair(item,index)">删除</div>
                   </div>
                 </div>
               </div>
@@ -506,7 +506,8 @@
         'userInfo',
         'inpartCount',
         'outpartCount',
-        'repairItemCount'
+        'repairItemCount',
+        'repairItems'
       ])
     },
     // 下拉刷新
@@ -601,6 +602,41 @@
         // 对应的id
         this[formName][type] = this[type+'Ids'][index]
       },
+      // 添加维修项目
+      handleRepair(){
+        wx.navigateTo({
+          url: '/pages/repair/main?select=true'
+        })
+      },
+      // 添加维修配件
+      handleProduct(){
+        wx.navigateTo({
+          url: '/pages/inventory/main?select=true'
+        })
+      },
+      // 编辑维修项目
+      handleEditRepair(item, index){
+        item.delete = false
+        item.add = false
+        item.index = index
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/selectRepair/main?id='+item.id
+          })
+        })
+      },
+      // 删除维修项目
+      handleDeleteRepair(item, index){
+        const that = this
+        item.delete = true
+        item.add = false
+        item.index = index
+        that.spinShow = true
+        that.$store.dispatch('updateRepairItem', item).then(() => {
+          globe.message('删除成功','success')
+          that.spinShow = false
+        })
+      },
       // 日期选择器
       handleDateChange(data, type) {
         console.log('picker发送选择改变，携带值为', data.mp.detail.value)
@@ -647,6 +683,10 @@
           //   globe.message('汽车车型不能为空', 'warning')
           //   return false
           // }
+          // 分发客户信息
+          this.$store.dispatch('saveClient',this.clientForm).then(()=>{
+
+          })
         }
         const stepCurrent = this.stepCurrent + 1
         this.stepCurrent = stepCurrent > 3 ? 3 : stepCurrent

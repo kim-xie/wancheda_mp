@@ -56,5 +56,30 @@ export default {
       commit(types.SET_EDITITEM, data)
       resolve()
     })
+  },
+  // 更新维修工单的维修项目列表
+  updateRepairItem({commit},item){
+    return new Promise((resolve,reject) => {
+      commit(types.SET_REPAIRITEM, item)
+      resolve()
+    })
+  },
+  // 更新维修领料列表
+  updateInventoryItem({
+    commit
+  }, item) {
+    return new Promise((resolve, reject) => {
+      commit(types.SET_INVENTORYITEM, item)
+      resolve()
+    })
+  },
+  // 保存开单客户信息
+  saveClient({
+    commit
+  }, item) {
+    return new Promise((resolve, reject) => {
+      commit(types.SET_CLIENT, item)
+      resolve()
+    })
   }
 }

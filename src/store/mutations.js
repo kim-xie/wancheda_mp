@@ -53,6 +53,36 @@ export default {
   // 保存编辑对象
   [types.SET_EDITITEM](state, editItem) {
     state.editItem = editItem
+  },
+
+  // 添加维修项目
+  [types.SET_REPAIRITEM](state, repairItem) {
+    if (repairItem.add){
+      console.log('add', repairItem.add)
+      state.repairItems.push(repairItem)
+      state.repairItemIds.push(repairItem.id)
+    } else if (repairItem.delete){
+      console.log('delete', repairItem.index)
+      console.log('delete', state.repairItems)
+      state.repairItems.splice(repairItem.index,1)
+      state.repairItemIds.splice(repairItem.index,1)
+      console.log('delete', state.repairItems)
+    }else{
+      console.log('edit', repairItem.index)
+      state.repairItems[repairItem.index] = repairItem
+      state.repairItemIds[repairItem.index] = repairItem.id
+    }
+  },
+
+  // 添加维修领料
+  [types.SET_INVENTORYITEM](state, inventoryItem) {
+    state.inventoryItems.push(inventoryItem)
+    state.inventoryItemIds.push(inventoryItem.inventoryId)
+  },
+
+  // 保存开单客户信息
+  [types.SET_CLIENT](state, client) {
+    state.client = client
   }
 
 }

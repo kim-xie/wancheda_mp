@@ -9,7 +9,7 @@
         </span>
         <!-- <span class="add_button float-left mr10">分类</span>
         <span class="add_button float-left">工种</span> -->
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+        <span v-if="select===''" class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -51,8 +51,9 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
+            <span v-if="select" class="button" @tap="handleSelect(item)">选择</span>
+            <span v-if="select===''" class="button edit" @tap="handleEdit(item)">编辑</span>
+            <span v-if="select===''" class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
@@ -74,9 +75,11 @@
   import global from '../../utils/globe'
   import api from '../../api/api'
   import * as utils from '../../assets/js/utils'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        select: '',
         modalVisible: false,
         spinShow: true,
         tipmessage: '我也是有底线的',
@@ -106,10 +109,22 @@
       }
     },
     mounted() {
-      this.spinShow = false
+    },
+    computed: {
+      ...mapGetters([
+        'repairItemIds'
+      ])
     },
     onLoad(){
+      this.select = ''
+      this.spinShow = false
       this.listData = []
+      if(global.getCurrentPageUrlArgs()){
+        const urlParams = global.getCurrentPageUrlArgs()
+        const types = urlParams.split('?')[1]
+        this.select = types.split('=')[1]
+        console.log(this.select)
+      }
       this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
@@ -159,9 +174,19 @@
         this.search.workTypeLK = ''
         this.getList(this.pageNo, this.pageSize)
       },
+      // 选择维修项目
+      handleSelect(item){
+        item.add = true
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/selectRepair/main?id='+item.id
+          })
+        })
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          'search.id_notIn': this.select && this.repairItemIds ? this.repairItemIds : '',
           'search.name_like': this.search.name,
           'search.code_like': this.search.code,
           'search.workTypeLK_eq': this.search.workTypeLK,
@@ -171,7 +196,7 @@
         this.spinShow = true
         this.$http.get(api.repair_list, params).then( res => {
           this.spinShow = false
-          console.log(res)
+          // console.log(res)
           if(res.success){
             this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements

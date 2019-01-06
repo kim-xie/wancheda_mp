@@ -60,8 +60,9 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button" @tap="inpart(item)">入库</span>
-            <span class="button" @tap="outpart(item)">出库</span>
+            <span v-if="select" class="button" @tap="handleSelect(item)">选择</span>
+            <span v-if="select===''" class="button" @tap="inpart(item)">入库</span>
+            <span v-if="select===''" class="button" @tap="outpart(item)">出库</span>
           </p>
         </div>
       </div>
@@ -81,6 +82,7 @@
   export default {
     data () {
       return {
+        select: '',
         spinShow: true,
         tipmessage: '我也是有底线的',
         loading: false,
@@ -98,8 +100,15 @@
       }
     },
     onLoad() {
+      this.select = ''
       this.spinShow = false
       this.getList(this.pageNo, this.pageSize)
+      if(globe.getCurrentPageUrlArgs()){
+        const urlParams = globe.getCurrentPageUrlArgs()
+        const types = urlParams.split('?')[1]
+        this.select = types.split('=')[1]
+        console.log(this.select)
+      }
     },
     // 下拉刷新
     onPullDownRefresh() {
