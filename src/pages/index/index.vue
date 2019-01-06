@@ -232,38 +232,38 @@
             <!-- 领料列表 -->
             <div class="productList repairList">
               <div class="repairItems">
-                <div class="repairItem">
+                <div class="repairItem" v-for="(item, index) in inventoryItems" :key="index">
                   <div class="repair_item">
                     <div class="item_label">配件名称</div>
-                    <div class="item_value">保养</div>
+                    <div class="item_value">{{item.name}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">单价(元)</div>
-                    <div class="item_value">100</div>
+                    <div class="item_value">{{item.sale}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">折扣(折)</div>
-                    <div class="item_value">9</div>
+                    <div class="item_value">{{item.discount}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">数量</div>
-                    <div class="item_value">1</div>
+                    <div class="item_value">{{item.count}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">小计(元)</div>
-                    <div class="item_value">90</div>
+                    <div class="item_value">{{item.subtotal}}/{{item.total}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">领料人</div>
-                    <div class="item_value">kim</div>
+                    <div class="item_value">{{item.receiverVal}}</div>
                   </div>
                   <div class="repair_item">
                     <div class="item_label">备注</div>
-                    <div class="item_value">备注</div>
+                    <div class="item_value">{{item.description}}</div>
                   </div>
                   <div class="item_button">
-                    <div class="button" @tap="handleEdit('repair')">编辑</div>
-                    <div class="button delete_button" @tap="handleDelete('repair')">删除</div>
+                    <div class="button" @tap="handleEditInventory(item, index)">编辑</div>
+                    <div class="button delete_button" @tap="handleDeleteInventory(item, index)">删除</div>
                   </div>
                 </div>
               </div>
@@ -507,7 +507,8 @@
         'inpartCount',
         'outpartCount',
         'repairItemCount',
-        'repairItems'
+        'repairItems',
+        'inventoryItems'
       ])
     },
     // 下拉刷新
@@ -633,6 +634,29 @@
         item.index = index
         that.spinShow = true
         that.$store.dispatch('updateRepairItem', item).then(() => {
+          globe.message('删除成功','success')
+          that.spinShow = false
+        })
+      },
+      // 编辑配件
+      handleEditInventory(item, index){
+        item.delete = false
+        item.add = false
+        item.index = index
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/selectInventory/main?id='+item.id
+          })
+        })
+      },
+      // 删除配件
+      handleDeleteInventory(item, index){
+        const that = this
+        item.delete = true
+        item.add = false
+        item.index = index
+        that.spinShow = true
+        that.$store.dispatch('updateInventoryItem', item).then(() => {
           globe.message('删除成功','success')
           that.spinShow = false
         })

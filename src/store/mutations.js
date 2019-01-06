@@ -58,17 +58,12 @@ export default {
   // 添加维修项目
   [types.SET_REPAIRITEM](state, repairItem) {
     if (repairItem.add){
-      console.log('add', repairItem.add)
       state.repairItems.push(repairItem)
       state.repairItemIds.push(repairItem.id)
     } else if (repairItem.delete){
-      console.log('delete', repairItem.index)
-      console.log('delete', state.repairItems)
       state.repairItems.splice(repairItem.index,1)
       state.repairItemIds.splice(repairItem.index,1)
-      console.log('delete', state.repairItems)
     }else{
-      console.log('edit', repairItem.index)
       state.repairItems[repairItem.index] = repairItem
       state.repairItemIds[repairItem.index] = repairItem.id
     }
@@ -76,8 +71,16 @@ export default {
 
   // 添加维修领料
   [types.SET_INVENTORYITEM](state, inventoryItem) {
-    state.inventoryItems.push(inventoryItem)
-    state.inventoryItemIds.push(inventoryItem.inventoryId)
+    if (inventoryItem.add) {
+      state.inventoryItems.push(inventoryItem)
+      state.inventoryItemIds.push(inventoryItem.id)
+    } else if (inventoryItem.delete) {
+      state.inventoryItems.splice(inventoryItem.index, 1)
+      state.inventoryItemIds.splice(inventoryItem.index, 1)
+    } else {
+      state.inventoryItems[inventoryItem.index] = inventoryItem
+      state.inventoryItemIds[inventoryItem.index] = inventoryItem.id
+    }
   },
 
   // 保存开单客户信息

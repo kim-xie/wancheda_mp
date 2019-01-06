@@ -1,8 +1,8 @@
 {
   "pages": [
-    
     "pages/index/main",
     "pages/selectRepair/main",
+    "pages/selectInventory/main",
     "pages/login/main",
     "pages/lookupdf/main",
     "pages/userInfo/main",

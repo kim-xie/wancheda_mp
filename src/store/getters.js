@@ -34,6 +34,16 @@ export const repairItems = (state) => {
 }
 
 export const repairItemIds = (state) => {
-  console.log('repairItems', state.repairItemIds)
+  console.log('repairItemIds', state.repairItemIds)
   return state.repairItemIds.join(',')
+}
+
+export const inventoryItems = (state) => {
+  console.log('inventoryItems', state.inventoryItems)
+  return state.inventoryItems
+}
+
+export const inventoryItemIds = (state) => {
+  console.log('inventoryItemIds', state.inventoryItemIds)
+  return state.inventoryItemIds.join(',')
 }

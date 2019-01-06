@@ -79,6 +79,7 @@
   import globe from '../../utils/globe'
   import api from '../../api/api'
   import * as utils from '../../assets/js/utils'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
@@ -99,16 +100,21 @@
         searchVal: ''
       }
     },
+    computed: {
+      ...mapGetters([
+        'inventoryItemIds'
+      ])
+    },
     onLoad() {
       this.select = ''
       this.spinShow = false
-      this.getList(this.pageNo, this.pageSize)
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         const types = urlParams.split('?')[1]
         this.select = types.split('=')[1]
         console.log(this.select)
       }
+      this.getList(this.pageNo, this.pageSize)
     },
     // 下拉刷新
     onPullDownRefresh() {
@@ -139,7 +145,6 @@
     methods: {
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.partName = ''
         this.search.partCode = ''
@@ -159,6 +164,7 @@
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         const params = {
+          'search.id_notIn': this.select && this.inventoryItemIds ? this.inventoryItemIds : '',
           'partCode': this.search.partCode,
           'partName': this.search.partName,
           'search.isDeleted_eq': false,
@@ -167,14 +173,13 @@
         }
         this.spinShow = true
         this.$http.get(api.inventory_list, params).then( res => {
-          console.log(res)
           if(res.success){
             this.listData = res.data.entitys
             this.totalData = res.data.entitys.length
             this.extendInfo = res.extendInfo
             this.getInventoryList(this.listData,this.extendInfo)
-            console.log(this.listData)
-            console.log(this.extendInfo)
+            //console.log(this.listData)
+            //console.log(this.extendInfo)
             this.spinShow = false
             if(callback && typeof callback == 'function'){
               callback()
@@ -199,6 +204,15 @@
           tableData[i].isDisable = extendInfo.partId[tableData[i].partId].isDisable
           tableData[i].unitLKVal = extendInfo.unitLK[tableData[i].unitLK].value
         }
+      },
+      // 选择维修项目
+      handleSelect(item){
+        item.add = true
+        this.$store.dispatch('saveEditItem', item).then(() => {
+          wx.navigateTo({
+            url: '/pages/selectInventory/main?id='+item.id
+          })
+        })
       },
       // 入库
       inpart(item){
