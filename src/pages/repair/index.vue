@@ -30,7 +30,7 @@
               <span class="value">{{item.workHour}}</span>
             </p>
             <p class="">
-              <span class="label">单价:</span>
+              <span class="label">单价(元):</span>
               <span class="value">{{item.sum}}</span>
             </p>
           </p>

@@ -19,7 +19,7 @@
             </i-step>
             <i-step>
                 <view slot="title">
-                  车辆信息
+                  工单信息
                 </view>
             </i-step>
             <i-step>
@@ -270,10 +270,69 @@
             </div>
           </div>
 
+          <!-- 确认下单 -->
+          <div class="billingForm" v-if="stepCurrent===3">
+            <div class="billingWrap">
+              <div class="client">
+                <i-card title="客户信息" :extra="clientForm.carNo">
+                  <view slot="content">
+                    车主：{{clientForm.name}}<br/>
+                    车型：{{carBrand}} {{clientForm.carModel}}
+                  </view>
+                  <view slot="footer">
+                    手机：{{clientForm.mobile}}
+                  </view>
+                </i-card>
+              </div>
+              <div class="client">
+                <i-card title="工单信息" :extra="repairTypeLK">
+                  <view slot="content">
+                    进店油表：{{carOilmeter}} <br/>
+                    进店里程：{{repairForm.carMileage}} km
+                  </view>
+                  <view slot="footer">服务顾问：{{clerk}}</view>
+                </i-card>
+              </div>
+              <div class="client">
+                <i-card title="维修项目" :extra="'小计：￥'+repairsubtotal">
+                  <view slot="content" v-for="(item, index) in repairItems" :key="index">
+                    项目名称：{{item.name}} <br/>
+                    单价：￥{{item.sum}} <br/>
+                    数量：{{item.workHour}} <br/>
+                    <hr style="height:1px;border:1px dashed #ccc;"/>
+                  </view>
+                  <view slot="footer">折扣：{{repairItems[0].discount}} 折</view>
+                </i-card>
+              </div>
+              <div class="client" v-if="inventoryItems.length>0">
+                <i-card title="维修领料" :extra="'小计：￥'+inventorysubtotal">
+                  <view slot="content" v-for="(item, index) in inventoryItems" :key="index">
+                    配件名称：{{item.name}} <br/>
+                    单价：￥{{item.sale}} <br/>
+                    工时：{{item.count}} <br/>
+                    <hr style="height:1px;border:1px dashed #ccc;"/>
+                  </view>
+                  <view slot="footer">折扣：{{inventoryItems[0].discount}} 折</view>
+                </i-card>
+              </div>
+              <div class="client">
+                <i-cell-group>
+                  <i-cell v-if="ownCoupon" title="优惠券" value="有可用" is-link @tap="selectCoupon"></i-cell>
+                  <i-cell v-else title="优惠券" value="无可用" is-link></i-cell>
+                  <!-- <i-cell title="折扣" :value="repairItems[0].discount+'折'"></i-cell> -->
+                  <i-cell v-if="couponVal>0" title="优惠券" :value="'-￥'+Number(couponVal)"></i-cell>
+                  <i-cell title="已优惠" :value="'-￥'+discounttotal"></i-cell>
+                  <i-cell title="消费金额" :value="'￥'+alltotal"></i-cell>
+                </i-cell-group>
+              </div>
+            </div>
+          </div>
+
           <!-- 按钮 -->
           <div class="step_button">
             <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" inline shape="circle" size="small">下一步</i-button>
             <i-button v-if="stepCurrent>0" @tap="handlePrev" type="info" inline shape="circle" size="small">上一步</i-button>
+            <i-button v-if="stepCurrent===3" @tap="billing" type="error" inline shape="circle" size="small">提交订单</i-button>
           </div>
         </div>
       </div>
@@ -440,6 +499,12 @@
   export default {
     data () {
       return {
+        repairtotal: 0,
+        repairsubtotal: 0,
+        inventorytotal: 0,
+        inventorysubtotal: 0,
+        discounttotal: 0,
+        alltotal: 0,
         tipmessage: '我也是有底线的',
         loading: false,
         showMore: false,
@@ -479,6 +544,9 @@
         repairWorkorderAllTotal: 0,
         allPageNo: 1,
         allPageSize: 10,
+        clientCouponTableData: [],
+        ownCoupon: false,
+        couponVal: 0,
       }
     },
     mounted() {
@@ -508,7 +576,8 @@
         'outpartCount',
         'repairItemCount',
         'repairItems',
-        'inventoryItems'
+        'inventoryItems',
+        'client'
       ])
     },
     // 下拉刷新
@@ -557,11 +626,11 @@
             if(res.success){
               this.spinShow = false
               let clientData = res.data.page.content
-              console.log(clientData)
+              //console.log(clientData)
               for(var i=0;i<clientData.length;i++){
                 _this.level = clientData[i].date.level.value
                 _this.type = clientData[i].date.type.value
-                _this.carBrand = clientData[i].date.level.value
+                _this.carBrand = clientData[i].date.carBrand.value
                 _this.clientSex = clientData[i].sex === true ? '男':'女'
                 _this.insuranceEndtime = clientData[i].insuranceEndtime
                 _this.registrationDate = clientData[i].registrationDate
@@ -661,6 +730,105 @@
           that.spinShow = false
         })
       },
+      // 下单
+      billing(formName){
+        let _this = this
+        let newRepairItemTable = []
+        for(var i=0;i<this.repairItemTableDatas.length;i++){
+          let tableDate = {}
+          tableDate.workorderId = ""
+          tableDate.itemId = _this.repairItemTableDatas[i].id
+          tableDate.mechanic = _this.repairItemTableDatas[i].mechanic
+          newRepairItemTable.push(tableDate)
+        }
+        let outpartInfos = []
+        for(var i=0;i< _this.productTableDatas.length;i++){
+          let outpartInfoObj = {
+            "workOrderNo": "",
+            "inventoryId": _this.productTableDatas[i].inventoryId,
+            "count": _this.productTableDatas[i].count,
+            "sale": _this.productTableDatas[i].sale,
+            "isDeleted": false
+          }
+          outpartInfos.push(outpartInfoObj)
+        }
+        // 客户信息
+        delete this.clientForm.date;
+        delete this.clientForm.carBrandVal;
+        delete this.clientForm.levelVal;
+        delete this.clientForm.insuranceEndtime;
+        delete this.clientForm.registrationDate;
+        delete this.clientForm.createTime;
+        delete this.clientForm.updateTime;
+        delete this.clientForm.typeVal;
+        this.clientForm.company = this.usercompany
+
+        // 订单详情
+        var addFormObj = {
+          // 客户信息
+          "client": this.clientForm,
+          // 维修工单
+          "repairWorkorder": {
+            "workorderState": '维修中',//工单状态
+            "repairTypeLK": this.repairOrderForm.repairTypeLK,//维修性质
+            "sum": Number(this.outpartsTotal) + Number(this.repairsTotal) - couponVal <=0?'':Number(this.outpartsTotal) + Number(this.repairsTotal) - couponVal,//维修金额
+            "clerk": this.repairOrderForm.clerk,//服务顾问
+            "carMileage": this.repairOrderForm.carMileage,//进店里程
+            "carOilmeter": this.repairOrderForm.carOilmeter,//进店油表
+            "sendMan": this.repairOrderForm.sendMan,//送修人
+            "endTime": this.repairOrderForm.endTime,//离店时间
+            "clentRemind": this.repairOrderForm.clentRemind,//客户嘱咐
+            "company": this.usercompany//公司
+          },
+          // 工单详情
+          "repairWorkorderItems": newRepairItemTable,
+          // 领料单
+          "outPartComposite": {
+            "outPart": {
+              "type": this.outpartType.id, //出库类型 -- 维修领料
+              "receiver": this.productTableDatas[0] ? this.productTableDatas[0].receiver : '', //领料人
+              "sum": this.outpartsTotal, //总金额
+              "repairWorkorderNo": "", // 对应维修开单
+              "clientName": "", // 对应配件销售
+              "carNo": "", // 对应配件销售
+              "departmentLK": "",// 对应配件内耗
+              "company": this.usercompany,//公司
+              "isDeleted": false
+            },
+            "outPartInfos": outpartInfos
+          }
+        }
+        //console.log(this.outpartsTotal)
+        this.$http.post(api.addRepairOrder, addFormObj, true).then((res) => {
+          if(res.success){
+            //this.$store.commit('updateRepairItemCount', Number(this.$store.state.repairItemCount)+1)
+            // _this.$alert('订单提交成功，前往查看订单？', '温馨提示', {
+            //   confirmButtonText: '确定',
+            //   cancelButtonText: '取消',
+            //   type: 'success'
+            // }).then(() => {
+            //   _this.$router.replace('/serviceRecord')
+            // }).catch(() => {
+            //   window.location.reload()
+            //   _this.repairOrderForm = null
+            //   _this.clientTableData = null
+            //   _this.repairItemTableDatas = null
+            //   _this.productTableDatas = null
+            // })
+          }else{
+            // _this.$alert('订单提交失败,请稍后重试', '温馨提示', {
+            //   confirmButtonText: '确定',
+            //   cancelButtonText: '取消',
+            //   type: 'danger'
+            // }).then(() => {
+            // }).catch(() => {
+
+            // })
+          }
+        }, error => {
+          globe.message('网络连接失败，请重试！','error')
+        })
+      },
       // 日期选择器
       handleDateChange(data, type) {
         console.log('picker发送选择改变，携带值为', data.mp.detail.value)
@@ -684,7 +852,7 @@
       },
       // 下单下一步
       handleNext(){
-        if(this.stepCurrent === 0){
+        if(this.stepCurrent == 0){
           // if(!this.clientForm.carNo){
           //   globe.message('车牌号不能为空', 'warning')
           //   return false
@@ -711,9 +879,51 @@
           this.$store.dispatch('saveClient',this.clientForm).then(()=>{
 
           })
+        }else if(this.stepCurrent === 2){
+          console.log(3)
+          const that = this
+          for(let i=0; i<that.repairItems.length;i++){
+            console.log('----------')
+            console.log(that.repairItems[i].total)
+            that.repairtotal += Number(that.repairItems[i].total)
+            that.repairsubtotal += Number(that.repairItems[i].subtotal)
+            console.log(that.repairsubtotal)
+          }
+          if(that.inventoryItems.length > 0){
+            for(let i=0; i<that.inventoryItems.length;i++){
+              console.log('----------')
+              console.log(that.inventoryItems[i].total)
+              that.inventorytotal += Number(that.inventoryItems[i].total)
+              that.inventorysubtotal += Number(that.inventoryItems[i].subtotal)
+              console.log(that.inventorysubtotal)
+            }
+          }
+          const allTotal = Number(that.repairtotal) + Number(that.inventorytotal)
+          const allSubTotal = Number(that.repairsubtotal) + Number(that.inventorysubtotal)
+          that.discounttotal = Number(allTotal - allSubTotal).toFixed(2)
+          that.alltotal = Number(allSubTotal).toFixed(2)
+          that.loadClientCouponData(that.client.id)
         }
-        const stepCurrent = this.stepCurrent + 1
+        let stepCurrent = this.stepCurrent + 1
         this.stepCurrent = stepCurrent > 3 ? 3 : stepCurrent
+      },
+      // 加载客户优惠券
+      loadClientCouponData(clientId) {
+        const params = {
+          'search.clientId_eq': clientId,
+          'page.pn': 1,
+          'page.size': 100
+        }
+        this.$http.get(api.coupon_list, params).then((res) => {
+          if(res.success){
+            this.clientCouponTableData = response.body.data.page.content
+            if(this.clientCouponTableData.length>0){
+              this.ownCoupon = true
+            }else{
+              this.ownCoupon = false
+            }
+          }
+        })
       },
       // 选择性别
       selectSex(){
@@ -1019,6 +1229,15 @@
         }
       }
     }
+  }
+}
+.billingForm{
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  .billingWrap{
+    width: 90%;
+    margin: 0 auto;
   }
 }
 .step_button{

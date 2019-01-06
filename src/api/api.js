@@ -38,7 +38,8 @@ const api = {
   outpartInfo_list: '/outPartInfo/extendPage',
   outPart_add: '/outPart/newOutPart',
   repairWorkorder: '/repairWorkorder/page',
-  getLookupById: '/lookup/getById'
+  getLookupById: '/lookup/getById',
+  addRepairOrder: '/repairWorkorder/newRepairWorkorder'
 }
 
 export default api
