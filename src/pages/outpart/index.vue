@@ -27,7 +27,8 @@
           <p class="item">
             <span class="label">出库类型</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'outpartType')" :range="outpartTypes">
-              <span class="input" v-model="outpartType"></span>
+              <span v-if="outpartType===''" class="input placeholder">请选择出库类型</span>
+              <span v-else class="input">{{outpartType}}</span>
             </picker>
           </p>
           <p class="item" v-if="outpartType === '维修领料'">
@@ -45,7 +46,8 @@
           <p class="item" v-if="outpartType === '配件内耗'">
             <span class="label">门店名称</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'company')" :range="companys">
-              <span class="input" v-model="company"></span>
+              <span v-if="company===''" class="input placeholder">请选择门店</span>
+              <span v-else class="input">{{company}}</span>
             </picker>
           </p>
           <p class="item" v-if="outpartType === '配件内耗'">
@@ -55,7 +57,8 @@
           <p class="item">
             <span class="label">领料人</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'receiver')" :range="receivers">
-              <span class="input" v-model="receiver"></span>
+              <span v-if="receiver===''" class="input placeholder">请选择领料人</span>
+              <span v-else class="input">{{receiver}}</span>
             </picker>
           </p>
           <p class="item">
@@ -644,9 +647,9 @@
     height: 100%;
     width: 90%;
     margin: 0 auto;
-    padding: 6px;
     .item{
       margin: 6px 0;
+      padding: 6px;
       overflow: hidden;
       border: 1px solid #ccc;
       .label{

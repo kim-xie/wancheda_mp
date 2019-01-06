@@ -27,13 +27,15 @@
           <p class="item">
             <span class="label">支付方式</span>
             <picker @change="bindPickerChange($event, 'inpartingForm', 'payMethhodLKVal')" :range="payMethhodLKVals">
-              <span v-model="payMethhodLKVal"></span>
+              <span v-if="payMethhodLKVal===''" class="input placeholder">请选择支付方式</span>
+              <span v-else class="input">{{payMethhodLKVal}}</span>
             </picker>
           </p>
           <p class="item">
             <span class="label">供应商</span>
             <picker @change="bindPickerChange($event, 'inpartingForm', 'supplierLK')" :range="supplierLKs">
-              <span v-model="supplierLK"></span>
+              <span v-if="supplierLK===''" class="input placeholder">请选择供应商</span>
+              <span v-else class="input">{{supplierLK}}</span>
             </picker>
           </p>
           <p class="item">
@@ -496,9 +498,9 @@
     height: 100%;
     width: 90%;
     margin: 0 auto;
-    padding: 6px;
     .item{
       margin: 6px 0;
+      padding: 6px;
       overflow: hidden;
       border: 1px solid #ccc;
       .label{
