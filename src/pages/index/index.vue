@@ -50,19 +50,22 @@
             <div class="item">
               <span class="label">客户级别:</span>
               <picker @change="bindPickerChange($event, 'clientForm', 'level')" :range="levels">
-                <input class="input" v-model="level" type="text" readonly placeholder="请选择客户级别">
+                <span v-if="level===''" class="input placeholder">请选择客户级别</span>
+                <span v-else class="input">{{level}}</span>
               </picker>
             </div>
             <div class="item">
               <span class="label">客户类型:</span>
               <picker @change="bindPickerChange($event, 'clientForm', 'type')" :range="types">
-                <input class="input" v-model="type" type="text" readonly placeholder="请选择客户类型">
+                <span v-if="type===''" class="input placeholder">请选择客户类型</span>
+                <span v-else class="input">{{type}}</span>
               </picker>
             </div>
             <div class="item">
               <span class="label">汽车品牌:</span>
               <picker @change="bindPickerChange($event, 'clientForm', 'carBrand')" :range="carBrands">
-                <input class="input" v-model="carBrand" type="text" readonly placeholder="请选择汽车品牌">
+                <span v-if="carBrand===''" class="input placeholder">请选择汽车品牌</span>
+                <span v-else class="input">{{carBrand}}</span>
               </picker>
             </div>
             <div class="item">
@@ -79,7 +82,8 @@
             </div>
             <div class="item" v-if="showMore">
               <span class="label">客户性别:</span>
-              <input class="input" v-model="clientSex" type="text" @tap="selectSex" placeholder="请选择客户性别">
+              <span v-if="clientSex===''" class="input placeholder" @tap="selectSex">请选择客户性别</span>
+              <span v-else class="input" @tap="selectSex">{{clientSex}}</span>
             </div>
             <div class="item" v-if="showMore">
               <span class="label">证件号码:</span>
@@ -106,9 +110,9 @@
               <picker
                 mode="date"
                 :value="insuranceEndtime"
-                @change="handleDateChange($event, 'insur')"
-              >
-                <input class="input" v-model="insuranceEndtime" type="text" readonly placeholder="请选择保险到期时间">
+                @change="handleDateChange($event, 'insur')">
+                <span v-if="insuranceEndtime===''" class="input placeholder">请选择保险到期时间</span>
+                <span v-else class="input">{{insuranceEndtime}}</span>
               </picker>
             </div>
             <div class="item" v-if="showMore">
@@ -116,9 +120,9 @@
               <picker
                 mode="date"
                 :value="registrationDate"
-                @change="handleDateChange($event, 'reg')"
-              >
-                <input class="input" v-model="registrationDate" type="text" readonly placeholder="请选择上牌日期">
+                @change="handleDateChange($event, 'reg')">
+                <span v-if="registrationDate===''" class="input placeholder">请选择上牌日期</span>
+                <span v-else class="input">{{registrationDate}}</span>
               </picker>
             </div>
             <div class="item" v-if="showMore">
@@ -138,7 +142,8 @@
             <div class="item">
               <span class="label">维修性质:</span>
               <picker @change="bindPickerChange($event, 'repairForm', 'repairTypeLK')" :range="repairTypeLKs">
-                <input class="input" v-model="repairTypeLK" type="text" placeholder="请选择维修性质">
+                <span v-if="repairTypeLK===''" class="input placeholder">请选择维修性质</span>
+                <span v-else class="input">{{repairTypeLK}}</span>
               </picker>
             </div>
             <div class="item">
@@ -148,7 +153,8 @@
             <div class="item">
               <span class="label">进店油表:</span>
               <picker @change="bindPickerChange($event, 'repairForm', 'carOilmeter')" :range="carOilmeters">
-                <input class="input" v-model="carOilmeter" type="text" placeholder="请选择进店油表">
+                <span v-if="carOilmeter===''" class="input placeholder">请选择进店油表</span>
+                <span v-else class="input">{{carOilmeter}}</span>
               </picker>
             </div>
             <div class="item">
@@ -161,13 +167,15 @@
                 mode="date"
                 :value="endTimeVal"
                 @change="handleDateChange($event, 'endTime')">
-                <input class="input" v-model="endTimeVal" type="text" readonly placeholder="请选择交车时间">
+                <span v-if="endTimeVal===''" class="input placeholder">请选择交车时间</span>
+                <span v-else class="input">{{endTimeVal}}</span>
               </picker>
             </div>
             <div class="item">
               <span class="label">服务顾问:</span>
               <picker @change="bindPickerChange($event, 'repairForm', 'clerk')" :range="clerks">
-                <input class="input" v-model="clerk" type="text" readonly placeholder="请选择服务顾问">
+                <span v-if="clerk===''" class="input placeholder">请选择服务顾问</span>
+                <span v-else class="input">{{clerk}}</span>
               </picker>
             </div>
             <div class="item">
@@ -176,10 +184,96 @@
             </div>
           </div>
 
+          <!-- 维修领料 -->
+          <div class="productForm" v-if="stepCurrent===2">
+            <i-button @click="handleClick" inline shape="circle" size="small">添加服务项目</i-button>
+            <i-button @click="handleClick" inline shape="circle" size="small">添加维修配件</i-button>
+
+            <!-- 服务项目列表 -->
+            <div class="repairList">
+              <div class="repairItems">
+                <div class="repairItem">
+                  <div class="repair_item">
+                    <div class="item_label">项目名称</div>
+                    <div class="item_value">保养</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">单价(元)</div>
+                    <div class="item_value">100</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">折扣(折)</div>
+                    <div class="item_value">9</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">工时/数量</div>
+                    <div class="item_value">1</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">小计(元)</div>
+                    <div class="item_value">90</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">技师</div>
+                    <div class="item_value">kim</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">备注</div>
+                    <div class="item_value">备注</div>
+                  </div>
+                  <div class="item_button">
+                    <div class="button" @tap="handleEdit('repair')">编辑</div>
+                    <div class="button delete_button" @tap="handleDelete('repair')">删除</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 领料列表 -->
+            <div class="productList repairList">
+              <div class="repairItems">
+                <div class="repairItem">
+                  <div class="repair_item">
+                    <div class="item_label">配件名称</div>
+                    <div class="item_value">保养</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">单价(元)</div>
+                    <div class="item_value">100</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">折扣(折)</div>
+                    <div class="item_value">9</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">数量</div>
+                    <div class="item_value">1</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">小计(元)</div>
+                    <div class="item_value">90</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">领料人</div>
+                    <div class="item_value">kim</div>
+                  </div>
+                  <div class="repair_item">
+                    <div class="item_label">备注</div>
+                    <div class="item_value">备注</div>
+                  </div>
+                  <div class="item_button">
+                    <div class="button" @tap="handleEdit('repair')">编辑</div>
+                    <div class="button delete_button" @tap="handleDelete('repair')">删除</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 按钮 -->
           <div class="step_button">
-            <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" shape="circle" size="small">下一步</i-button>
-            <i-button v-if="stepCurrent>0" @tap="handlePrev" type="info" shape="circle" size="small">上一步</i-button>
+            <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" inline shape="circle" size="small">下一步</i-button>
+            <i-button v-if="stepCurrent>0" @tap="handlePrev" type="info" inline shape="circle" size="small">上一步</i-button>
           </div>
         </div>
       </div>
@@ -187,7 +281,7 @@
         <div>
           <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
             <i-tab key="tab1" title="维修中" :count="repairWorkorderTotal"></i-tab>
-            <i-tab key="tab2" title="待付款" :count="repairWorkorderTotal"></i-tab>
+            <!-- <i-tab key="tab2" title="待付款" :count="repairWorkorderTotal"></i-tab> -->
             <i-tab key="tab3" :title="'已完成('+repairWorkorderAllTotal+')'"></i-tab>
           </i-tabs>
           <!-- 待完成订单 -->
@@ -384,7 +478,7 @@
         repairWorkorderTotal: 0,
         repairWorkorderAllTotal: 0,
         allPageNo: 1,
-        allPageSize: 2,
+        allPageSize: 10,
       }
     },
     mounted() {
@@ -431,6 +525,10 @@
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
+      // console.log(this.repairWorkorderAllTotal)
+      // console.log(this.allPageSize)
+      // console.log(this.repairWorkorderAllTotal/this.allPageSize)
+      // console.log(this.allPageNo)
       if(this.allPageNo < this.repairWorkorderAllTotal/this.allPageSize){
         this.loading = true
         this.tipmessage = '玩命加载中'
@@ -527,28 +625,28 @@
       // 下单下一步
       handleNext(){
         if(this.stepCurrent === 0){
-          if(!this.clientForm.carNo){
-            globe.message('车牌号不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.name){
-            globe.message('客户名称不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.level){
-            globe.message('客户级别不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.mobile){
-            globe.message('客户手机不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.type){
-            globe.message('客户类型不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.carBrand){
-            globe.message('汽车品牌不能为空', 'warning')
-            return false
-          }else if(!this.clientForm.carModel){
-            globe.message('汽车车型不能为空', 'warning')
-            return false
-          }
+          // if(!this.clientForm.carNo){
+          //   globe.message('车牌号不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.name){
+          //   globe.message('客户名称不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.level){
+          //   globe.message('客户级别不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.mobile){
+          //   globe.message('客户手机不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.type){
+          //   globe.message('客户类型不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.carBrand){
+          //   globe.message('汽车品牌不能为空', 'warning')
+          //   return false
+          // }else if(!this.clientForm.carModel){
+          //   globe.message('汽车车型不能为空', 'warning')
+          //   return false
+          // }
         }
         const stepCurrent = this.stepCurrent + 1
         this.stepCurrent = stepCurrent > 3 ? 3 : stepCurrent
@@ -709,6 +807,9 @@
 .navigator-hover {
   color:blue;
 }
+.placeholder{
+  color: #777;
+}
 </style>
 
 <style lang="scss" scoped>
@@ -803,10 +904,63 @@
     text-align: center;
   }
 }
-
+.productForm{
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  overflow: hidden;
+  .repairList{
+    overflow: hidden;
+    margin: 0 auto;
+    margin-top: 10px;
+    width: 90%;
+    .repairItem{
+      overflow: hidden;
+      background: #ccc;
+      height: 100%;
+      border-radius: 6px;
+      padding: 10px 10px 0 10px;
+      .repair_item{
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        .item_label{
+          width: 40%;
+          float: left;
+        }
+        .item_value{
+          width: 60%;
+          float: left;
+        }
+      }
+      .item_button{
+        overflow: hidden;
+        height: 50px;
+        line-height: 50px;
+        width: 100%;
+        margin-top: 10px;
+        border-top: 1px solid #333;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .button{
+          width: 80px;
+          margin: 0 auto;
+          height: 30px;
+          line-height: 30px;
+          border: 1px solid #333;
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+}
 .step_button{
   width: 100%;
   margin: 0 auto;
+  text-align: center;
 }
 
 </style>

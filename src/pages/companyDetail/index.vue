@@ -7,41 +7,42 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">所属品牌</span>
-        <input v-model="form.brand"/>
+        <input v-model="form.brand" placeholder="请输入所属品牌"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">门店类型</span>
         <picker @change="bindPickerChange($event, 'form', 'type')" :range="types">
-          <input v-model="type" readonly/>
+          <span v-if="type===''" class="input placeholder">请选择门店类型</span>
+          <span v-else class="input">{{type}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">门店名称</span>
-        <input v-model="form.name"/>
+        <input v-model="form.name" placeholder="请输入门店名称"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">门店代码</span>
-        <input v-model="form.code"/>
+        <input v-model="form.code" placeholder="请输入门店代码"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">门店地址</span>
-        <input v-model="form.address"/>
+        <input v-model="form.address" placeholder="请输入门店地址"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客服邮箱</span>
-        <input v-model="form.email"/>
+        <input v-model="form.email" placeholder="请输入客服邮箱"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客服热线</span>
-        <input v-model="form.mobile"/>
+        <input v-model="form.mobile" placeholder="请输入客服热线"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">默认车牌</span>
-        <input v-model="form.carNo"/>
+        <input v-model="form.carNo" placeholder="请输入默认车牌"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">备注</span>
-        <input v-model="form.description"/>
+        <input v-model="form.description" placeholder="请输入备注信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>
@@ -215,6 +216,9 @@
       box-shadow:0 0 10rpx $--color-primary;
       color: $--color-white;
       font-size: 36rpx;
+    }
+    .placeholder{
+      color: #777;
     }
   }
 </style>

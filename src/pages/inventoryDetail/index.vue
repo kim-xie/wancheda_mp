@@ -8,15 +8,15 @@
 
       <p class="input_wrap" v-if="type === 'inpart'">
         <span class="input_label">进货价:</span>
-        <input type="number" v-model="form.cost"/>
+        <input type="number" v-model="form.cost" placeholder="请输入进货价"/>
       </p>
       <p class="input_wrap" v-if="type === 'outpart'">
         <span class="input_label">销售价:</span>
-        <input type="number" v-model="form.sale"/>
+        <input type="number" v-model="form.sale" placeholder="请输入销售价"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">配件数量:</span>
-        <input type="number" v-model="form.count"/>
+        <input type="number" v-model="form.count" placeholder="请输入配件数量"/>
       </p>
       <button class="save" v-if="type === 'outpart'" @click="handleSave">出 库</button>
       <button class="save" v-if="type === 'inpart'" @click="handleSave">入 库</button>

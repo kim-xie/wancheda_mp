@@ -7,39 +7,41 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">账号名</span>
-        <input v-model="form.username"/>
+        <input v-model="form.username" placeholder="请输入账号名"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">真实姓名</span>
-        <input v-model="form.fullname"/>
+        <input v-model="form.fullname" placeholder="请输入真实姓名"/>
       </p>
       <p class="input_wrap" v-if="id === ''">
         <span class="input_label">初始密码</span>
-        <input type="password" v-model="password"/>
+        <input type="password" v-model="password" placeholder="请输入初始密码"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">联系电话</span>
-        <input v-model="form.mobile"/>
+        <input v-model="form.mobile" type="number" placeholder="请输入联系电话"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">邮箱</span>
-        <input v-model="form.email"/>
+        <input v-model="form.email" placeholder="请输入邮箱"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">所属公司</span>
         <picker @change="bindPickerChange($event, 'form', 'company')" :range="companys">
-          <input v-model="company" readonly/>
+          <span v-if="company===''" class="input placeholder">请选择所属公司</span>
+          <span v-else class="input">{{company}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">角色</span>
         <picker @change="bindPickerChange($event, 'form', 'role')" :range="roles">
-          <input v-model="role" readonly/>
+          <span v-if="role===''" class="input placeholder">请选择所属角色</span>
+          <span v-else class="input">{{role}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">备注</span>
-        <input v-model="form.description"/>
+        <input v-model="form.description" placeholder="请输入备注信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>
@@ -257,6 +259,9 @@
       box-shadow:0 0 10rpx $--color-primary;
       color: $--color-white;
       font-size: 36rpx;
+    }
+    .placeholder{
+      color: #777;
     }
   }
 </style>

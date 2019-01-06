@@ -7,35 +7,37 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">项目代码:</span>
-        <input v-model="form.code"/>
+        <input v-model="form.code" placeholder="请输入项目代码"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">项目名称:</span>
-        <input v-model="form.name"/>
+        <input v-model="form.name" placeholder="请输入项目名称"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">所属分类:</span>
         <picker @change="bindPickerChange($event, 'form', 'typeLK')" :range="typeLKs">
-          <input v-model="typeLK" readonly/>
+          <span v-if="typeLK===''" class="input placeholder">请选择所属分类</span>
+          <span v-else class="input">{{typeLK}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">维修工种:</span>
         <picker @change="bindPickerChange($event, 'form', 'workTypeLK')" :range="workTypeLKs">
-          <input v-model="workTypeLK" readonly/>
+          <span v-if="workTypeLK===''" class="input placeholder">请选择维修工种</span>
+          <span v-else class="input">{{workTypeLK}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">数量/工时:</span>
-        <input v-model="form.workHour"/>
+        <input v-model="form.workHour" type="number" placeholder="请输入数量/工时"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">单价:</span>
-        <input v-model="form.sum"/>
+        <input v-model="form.sum" type="number" placeholder="请输入单价"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">备注:</span>
-        <input v-model="form.description"/>
+        <input v-model="form.description" placeholder="请输入备注信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>

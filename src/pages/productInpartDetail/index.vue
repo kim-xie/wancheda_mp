@@ -8,16 +8,17 @@
 
       <p class="input_wrap">
         <span class="input_label">进货价:</span>
-        <input v-model="cost"/>
+        <input v-model="cost" placeholder="请输入进货价"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">配件数量:</span>
-        <input v-model="count"/>
+        <input v-model="count" placeholder="请输入配件数量"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">库位号:</span>
         <picker @change="bindPickerChange($event, 'form', 'repCodeLK')" :range="repCodeLKs">
-          <input v-model="repCodeLK" readonly/>
+          <span v-if="repCodeLK===''" class="input placeholder">请选择库位号</span>
+          <span v-else class="input">{{repCodeLK}}</span>
         </picker>
       </p>
       <button class="save" @tap="handleSave">入 库</button>
@@ -50,6 +51,7 @@
       this.form = {}
       this.spinShow = false
       this.id = ''
+      this.repCodeLK = ''
       console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()

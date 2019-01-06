@@ -27,7 +27,7 @@
           <p class="item">
             <span class="label">出库类型</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'outpartType')" :range="outpartTypes">
-              <input class="input" v-model="outpartType" type="text" readonly>
+              <span class="input" v-model="outpartType"></span>
             </picker>
           </p>
           <p class="item" v-if="outpartType === '维修领料'">
@@ -45,7 +45,7 @@
           <p class="item" v-if="outpartType === '配件内耗'">
             <span class="label">门店名称</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'company')" :range="companys">
-              <input class="input" v-model="company" type="text" readonly>
+              <span class="input" v-model="company"></span>
             </picker>
           </p>
           <p class="item" v-if="outpartType === '配件内耗'">
@@ -55,7 +55,7 @@
           <p class="item">
             <span class="label">领料人</span>
             <picker @change="bindPickerChange($event, 'outpartingForm', 'receiver')" :range="receivers">
-              <input class="input" v-model="receiver" type="text" readonly>
+              <span class="input" v-model="receiver"></span>
             </picker>
           </p>
           <p class="item">

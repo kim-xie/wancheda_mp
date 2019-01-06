@@ -1,14 +1,14 @@
 {
   "pages": [
-    "pages/login/main",
     "pages/index/main",
+    "pages/login/main",
     "pages/lookupdf/main",
     "pages/userInfo/main",
     "pages/changePwd/main",
     "pages/company/main",
     "pages/companyDetail/main",
     "pages/account/main",
-    "pages/acconutDetail/main",
+    "pages/accountDetail/main",
     "pages/role/main",
     "pages/roleDetail/main",
     "pages/lookup/main",
@@ -34,7 +34,8 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "万车达",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
   },
   "component": true,
   "debug": true

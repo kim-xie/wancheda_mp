@@ -7,34 +7,36 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">客户姓名</span>
-        <input v-model="form.name"/>
+        <input v-model="form.name" placeholder="请输入客户姓名"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客户手机</span>
-        <input v-model="form.mobile"/>
+        <input v-model="form.mobile" placeholder="请输入客户手机号"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">车牌号</span>
-        <input v-model="form.carNo"/>
+        <input v-model="form.carNo" placeholder="请输入车牌号"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">汽车品牌</span>
         <picker @change="bindPickerChange($event, 'form', 'carBrand')" :range="carBrands">
-          <input v-model="carBrand" readonly/>
+          <span v-if="carBrand===''" class="input placeholder">请选择汽车品牌</span>
+          <span v-else class="input">{{carBrand}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">车型</span>
-        <input v-model="form.carModel"/>
+        <input v-model="form.carModel" placeholder="请输入车型"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">车身颜色</span>
-        <input v-model="form.carColor"/>
+        <input v-model="form.carColor" placeholder="请输入车身颜色"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客户级别</span>
         <picker @change="bindPickerChange($event, 'form', 'level')" :range="levels">
-          <input v-model="level" readonly/>
+          <span v-if="level===''" class="input placeholder">请选择客户级别</span>
+          <span v-else class="input">{{level}}</span>
         </picker>
       </p>
       <!-- <p class="input_wrap">
@@ -45,61 +47,63 @@
       </p> -->
       <p class="input_wrap">
         <span class="input_label">客户地址</span>
-        <input v-model="form.address"/>
+        <input v-model="form.address" placeholder="请输入客户地址"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">证件号</span>
-        <input v-model="form.idcard"/>
+        <input v-model="form.idcard" placeholder="请输入证件号"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">车架号</span>
-        <input v-model="form.carVIN"/>
+        <input v-model="form.carVIN" placeholder="请输入车架号"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">发动机号</span>
-        <input v-model="form.engineNo"/>
+        <input v-model="form.engineNo" placeholder="请输入发动机号"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">上牌日期</span>
         <picker
           mode="date"
           :value="registrationDate"
-          @change="handleDateChange($event, 'reg')"
-        >
-          <input v-model="registrationDate"/>
+          @change="handleDateChange($event, 'reg')">
+          <span v-if="registrationDate===''" class="input placeholder">请选择上牌日期</span>
+          <span v-else class="input">{{registrationDate}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">客户邮箱</span>
-        <input v-model="form.email"/>
+        <input v-model="form.email" placeholder="请输入客户邮箱"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客户性别</span>
-        <input class="input" v-model="clientSex" type="text" @tap="selectSex">
+        <span v-if="clientSex===''" class="input placeholder" @tap="selectSex">请选择客户性别</span>
+        <span v-else class="input" @tap="selectSex">{{clientSex}}</span>
       </p>
       <p class="input_wrap">
         <span class="input_label">客户类型</span>
         <picker @change="bindPickerChange($event, 'form', 'type')" :range="types">
-          <input v-model="type" readonly/>
+          <span v-if="type===''" class="input placeholder">请选择客户类型</span>
+          <span v-else class="input">{{type}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">保险公司</span>
-        <input v-model="form.insurer"/>
+        <input v-model="form.insurer" placeholder="请输入保险公司"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">保险到期时间</span>
         <picker
           mode="date"
           :value="insuranceEndtime"
-          @change="handleDateChange($event, 'insur')"
-        >
-          <input v-model="insuranceEndtime"/>
+          @change="handleDateChange($event, 'insur')">
+          <span v-if="insuranceEndtime===''" class="input placeholder">请选择保险到期时间</span>
+          <span v-else class="input">{{insuranceEndtime}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">备注</span>
-        <input type="textarea" v-model="form.description"/>
+        <input type="textarea" v-model="form.description" placeholder="请输入备注信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>
@@ -377,6 +381,9 @@
       box-shadow:0 0 10rpx $--color-primary;
       color: $--color-white;
       font-size: 36rpx;
+    }
+    .placeholder{
+      color: #777;
     }
   }
 </style>

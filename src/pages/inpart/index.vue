@@ -27,13 +27,13 @@
           <p class="item">
             <span class="label">支付方式</span>
             <picker @change="bindPickerChange($event, 'inpartingForm', 'payMethhodLKVal')" :range="payMethhodLKVals">
-              <input v-model="payMethhodLKVal" readonly/>
+              <span v-model="payMethhodLKVal"></span>
             </picker>
           </p>
           <p class="item">
             <span class="label">供应商</span>
             <picker @change="bindPickerChange($event, 'inpartingForm', 'supplierLK')" :range="supplierLKs">
-              <input v-model="supplierLK" readonly/>
+              <span v-model="supplierLK"></span>
             </picker>
           </p>
           <p class="item">

@@ -7,20 +7,20 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">名称</span>
-        <input v-model="form.value"/>
+        <input v-model="form.value" placeholder="请输入名称"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">代码</span>
         <input v-model="form.code" v-if="isEdit" readonly disabled/>
-        <input v-model="form.code" v-else/>
+        <input v-model="form.code" v-else placeholder="请输入代码"/>
       </p>
       <p class="input_wrap" v-if="form.parentId">
         <span class="input_label">父节点</span>
-        <input v-model="form.parentId"/>
+        <input v-model="form.parentId" placeholder="请输入父节点"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">描述</span>
-        <input v-model="form.description"/>
+        <input v-model="form.description" placeholder="请输入描述信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>

@@ -8,12 +8,13 @@
       <p class="input_wrap">
         <span class="input_label">优惠券名称</span>
         <picker @change="bindPickerChange($event, 'form', 'couponId')" :range="couponIds">
-          <input v-model="couponId" readonly/>
+          <span v-if="couponId===''" class="input placeholder">请选择优惠券</span>
+          <span v-else class="input">{{couponId}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">优惠券数量</span>
-        <input type="number" v-model="form.num"/>
+        <input type="number" v-model="form.num" placeholder="请输入优惠券数量"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>

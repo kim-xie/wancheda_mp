@@ -8,20 +8,21 @@
 
       <p class="input_wrap">
         <span class="input_label">名称</span>
-        <input v-model="form.name"/>
+        <input v-model="form.name" placeholder="请输入名称"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">代码</span>
         <input v-model="form.code" v-if="id!==''" readonly disabled/>
-        <input v-model="form.code" v-if="id===''"/>
+        <input v-model="form.code" v-if="id===''" placeholder="请输入代码"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">类型</span>
-        <input v-model="type" readonly @tap="selectType"/>
+        <span v-if="type===''" class="input placeholder" @tap="selectType">请选择类型</span>
+        <span v-else class="input" @tap="selectType">{{type}}</span>
       </p>
       <p class="input_wrap">
         <span class="input_label">描述</span>
-        <input v-model="form.description"/>
+        <input v-model="form.description" placeholder="请输入描述信息"/>
       </p>
       <button class="save" @click="handleSave">保 存</button>
     </div>
