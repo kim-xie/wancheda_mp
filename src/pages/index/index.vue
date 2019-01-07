@@ -1,9 +1,7 @@
 <template>
   <div class="container">
     <div class="tab_content">
-      <!-- <div class="company">
-        <h4>{{company}}</h4>
-      </div> -->
+
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
       <!-- 加载中组件 -->
@@ -328,6 +326,11 @@
             </div>
           </div>
 
+          <!-- 弹窗 -->
+          <i-modal title="温馨提示" :visible="modalVisible" @ok="handleOk" @cancel="handleClose">
+            <view>{{modalMessage}}</view>
+          </i-modal>
+
           <!-- 按钮 -->
           <div class="step_button">
             <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" inline shape="circle" size="small">下一步</i-button>
@@ -499,6 +502,9 @@
   export default {
     data () {
       return {
+        modalSuccess: true,
+        modalVisible: false,
+        modalMessage: '',
         repairtotal: 0,
         repairsubtotal: 0,
         inventorytotal: 0,
@@ -536,7 +542,6 @@
         clerkIds: [],
         hasPermission: false,
         current: 'index',
-        company: '深圳分店',
         tab_current: 'tab1',
         repairWorkorders: [],
         repairWorkorderAlls: [],
@@ -547,10 +552,12 @@
         clientCouponTableData: [],
         ownCoupon: false,
         couponVal: 0,
+        usercompany: '',
+        outpartType: ''
       }
     },
     mounted() {
-      this.hasPermission = this.checkPermission(),
+      this.hasPermission = this.checkPermission()
       this.spinShow = false
       const that = this
       // 客户级别
@@ -567,6 +574,15 @@
       this.getUserList(function(valueArray, idArray){
         that.clerks = valueArray
         that.clerkIds = idArray
+      })
+      // 获取领料类型
+      this.getLookupByCode('outpart_type',1,1000,function(data,total){
+        const repairOutpart = data
+        for (var i = 0; i < repairOutpart.length; i++) {
+          if(repairOutpart[i].code == '0'){
+            that.outpartType = repairOutpart[i]
+          }
+        }
       })
     },
     computed: {
@@ -586,7 +602,7 @@
       console.log(this.allPageNo)
       if(this.allPageNo > 1){
         this.allPageNo = this.allPageNo-1
-        this.getRepairWorkorder(this.allPageNo, this.allPageSize, '',function(){
+        this.getRepairWorkorder(this.allPageNo, this.allPageSize,function(){
           wx.stopPullDownRefresh()
         })
       }
@@ -604,7 +620,7 @@
         this.loading = true
         this.tipmessage = '玩命加载中'
         this.allPageNo = this.allPageNo+1
-        this.getRepairWorkorder(this.allPageNo, this.allPageSize, '', function(){
+        this.getRepairWorkorder(this.allPageNo, this.allPageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
         })
@@ -656,8 +672,7 @@
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
         if(this.current === 'order'){
-          this.getRepairWorkorder(1,1000,'维修中')
-          this.getRepairWorkorder(this.allPageNo,this.allPageSize,'')
+          this.getRepairWorkorder(this.allPageNo,this.allPageSize)
         }
       },
       // 切换tab
@@ -730,104 +745,118 @@
           that.spinShow = false
         })
       },
-      // 下单
+      // 提交订单
       billing(formName){
-        let _this = this
+        const _this = this
+        _this.spinShow = true
+        // 维修项目
         let newRepairItemTable = []
-        for(var i=0;i<this.repairItemTableDatas.length;i++){
+        for(var i=0;i<this.repairItems.length;i++){
           let tableDate = {}
           tableDate.workorderId = ""
-          tableDate.itemId = _this.repairItemTableDatas[i].id
-          tableDate.mechanic = _this.repairItemTableDatas[i].mechanic
+          tableDate.itemId = _this.repairItems[i].id
+          tableDate.mechanic = _this.repairItems[i].mechanic
           newRepairItemTable.push(tableDate)
         }
+        // 出库配件
         let outpartInfos = []
-        for(var i=0;i< _this.productTableDatas.length;i++){
+        for(var i=0;i< _this.inventoryItems.length;i++){
           let outpartInfoObj = {
             "workOrderNo": "",
-            "inventoryId": _this.productTableDatas[i].inventoryId,
-            "count": _this.productTableDatas[i].count,
-            "sale": _this.productTableDatas[i].sale,
+            "inventoryId": _this.inventoryItems[i].id,
+            "count": _this.inventoryItems[i].count,
+            "sale": _this.inventoryItems[i].sale,
             "isDeleted": false
           }
           outpartInfos.push(outpartInfoObj)
         }
         // 客户信息
-        delete this.clientForm.date;
-        delete this.clientForm.carBrandVal;
-        delete this.clientForm.levelVal;
-        delete this.clientForm.insuranceEndtime;
-        delete this.clientForm.registrationDate;
-        delete this.clientForm.createTime;
-        delete this.clientForm.updateTime;
-        delete this.clientForm.typeVal;
-        this.clientForm.company = this.usercompany
+        if(_this.clientForm.id){
+          delete _this.clientForm.date
+          delete _this.clientForm.levelVal
+          delete _this.clientForm.insuranceEndtime
+          delete _this.clientForm.registrationDate
+          delete _this.clientForm.createTime
+          delete _this.clientForm.updateTime
+          //_this.clientForm.company = _this.userInfo.company
+        }
 
         // 订单详情
         var addFormObj = {
           // 客户信息
-          "client": this.clientForm,
+          "client": _this.clientForm,
           // 维修工单
           "repairWorkorder": {
             "workorderState": '维修中',//工单状态
-            "repairTypeLK": this.repairOrderForm.repairTypeLK,//维修性质
-            "sum": Number(this.outpartsTotal) + Number(this.repairsTotal) - couponVal <=0?'':Number(this.outpartsTotal) + Number(this.repairsTotal) - couponVal,//维修金额
-            "clerk": this.repairOrderForm.clerk,//服务顾问
-            "carMileage": this.repairOrderForm.carMileage,//进店里程
-            "carOilmeter": this.repairOrderForm.carOilmeter,//进店油表
-            "sendMan": this.repairOrderForm.sendMan,//送修人
-            "endTime": this.repairOrderForm.endTime,//离店时间
-            "clentRemind": this.repairOrderForm.clentRemind,//客户嘱咐
-            "company": this.usercompany//公司
+            "repairTypeLK": _this.repairForm.repairTypeLK,//维修性质
+            "sum": Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponVal) <=0?'':Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponVal),//消费金额
+            "clerk": _this.repairForm.clerk,//服务顾问
+            "carMileage": _this.repairForm.carMileage,//进店里程
+            "carOilmeter": _this.repairForm.carOilmeter,//进店油表
+            "sendMan": _this.repairForm.sendMan,//送修人
+            "endTime": _this.repairForm.endTime,//离店时间
+            "clentRemind": _this.repairForm.clentRemind,//客户嘱咐
+            "company": _this.userInfo.company//公司
           },
           // 工单详情
           "repairWorkorderItems": newRepairItemTable,
           // 领料单
           "outPartComposite": {
             "outPart": {
-              "type": this.outpartType.id, //出库类型 -- 维修领料
-              "receiver": this.productTableDatas[0] ? this.productTableDatas[0].receiver : '', //领料人
-              "sum": this.outpartsTotal, //总金额
+              "type": _this.outpartType.id, //出库类型 -- 维修领料
+              "receiver": _this.inventoryItems[0] ? _this.inventoryItems[0].receiver : '', //领料人
+              "sum": _this.inventorysubtotal, //总金额
               "repairWorkorderNo": "", // 对应维修开单
               "clientName": "", // 对应配件销售
               "carNo": "", // 对应配件销售
               "departmentLK": "",// 对应配件内耗
-              "company": this.usercompany,//公司
+              "company": _this.userInfo.company,//公司
               "isDeleted": false
             },
             "outPartInfos": outpartInfos
           }
         }
-        //console.log(this.outpartsTotal)
-        this.$http.post(api.addRepairOrder, addFormObj, true).then((res) => {
+        _this.$http.post(api.addRepairOrder, addFormObj, true).then((res) => {
           if(res.success){
-            //this.$store.commit('updateRepairItemCount', Number(this.$store.state.repairItemCount)+1)
-            // _this.$alert('订单提交成功，前往查看订单？', '温馨提示', {
-            //   confirmButtonText: '确定',
-            //   cancelButtonText: '取消',
-            //   type: 'success'
-            // }).then(() => {
-            //   _this.$router.replace('/serviceRecord')
-            // }).catch(() => {
-            //   window.location.reload()
-            //   _this.repairOrderForm = null
-            //   _this.clientTableData = null
-            //   _this.repairItemTableDatas = null
-            //   _this.productTableDatas = null
-            // })
+            setTimeout(function(){
+              _this.spinShow = false
+              _this.modalMessage = '订单提交成功，前往查看订单？'
+              _this.modalVisible = true
+              _this.modalSuccess = true
+            },1000)
           }else{
-            // _this.$alert('订单提交失败,请稍后重试', '温馨提示', {
-            //   confirmButtonText: '确定',
-            //   cancelButtonText: '取消',
-            //   type: 'danger'
-            // }).then(() => {
-            // }).catch(() => {
-
-            // })
+            setTimeout(function(){
+              _this.spinShow = false
+              _this.modalMessage = '订单提交失败,请稍后重试!'
+              _this.modalVisible = true
+              _this.modalSuccess = false
+            },1000)
           }
         }, error => {
           globe.message('网络连接失败，请重试！','error')
         })
+      },
+      // 弹窗确定按钮
+      handleOk(){
+        if(this.modalSuccess){
+          this.modalVisible = false
+          this.current = 'order'
+          this.getRepairWorkorder(this.allPageNo,this.allPageSize)
+        }else{
+          this.modalVisible = false
+        }
+      },
+      // 弹窗关闭按钮
+      handleClose(){
+        if(this.modalSuccess){
+          this.modalVisible = false
+          this.current = 'index'
+          this.stepCurrent = 0
+          this.clientForm = {}
+          this.repairForm = {}
+        }else{
+          this.modalVisible = false
+        }
       },
       // 日期选择器
       handleDateChange(data, type) {
@@ -880,22 +909,15 @@
 
           })
         }else if(this.stepCurrent === 2){
-          console.log(3)
           const that = this
           for(let i=0; i<that.repairItems.length;i++){
-            console.log('----------')
-            console.log(that.repairItems[i].total)
             that.repairtotal += Number(that.repairItems[i].total)
             that.repairsubtotal += Number(that.repairItems[i].subtotal)
-            console.log(that.repairsubtotal)
           }
           if(that.inventoryItems.length > 0){
             for(let i=0; i<that.inventoryItems.length;i++){
-              console.log('----------')
-              console.log(that.inventoryItems[i].total)
               that.inventorytotal += Number(that.inventoryItems[i].total)
               that.inventorysubtotal += Number(that.inventoryItems[i].subtotal)
-              console.log(that.inventorysubtotal)
             }
           }
           const allTotal = Number(that.repairtotal) + Number(that.inventorytotal)
@@ -1018,10 +1040,9 @@
         })
       },
       // 获取维修记录
-      getRepairWorkorder(pageNo,pageSize,status,callback){
+      getRepairWorkorder(pageNo,pageSize,callback){
         const params = {
           'search.company_eq': '',
-          'search.workorderState_eq': status,
           'page.pn': pageNo,
           'page.size': pageSize
         }
@@ -1029,13 +1050,12 @@
         this.$http.get(api.repairWorkorder, params).then( res => {
           if(res.success){
             this.spinShow = false
-            if(status === '维修中'){
-              this.repairWorkorders = res.data.page.content
-              this.repairWorkorderTotal = res.data.page.totalElements
-            }else{
-              this.repairWorkorderAlls = res.data.page.content
-              this.repairWorkorderAllTotal = res.data.page.totalElements
-            }
+            this.repairWorkorderAlls = res.data.page.content
+            this.repairWorkorderAllTotal = res.data.page.totalElements
+            this.repairWorkorders = this.repairWorkorderAlls.filter(item => {
+              return item.workorderState === '维修中'
+            })
+            this.repairWorkorderTotal = this.unpayTableData.length
             if(callback && typeof callback === 'function'){
               callback()
             }
