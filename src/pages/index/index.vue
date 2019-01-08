@@ -184,86 +184,52 @@
 
           <!-- 维修领料 -->
           <div class="productForm" v-if="stepCurrent===2">
-            <i-button @click="handleRepair" inline shape="circle" size="small">添加服务项目</i-button>
-            <i-button @click="handleProduct" inline shape="circle" size="small">添加维修配件</i-button>
+            <div class="productForm_button">
+              <i-button @click="handleRepair" inline shape="circle" size="small">添加服务项目</i-button>
+              <i-button @click="handleProduct" inline shape="circle" size="small">添加维修配件</i-button>
+            </div>
 
             <!-- 服务项目列表 -->
             <div class="repairList">
               <div class="repairItems">
-                <div class="repairItem" v-for="(item, index) in repairItems" :key="index">
-                  <div class="repair_item">
-                    <div class="item_label">项目名称</div>
-                    <div class="item_value">{{item.name}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">单价(元)</div>
-                    <div class="item_value">{{item.sum}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">折扣(折)</div>
-                    <div class="item_value">{{item.discount}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">工时/数量</div>
-                    <div class="item_value">{{item.workHour}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">小计(元)</div>
-                    <div class="item_value">{{item.subtotal}}/{{item.total}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">技师</div>
-                    <div class="item_value">{{item.mechanicVal}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">备注</div>
-                    <div class="item_value">{{item.description}}</div>
-                  </div>
-                  <div class="item_button">
-                    <div class="button" @tap="handleEditRepair(item,index)">编辑</div>
-                    <div class="button delete_button" @tap="handleDeleteRepair(item,index)">删除</div>
-                  </div>
-                </div>
+                <i-card v-if="repairItems.length>0" title="维修项目清单" :extra="repairItems.length">
+                  <view slot="content" v-for="(item, index) in repairItems" :key="index">
+                    项目名称：{{item.name}} <br/>
+                    工时/数量：{{item.workHour}} <br/>
+                    单价(元)：￥{{item.sum}} <br/>
+                    小计(元)：￥{{item.subtotal}} <br/>
+                    技师：{{item.mechanicVal}} <br/>
+                    备注：{{item.description}} <br/>
+                    <div class="item_button">
+                      <div class="button" @tap="handleEditRepair(item,index)">编辑</div>
+                      <div class="button delete_button" @tap="handleDeleteRepair(item,index)">删除</div>
+                    </div>
+                    <hr style="border:1px dashed #ccc;"/>
+                  </view>
+                  <view slot="footer">折扣：{{repairItems[0].discount}} 折</view>
+                </i-card>
               </div>
             </div>
 
             <!-- 领料列表 -->
-            <div class="productList repairList">
+            <div class="repairList">
               <div class="repairItems">
-                <div class="repairItem" v-for="(item, index) in inventoryItems" :key="index">
-                  <div class="repair_item">
-                    <div class="item_label">配件名称</div>
-                    <div class="item_value">{{item.name}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">单价(元)</div>
-                    <div class="item_value">{{item.sale}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">折扣(折)</div>
-                    <div class="item_value">{{item.discount}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">数量</div>
-                    <div class="item_value">{{item.count}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">小计(元)</div>
-                    <div class="item_value">{{item.subtotal}}/{{item.total}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">领料人</div>
-                    <div class="item_value">{{item.receiverVal}}</div>
-                  </div>
-                  <div class="repair_item">
-                    <div class="item_label">备注</div>
-                    <div class="item_value">{{item.description}}</div>
-                  </div>
-                  <div class="item_button">
-                    <div class="button" @tap="handleEditInventory(item, index)">编辑</div>
-                    <div class="button delete_button" @tap="handleDeleteInventory(item, index)">删除</div>
-                  </div>
-                </div>
+                <i-card v-if="inventoryItems.length>0" title="维修领料清单" :extra="inventoryItems.length">
+                  <view slot="content" v-for="(item, index) in inventoryItems" :key="index">
+                    配件名称：{{item.name}} <br/>
+                    数量：{{item.count}} <br/>
+                    单价(元)：￥{{item.sale}} <br/>
+                    小计(元)：￥{{item.subtotal}} <br/>
+                    领料人：{{item.receiverVal}} <br/>
+                    备注：{{item.description}} <br/>
+                    <div class="item_button">
+                      <div class="button" @tap="handleEditInventory(item, index)">编辑</div>
+                      <div class="button delete_button" @tap="handleDeleteInventory(item, index)">删除</div>
+                    </div>
+                    <hr style="border:1px dashed #ccc;"/>
+                  </view>
+                  <view slot="footer">折扣：{{inventoryItems[0].discount}} 折</view>
+                </i-card>
               </div>
             </div>
           </div>
@@ -271,7 +237,7 @@
           <!-- 确认下单 -->
           <div class="billingForm" v-if="stepCurrent===3">
             <div class="billingWrap">
-              <div class="client">
+              <div class="billing_card">
                 <i-card title="客户信息" :extra="clientForm.carNo">
                   <view slot="content">
                     车主：{{clientForm.name}}<br/>
@@ -282,7 +248,7 @@
                   </view>
                 </i-card>
               </div>
-              <div class="client">
+              <div class="billing_card">
                 <i-card title="工单信息" :extra="repairTypeLK">
                   <view slot="content">
                     进店油表：{{carOilmeter}} <br/>
@@ -291,36 +257,37 @@
                   <view slot="footer">服务顾问：{{clerk}}</view>
                 </i-card>
               </div>
-              <div class="client">
+              <div class="billing_card">
                 <i-card title="维修项目" :extra="'小计：￥'+repairsubtotal">
                   <view slot="content" v-for="(item, index) in repairItems" :key="index">
                     项目名称：{{item.name}} <br/>
                     单价：￥{{item.sum}} <br/>
-                    数量：{{item.workHour}} <br/>
-                    <hr style="height:1px;border:1px dashed #ccc;"/>
+                    工时/数量：{{item.workHour}} <br/>
+                    <hr style="margin-top:4px;border:1px dashed #ccc;"/>
                   </view>
                   <view slot="footer">折扣：{{repairItems[0].discount}} 折</view>
                 </i-card>
               </div>
-              <div class="client" v-if="inventoryItems.length>0">
+              <div class="billing_card" v-if="inventoryItems.length>0">
                 <i-card title="维修领料" :extra="'小计：￥'+inventorysubtotal">
                   <view slot="content" v-for="(item, index) in inventoryItems" :key="index">
                     配件名称：{{item.name}} <br/>
                     单价：￥{{item.sale}} <br/>
-                    工时：{{item.count}} <br/>
-                    <hr style="height:1px;border:1px dashed #ccc;"/>
+                    数量：{{item.count}} <br/>
+                    <hr style="margin-top:4px;border:1px dashed #ccc;"/>
                   </view>
                   <view slot="footer">折扣：{{inventoryItems[0].discount}} 折</view>
                 </i-card>
               </div>
-              <div class="client">
+              <div class="billing_card">
                 <i-cell-group>
-                  <i-cell v-if="ownCoupon" title="优惠券" value="有可用" is-link @tap="selectCoupon"></i-cell>
+                  <picker v-if="ownCoupon" @change="pickerCoupon($event, 'couponForm', 'couponVal')" :range="couponNames">
+                    <i-cell  title="优惠券" value="有可用" is-link></i-cell>
+                  </picker>
                   <i-cell v-else title="优惠券" value="无可用" is-link></i-cell>
-                  <!-- <i-cell title="折扣" :value="repairItems[0].discount+'折'"></i-cell> -->
-                  <i-cell v-if="couponVal>0" title="优惠券" :value="'-￥'+Number(couponVal)"></i-cell>
-                  <i-cell title="已优惠" :value="'-￥'+discounttotal"></i-cell>
-                  <i-cell title="消费金额" :value="'￥'+alltotal"></i-cell>
+                  <i-cell v-if="couponForm.couponVal>0" title="优惠券" :value="'-￥'+couponPrice"></i-cell>
+                  <i-cell title="已优惠" :value="'-￥'+discountPrice"></i-cell>
+                  <i-cell title="消费金额" :value="'￥'+consumPrice"></i-cell>
                 </i-cell-group>
               </div>
             </div>
@@ -511,6 +478,9 @@
         inventorysubtotal: 0,
         discounttotal: 0,
         alltotal: 0,
+        discountPrice: '',
+        consumPrice: '',
+        couponPrice: '',
         tipmessage: '我也是有底线的',
         loading: false,
         showMore: false,
@@ -551,7 +521,11 @@
         allPageSize: 10,
         clientCouponTableData: [],
         ownCoupon: false,
-        couponVal: 0,
+        couponForm: {
+          couponVal: 0,
+        },
+        couponNames: [],
+        couponVals: [],
         usercompany: '',
         outpartType: ''
       }
@@ -612,10 +586,6 @@
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      // console.log(this.repairWorkorderAllTotal)
-      // console.log(this.allPageSize)
-      // console.log(this.repairWorkorderAllTotal/this.allPageSize)
-      // console.log(this.allPageNo)
       if(this.allPageNo < this.repairWorkorderAllTotal/this.allPageSize){
         this.loading = true
         this.tipmessage = '玩命加载中'
@@ -628,6 +598,25 @@
     },
     methods: {
       checkPermission,
+      // 转化为两位数价格
+      toDecimal2(x) {
+        let f = parseFloat(x)
+        if (isNaN(f)) {
+          return false
+        }
+        let float = Math.round(x*100)/100
+        let s = float.toString()
+        let rs = s.indexOf('.')
+        if (rs < 0) {
+          rs = s.length
+          s += '.'
+        }
+        while (s.length <= rs + 2) {
+          s += '0'
+        }
+        console.log(s)
+        return s
+      },
       // 搜索客户信息
       searchCar(){
         if(this.clientForm.carNo){
@@ -686,6 +675,17 @@
         this[type] = this[type+'s'][index]
         // 对应的id
         this[formName][type] = this[type+'Ids'][index]
+      },
+      // 优惠券选择器
+      pickerCoupon(data, formName, type){
+        const index = data.mp.detail.value
+        // 显示的值
+        this[type] = this['couponNames'][index]
+        // 对应的id
+        this[formName][type] = Number(this[type+'s'][index])
+        this.discountPrice = this.toDecimal2(this.discounttotal + this[formName][type])
+        this.consumPrice = this.toDecimal2(this.alltotal - this[formName][type])
+        this.couponPrice = this.toDecimal2(this[formName][type])
       },
       // 添加维修项目
       handleRepair(){
@@ -789,7 +789,7 @@
           "repairWorkorder": {
             "workorderState": '维修中',//工单状态
             "repairTypeLK": _this.repairForm.repairTypeLK,//维修性质
-            "sum": Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponVal) <=0?'':Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponVal),//消费金额
+            "sum": Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponForm.couponVal) <=0?'':Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponForm.couponVal),//消费金额
             "clerk": _this.repairForm.clerk,//服务顾问
             "carMileage": _this.repairForm.carMileage,//进店里程
             "carOilmeter": _this.repairForm.carOilmeter,//进店油表
@@ -922,8 +922,10 @@
           }
           const allTotal = Number(that.repairtotal) + Number(that.inventorytotal)
           const allSubTotal = Number(that.repairsubtotal) + Number(that.inventorysubtotal)
-          that.discounttotal = Number(allTotal - allSubTotal).toFixed(2)
-          that.alltotal = Number(allSubTotal).toFixed(2)
+          that.discounttotal = Number(allTotal - allSubTotal)
+          that.alltotal = Number(allSubTotal)
+          that.discountPrice = that.toDecimal2(that.discounttotal)
+          that.consumPrice = that.toDecimal2(that.alltotal)
           that.loadClientCouponData(that.client.id)
         }
         let stepCurrent = this.stepCurrent + 1
@@ -938,9 +940,19 @@
         }
         this.$http.get(api.coupon_list, params).then((res) => {
           if(res.success){
-            this.clientCouponTableData = response.body.data.page.content
+            this.clientCouponTableData = res.data.page.content
             if(this.clientCouponTableData.length>0){
               this.ownCoupon = true
+              let nameArray = []
+              let codeArray = []
+              for(let i=0;i<this.clientCouponTableData.length;i++){
+                nameArray.push(this.clientCouponTableData[i].date.couponId.value)
+                codeArray.push(this.clientCouponTableData[i].date.couponId.code)
+              }
+              this.couponNames = nameArray
+              this.couponVals = codeArray
+              console.log(nameArray)
+              console.log(codeArray)
             }else{
               this.ownCoupon = false
             }
@@ -1043,6 +1055,7 @@
       getRepairWorkorder(pageNo,pageSize,callback){
         const params = {
           'search.company_eq': '',
+          //'search.workorderState_eq': status,
           'page.pn': pageNo,
           'page.size': pageSize
         }
@@ -1107,19 +1120,12 @@
 </style>
 
 <style lang="scss" scoped>
-.company{
-  height: 74rpx;
-  line-height: 74rpx;
-  text-align: center;
-  background-color: $--color-success-light;
-  color: $--color-warning;
-}
 .transition{
   transition: $--fade-transition;
 }
 .tab_content{
   width: 100%;
-  padding-bottom: 40px;
+  padding-bottom: 46px;
 }
 .tab_bar{
   width: 100vw;
@@ -1201,52 +1207,31 @@
 .productForm{
   width: 100%;
   margin: 0 auto;
-  text-align: center;
   overflow: hidden;
+  .productForm_button{
+    text-align: center;
+  }
   .repairList{
     overflow: hidden;
     margin: 0 auto;
     margin-top: 10px;
     width: 90%;
-    .repairItem{
+    .item_button{
       overflow: hidden;
-      background: #ccc;
-      height: 100%;
-      border-radius: 6px;
-      padding: 10px 10px 0 10px;
-      .repair_item{
-        overflow: hidden;
-        width: 100%;
-        height: 100%;
-        text-align: left;
-        .item_label{
-          width: 40%;
-          float: left;
-        }
-        .item_value{
-          width: 60%;
-          float: left;
-        }
-      }
-      .item_button{
-        overflow: hidden;
-        height: 50px;
-        line-height: 50px;
-        width: 100%;
-        margin-top: 10px;
-        border-top: 1px solid #333;
-        text-align: center;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .button{
-          width: 80px;
-          margin: 0 auto;
-          height: 30px;
-          line-height: 30px;
-          border: 1px solid #333;
-          border-radius: 6px;
-        }
+      height: 50px;
+      line-height: 50px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .button{
+        width: 80px;
+        margin: 0 auto;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid #d2d2d2;
+        border-radius: 6px;
       }
     }
   }
@@ -1256,8 +1241,10 @@
   margin: 0 auto;
   overflow: hidden;
   .billingWrap{
-    width: 90%;
     margin: 0 auto;
+    .billing_card{
+      margin-top: 10px;
+    }
   }
 }
 .step_button{
