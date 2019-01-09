@@ -156,7 +156,7 @@
               </picker>
             </div>
             <div class="item">
-              <span class="label">进店里程:</span>
+              <span class="label">进店里程(km):</span>
               <input class="input" v-model="repairForm.carMileage" type="number" placeholder="请输入进店里程">
             </div>
             <div class="item">
@@ -258,7 +258,7 @@
                 </i-card>
               </div>
               <div class="billing_card">
-                <i-card title="维修项目" :extra="'小计：￥'+repairsubtotal">
+                <i-card v-if="repairItems.length>0" title="维修项目" :extra="'小计：￥'+repairsubtotal">
                   <view slot="content" v-for="(item, index) in repairItems" :key="index">
                     项目名称：{{item.name}} <br/>
                     单价：￥{{item.sum}} <br/>
@@ -269,7 +269,7 @@
                 </i-card>
               </div>
               <div class="billing_card" v-if="inventoryItems.length>0">
-                <i-card title="维修领料" :extra="'小计：￥'+inventorysubtotal">
+                <i-card v-if="inventoryItems.length>0" title="维修领料" :extra="'小计：￥'+inventorysubtotal">
                   <view slot="content" v-for="(item, index) in inventoryItems" :key="index">
                     配件名称：{{item.name}} <br/>
                     单价：￥{{item.sale}} <br/>
@@ -531,7 +531,6 @@
       }
     },
     mounted() {
-      this.hasPermission = this.isSuperAdmin()
       this.spinShow = false
       const that = this
       // 客户级别
@@ -597,7 +596,6 @@
       }
     },
     methods: {
-      isSuperAdmin,
       // 转化为两位数价格
       toDecimal2(x) {
         let f = parseFloat(x)
@@ -882,34 +880,52 @@
       // 下单下一步
       handleNext(){
         if(this.stepCurrent == 0){
-          // if(!this.clientForm.carNo){
-          //   globe.message('车牌号不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.name){
-          //   globe.message('客户名称不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.level){
-          //   globe.message('客户级别不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.mobile){
-          //   globe.message('客户手机不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.type){
-          //   globe.message('客户类型不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.carBrand){
-          //   globe.message('汽车品牌不能为空', 'warning')
-          //   return false
-          // }else if(!this.clientForm.carModel){
-          //   globe.message('汽车车型不能为空', 'warning')
-          //   return false
-          // }
+          if(!this.clientForm.carNo){
+            globe.message('车牌号不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.name){
+            globe.message('客户名称不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.level){
+            globe.message('客户级别不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.mobile){
+            globe.message('客户手机不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.type){
+            globe.message('客户类型不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.carBrand){
+            globe.message('汽车品牌不能为空', 'warning')
+            return false
+          }else if(!this.clientForm.carModel){
+            globe.message('汽车车型不能为空', 'warning')
+            return false
+          }
           // 分发客户信息
           this.$store.dispatch('saveClient',this.clientForm).then(()=>{
 
           })
+        }else if(this.stepCurrent === 1){
+          if(!this.repairForm.repairTypeLK){
+            globe.message('维修性质不能为空', 'warning')
+            return false
+          }else if(!this.repairForm.carOilmeter){
+            globe.message('进店油表不能为空', 'warning')
+            return false
+          }else if(!this.repairForm.carMileage){
+            globe.message('进店里程不能为空', 'warning')
+            return false
+          }else if(!this.repairForm.clerk){
+            globe.message('服务顾问不能为空', 'warning')
+            return false
+          }
         }else if(this.stepCurrent === 2){
           const that = this
+          if(this.repairItems.length<1){
+            globe.message('请添加服务项目', 'warning')
+            return false
+          }
           for(let i=0; i<that.repairItems.length;i++){
             that.repairtotal += Number(that.repairItems[i].total)
             that.repairsubtotal += Number(that.repairItems[i].subtotal)
@@ -951,8 +967,6 @@
               }
               this.couponNames = nameArray
               this.couponVals = codeArray
-              console.log(nameArray)
-              console.log(codeArray)
             }else{
               this.ownCoupon = false
             }
