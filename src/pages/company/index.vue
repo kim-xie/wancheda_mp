@@ -7,7 +7,7 @@
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+        <span v-if="isSuperAdmin" class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -75,8 +75,8 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
+            <span v-if="isSuperAdmin || isCompanyAdmin" class="button edit" @tap="handleEdit(item)">编辑</span>
+            <span v-if="isSuperAdmin" class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
@@ -99,9 +99,14 @@
   import global from '../../utils/globe'
   import api from '../../api/api'
   import * as utils from '../../assets/js/utils'
+  import {isSuperAdmin, isCompanyAdmin} from '../../utils/permission'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        isSuperAdmin: false,
+        isCompanyAdmin: false,
+        usercompany: '',
         modalVisible: false,
         spinShow: true,
         tipmessage: '我也是有底线的',
@@ -128,10 +133,17 @@
         ]
       }
     },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
+    },
     mounted() {
-      this.spinShow = false
+
     },
     onLoad(){
+      this.spinShow = false
+      this.usercompany = this.userInfo.company
       this.listData = []
       this.getCompanyList(this.pageNo, this.pageSize)
     },
@@ -164,7 +176,6 @@
     methods: {
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.name = ''
         this.search.code = ''
@@ -183,9 +194,17 @@
       },
       // 获取公司列表
       getCompanyList(pageNo, pageSize, callback){
+        if(isSuperAdmin(this.userInfo.date.role.code)){
+          this.usercompany = ''
+          this.isSuperAdmin = true
+        }
+        if(isCompanyAdmin(this.userInfo.date.role.code)){
+          this.isCompanyAdmin = true
+        }
         const params = {
           'search.name_like': this.search.name,
           'search.code_like': this.search.code,
+          'search.id_eq': this.usercompany,
           'search.isDeleted_eq': false,
           pageNo,
           pageSize

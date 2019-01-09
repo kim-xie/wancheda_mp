@@ -27,7 +27,7 @@
         <div class="item_footer">
           <p class="item_edit">
             <span class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span class="button delete" @tap="handleDelete(item)">删除</span>
+            <span v-if="isSuperAdmin || isCompanyAdmin" class="button delete" @tap="handleDelete(item)">删除</span>
           </p>
         </div>
       </div>
@@ -49,9 +49,13 @@
   import globe from '../../utils/globe'
   import api from '../../api/api'
   import * as utils from '../../assets/js/utils'
+  import {isSuperAdmin, isCompanyAdmin} from '../../utils/permission'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        isCompanyAdmin: false,
+        isSuperAdmin: false,
         lookupdfCode: '',
         modalVisible: false,
         firstLoad: false,
@@ -75,6 +79,11 @@
             }
         ]
       }
+    },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
     },
     onLoad(){
       this.firstLoad = false
@@ -123,6 +132,11 @@
     methods: {
       // 获取列表数据
       getList(pageNo, pageSize, callback){
+        if(isSuperAdmin(this.userInfo.date.role.code)){
+          this.isSuperAdmin = true
+        } else if(isCompanyAdmin(this.userInfo.date.role.code)){
+          this.isCompanyAdmin = true
+        }
         const params = {
           pageNo,
           pageSize

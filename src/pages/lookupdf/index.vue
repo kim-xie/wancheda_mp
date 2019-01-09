@@ -45,10 +45,10 @@
               <view class="i-swipeout-button" @tap="actionsTap('dictionary',item.code)">
                 <i class="iconfont icon-i-order"></i>
               </view>
-              <view class="i-swipeout-button" @tap="actionsTap('edit',item)">
+              <view v-if="isSuperAdmin || isCompanyAdmin" class="i-swipeout-button" @tap="actionsTap('edit',item)">
                 <i class="iconfont icon-edit"></i>
               </view>
-              <view class="i-swipeout-button" @tap="actionsTap('delete',item.id)">
+              <view v-if="isSuperAdmin" class="i-swipeout-button" @tap="actionsTap('delete',item.id)">
                 <i class="iconfont icon-delete"></i>
               </view>
           </view>
@@ -72,9 +72,13 @@
 <script>
   import globe from '../../utils/globe'
   import api from '../../api/api'
+  import {isSuperAdmin, isCompanyAdmin} from '../../utils/permission'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        isCompanyAdmin: false,
+        isSuperAdmin: false,
         toggle: false,
         modalVisible: false,
         firstLoad: false,
@@ -97,6 +101,11 @@
             }
         ]
       }
+    },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
     },
     onLoad(){
       this.spinShow = false
@@ -133,12 +142,16 @@
     methods: {
       // 获取列表数据
       getList(pageNo, pageSize, callback){
+        if(isSuperAdmin(this.userInfo.date.role.code)){
+          this.isSuperAdmin = true
+        } else if(isCompanyAdmin(this.userInfo.date.role.code)){
+          this.isCompanyAdmin = true
+        }
         const params = {
           'page.pn': pageNo,
           'page.size': pageSize
         }
         this.$http.get(api.lookupdf_list, params).then( res => {
-          console.log(res)
           if(res.success){
             this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements

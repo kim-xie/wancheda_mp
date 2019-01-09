@@ -7,7 +7,7 @@
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
         </span>
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+        <span v-if="isCompanyAdmin || isSuperAdmin" class="add_button float-right" @tap="handleAdd">新增</span>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -56,10 +56,10 @@
         </div>
         <div class="item_footer">
           <p class="item_edit">
-            <span class="button undisable" v-if="item.isDisable" @tap="handleStatus(item)">启用</span>
-            <span class="button disable" v-if="!item.isDisable" @tap="handleStatus(item)">禁用</span>
-            <span class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
+            <span class="button undisable" v-if="item.isDisable && (isCompanyAdmin || isSuperAdmin)" @tap="handleStatus(item)">启用</span>
+            <span class="button disable" v-if="!item.isDisable && (isCompanyAdmin || isSuperAdmin)" @tap="handleStatus(item)">禁用</span>
+            <span v-if="isCompanyAdmin || isSuperAdmin" class="button edit" @tap="handleEdit(item)">编辑</span>
+            <span v-if="isCompanyAdmin || isSuperAdmin" class="button delete" @tap="handleDelete(item.id)">删除</span>
           </p>
         </div>
       </div>
@@ -81,9 +81,15 @@
   import globe from '../../utils/globe'
   import api from '../../api/api'
   import * as utils from '../../assets/js/utils'
+  import {isSuperAdmin, isCompanyAdmin} from '../../utils/permission'
+  import { mapGetters } from 'vuex'
   export default {
     data () {
       return {
+        isCompanyAdmin: false,
+        isSuperAdmin: false,
+        usercompany: '',
+        accountId: '',
         modalVisible: false,
         spinShow: true,
         tipmessage: '我也是有底线的',
@@ -110,10 +116,18 @@
         ]
       }
     },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
+    },
     mounted() {
-      this.spinShow = false
+
     },
     onLoad(){
+      this.usercompany = this.userInfo.company
+      this.accountId = this.userInfo.id
+      this.spinShow = false
       this.listData = []
       this.getList(this.pageNo, this.pageSize)
     },
@@ -144,9 +158,10 @@
       }
     },
     methods: {
+      // isSuperAdmin,
+      // isCompanyAdmin,
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.fullname = ''
         this.search.username = ''
@@ -165,9 +180,19 @@
       },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
+        if(isSuperAdmin(this.userInfo.date.role.code)){
+          this.usercompany = '',
+          this.accountId = '',
+          this.isSuperAdmin = true
+        } else if(isCompanyAdmin(this.userInfo.date.role.code)){
+          this.accountId = '',
+          this.isCompanyAdmin = true
+        }
         const params = {
           'search.fullname_like': this.search.fullname,
           'search.username_like': this.search.username,
+          'search.id_eq': this.accountId,
+          'search.company_eq': this.usercompany,
           'page.pn': pageNo,
           'page.size': pageSize
         }

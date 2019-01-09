@@ -463,7 +463,7 @@
 
 <script>
   import globe from '../../utils/globe'
-  import checkPermission from '../../utils/permission'
+  import {isSuperAdmin} from '../../utils/permission'
   import api from '../../api/api'
   import { mapGetters } from 'vuex'
   export default {
@@ -531,7 +531,7 @@
       }
     },
     mounted() {
-      this.hasPermission = this.checkPermission()
+      this.hasPermission = this.isSuperAdmin()
       this.spinShow = false
       const that = this
       // 客户级别
@@ -597,7 +597,7 @@
       }
     },
     methods: {
-      checkPermission,
+      isSuperAdmin,
       // 转化为两位数价格
       toDecimal2(x) {
         let f = parseFloat(x)

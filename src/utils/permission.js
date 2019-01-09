@@ -21,10 +21,10 @@
 //   return isExist
 // }
 
-// 校验角色
-function checkPermission(){
-  if (this.$store.getters.userInfo.date) {
-    const role = this.$store.getters.userInfo.date.role.code
+// 校验超级管理员角色
+function isSuperAdmin(role) {
+  if (role) {
+    console.log(role)
     if (role === 'super_admin') {
       return true
     } else {
@@ -33,4 +33,19 @@ function checkPermission(){
   }
 }
 
-export default checkPermission
+// 校验门店管理员角色
+function isCompanyAdmin(role) {
+  if (role) {
+    console.log(role)
+    if (role === 'company_admin') {
+      return true
+    } else {
+      return false
+    }
+  }
+}
+
+export {
+  isSuperAdmin,
+  isCompanyAdmin
+}
