@@ -1,19 +1,78 @@
 <template>
   <div class="container">
     <div class="company">
-      <div class="company_header">
-        <span class="search">
+      <div class="company_header clearfix">
+        <div class="search clearfix">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或代码搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
-        </span>
-        <span v-if="isSuperAdmin" class="add_button float-right" @tap="handleAdd">新增</span>
+        </div>
+        <van-button v-if="isSuperAdmin" size="small" plain type="primary" class="add_button float-right" @tap="handleAdd">新增</van-button>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
+      <!-- <div class="company_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
+        <van-panel class="item_detail" :title="item.name" :desc="item.address" :status="item.code" use-footer-slot>
+          <view>
+            <p class="detail">
+              <p class="">
+                <span class="label">门店品牌:</span>
+                <span class="value">{{item.brand}}</span>
+              </p>
+              <p class="">
+                <span class="label">门店类型:</span>
+                <span class="value">{{item.date.type.value}}</span>
+              </p>
+            </p>
+            <p class="detail">
+              <p class="">
+                <span class="label">默认车牌:</span>
+                <span class="value">{{item.carNo}}</span>
+              </p>
+              <p class="">
+                <span class="label">门店地址:</span>
+                <span class="value">{{item.address}}</span>
+              </p>
+            </p>
+            <p class="detail">
+              <p class="">
+                <span class="label">客服热线:</span>
+                <span class="value">{{item.mobile}}</span>
+              </p>
+              <p class="">
+                <span class="label">营业时间:</span>
+                <span class="value">{{item.createTime}}</span>
+              </p>
+            </p>
+            <p class="detail">
+              <p class="">
+                <span class="label">客服邮箱:</span>
+                <span class="value">{{item.email}}</span>
+              </p>
+              <p class="">
+                <span class="label">备注:</span>
+                <span class="value">{{item.description}}</span>
+              </p>
+            </p>
+            <p class="detail">
+              <p class="">
+                <span class="label">建立时间:</span>
+                <span class="value">{{item.createTime}}</span>
+              </p>
+              <p class="">
+                <span class="label">更新时间:</span>
+                <span class="value">{{item.updateTime}}</span>
+              </p>
+            </p>
+          </view>
+          <view slot="footer" class="float-right">
+            <van-button v-if="isSuperAdmin || isCompanyAdmin" size="small" @tap="handleEdit(item)">编辑</van-button>
+            <van-button v-if="isSuperAdmin" size="small" type="danger"  @tap="handleDelete(item.id)">删除</van-button>
+          </view>
+        </van-panel> -->
       <div class="company_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
@@ -175,7 +234,9 @@
     },
     methods: {
       // 搜索
-      goSearch(){
+      goSearch(data){
+        console.log(data)
+        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.name = ''
         this.search.code = ''
@@ -278,50 +339,49 @@
   .company{
   width: 100%;
   .company_header{
-    width: 90%;
-    padding: 6px;
-    background-color: #f2f4fb;
-    height: 140rpx;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin-top:4px;
+      margin: 10px 10px 0 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
   .company_item{
+    padding: 10px;
     width: 90%;
-    background-color: #f2f4fb;
-    margin: 20px auto;
-    border: 1px solid #f2f4fb;
-    border-radius: 6px;
-    padding: 6px;
+    margin: 0 auto;
+    background: $--background-color-base;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: $--box-shadow-light;
     .item_header{
-      border-bottom: 1px solid $--color-info;
-      padding: 0 0 4px 0;
+      border-bottom: 1px solid $--color-border-white;
+      padding: 0 0 6px 0;
       .code{
-        color: $--color-info;
+        color: $--color-text-placeholder;
       }
     }
     .item_detail{
-      padding: 6px 0;
+      padding: 10px 0;
       .label{
         display: inline-block;
         width: 200rpx;
@@ -329,16 +389,19 @@
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
-      padding-top: 6px;
+      padding-top: 8px;
       .button{
         display: inline-block;
         padding: 2px 10px;
-        border: 1px solid $--color-info;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
         color: $--color-text-regular;
+      }
+      .delete{
+        color: $--color-danger;
       }
     }
   }

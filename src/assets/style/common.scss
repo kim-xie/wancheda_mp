@@ -34,3 +34,14 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+.clearfix:after {
+    content: "020";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {
+    /* 触发 hasLayout */
+    zoom: 1;
+}

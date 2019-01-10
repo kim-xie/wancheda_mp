@@ -7,6 +7,9 @@
         "i-spin": "../../dist/spin/index",
         "i-message": "../../dist/message/index",
         "i-modal": "../../dist/modal/index",
-        "i-divider": "../../dist/divider/index"
+        "i-divider": "../../dist/divider/index",
+        "van-search": "../../vant-weapp/search/index",
+        "van-panel": "../../vant-weapp/panel/index",
+        "van-button": "../../vant-weapp/button/index"
     }
 }

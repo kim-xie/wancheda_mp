@@ -33,11 +33,10 @@
     "pages/logs/main"
   ],
   "window": {
-    "backgroundTextStyle": "light",
+    "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "万车达",
     "navigationBarTextStyle": "black"
   },
-  "component": true,
   "debug": false
 }
