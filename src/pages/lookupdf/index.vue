@@ -281,7 +281,7 @@
     }
     .i-swipeout-button{
       float: left;
-      width: 60px;
+      width: 110rpx;
       text-align: center;
       background-color: $--color-primary-light-1;
       height: 100%;

@@ -21,7 +21,7 @@
       <p class="input_wrap" v-if="form.parentId">
         <span class="input_label">父节点</span>
         <picker @change="bindPickerChange($event, 'form', 'parentId')" :range="parentIds">
-          <span v-if="parentId===''" class="input placeholder">请选择父节点</span>
+          <span v-if="!parentId" class="input placeholder">请选择父节点</span>
           <span v-else class="input">{{parentId}}</span>
         </picker>
       </p>
