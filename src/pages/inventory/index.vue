@@ -1,13 +1,17 @@
 <template>
   <div class="container">
     <div class="product">
-      <div class="product_header">
-        <span class="search">
+      <div class="product_header clearfix">
+        <div class="search">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或编号搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
-        </span>
-        <!-- <span class="add_button float-left mr10">公司</span> -->
+        </div>
+        <!-- <span class="search">
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或编号搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
+        </span> -->
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -112,30 +116,18 @@
         const urlParams = globe.getCurrentPageUrlArgs()
         const types = urlParams.split('?')[1]
         this.select = types.split('=')[1]
-        console.log(this.select)
       }
       this.getList(this.pageNo, this.pageSize)
-    },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.pageNo)
-      if(this.pageNo > 1){
-        this.pageNo = this.pageNo-1
-        this.getList(this.pageNo, this.pageSize, function(){
-          wx.stopPullDownRefresh()
-        })
-      }
     },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.pageNo < this.totalData/this.pageSize){
+      if(this.pageSize < this.totalData){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.pageNo = this.pageNo+1
+        this.pageSize = this.pageSize+10
         this.getList(this.pageNo, this.pageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -271,43 +263,41 @@
 .product{
   width: 100%;
   .product_header{
-    width: 90%;
-    padding: 6px;
-    background-color: #f2f4fb;
-    height: 80rpx;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin-top:4px;
+      margin: 10px 10px 10px 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
   .product_item{
-    width: 90%;
+    width: 91%;
     background-color: #f2f4fb;
     margin: 20px auto;
-    border: 1px solid #f2f4fb;
+    box-shadow: $--box-shadow-light;
     border-radius: 6px;
     padding: 6px;
     .item_header{
-      border-bottom: 1px solid $--color-info;
+      border-bottom: 1px solid $--color-border-white;
       padding: 0 0 4px 0;
       .code{
         color: $--color-info;
@@ -322,7 +312,7 @@
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
       padding-top: 6px;
       .button{

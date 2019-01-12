@@ -2,6 +2,7 @@
   "pages": [
     "pages/login/main",
     "pages/index/main",
+    "pages/repair/main",
     "pages/selectRepair/main",
     "pages/selectInventory/main",
     "pages/lookupdf/main",
@@ -27,7 +28,7 @@
     "pages/inventoryDetail/main",
     "pages/inpart/main",
     "pages/outpart/main",
-    "pages/repair/main",
+    
     "pages/repairDetail/main",
     "pages/finance/main",
     "pages/logs/main"

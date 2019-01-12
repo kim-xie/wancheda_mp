@@ -4,7 +4,7 @@
         "i-spin": "../../dist/spin/index",
         "i-message": "../../dist/message/index",
         "i-modal": "../../dist/modal/index",
-        "i-divider": "../../dist/divider/index"
-    },
-    "enablePullDownRefresh": true
+        "i-divider": "../../dist/divider/index",
+        "van-button": "../../vant-weapp/button/index"
+    }
 }

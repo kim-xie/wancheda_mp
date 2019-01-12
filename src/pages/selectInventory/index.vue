@@ -59,7 +59,6 @@
         const urlParams = globe.getCurrentPageUrlArgs()
         const ids = urlParams.split('?')[1]
         this.inventoryId = ids.split('=')[1]
-        console.log(this.inventoryId)
         this.getDetail()
       }
       // 获取用户列表

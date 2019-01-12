@@ -7,22 +7,22 @@
       <i-spin size="large" fix v-if="spinShow"></i-spin>
       <p class="input_wrap">
         <span class="input_label">项目代码:</span>
-        <input v-model="form.code" placeholder="请输入项目代码"/>
+        <input v-model="form.code" placeholder="请输入项目代码" readonly disabled/>
       </p>
       <p class="input_wrap">
         <span class="input_label">项目名称:</span>
-        <input v-model="form.name" placeholder="请输入项目名称"/>
+        <input v-model="form.name" placeholder="请输入项目名称" readonly disabled/>
       </p>
       <p class="input_wrap">
         <span class="input_label">所属分类:</span>
-        <picker @change="bindPickerChange($event, 'form', 'typeLK')" :range="typeLKs">
+        <picker :range="typeLKs">
           <span v-if="typeLK===''" class="input placeholder">请选择所属分类</span>
           <span v-else class="input">{{typeLK}}</span>
         </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">维修工种:</span>
-        <picker @change="bindPickerChange($event, 'form', 'workTypeLK')" :range="workTypeLKs">
+        <picker :range="workTypeLKs">
           <span v-if="workTypeLK===''" class="input placeholder">请选择维修工种</span>
           <span v-else class="input">{{workTypeLK}}</span>
         </picker>
@@ -86,7 +86,6 @@
       this.id = ''
       this.discount = 10
       this.repairIndex = ''
-      console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]

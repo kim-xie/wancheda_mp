@@ -2,7 +2,7 @@
   <div class="container">
     <div class="company">
       <div class="company_header clearfix">
-        <div class="search clearfix">
+        <div class="search">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或代码搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
@@ -14,65 +14,6 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
-      <!-- <div class="company_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
-        <van-panel class="item_detail" :title="item.name" :desc="item.address" :status="item.code" use-footer-slot>
-          <view>
-            <p class="detail">
-              <p class="">
-                <span class="label">门店品牌:</span>
-                <span class="value">{{item.brand}}</span>
-              </p>
-              <p class="">
-                <span class="label">门店类型:</span>
-                <span class="value">{{item.date.type.value}}</span>
-              </p>
-            </p>
-            <p class="detail">
-              <p class="">
-                <span class="label">默认车牌:</span>
-                <span class="value">{{item.carNo}}</span>
-              </p>
-              <p class="">
-                <span class="label">门店地址:</span>
-                <span class="value">{{item.address}}</span>
-              </p>
-            </p>
-            <p class="detail">
-              <p class="">
-                <span class="label">客服热线:</span>
-                <span class="value">{{item.mobile}}</span>
-              </p>
-              <p class="">
-                <span class="label">营业时间:</span>
-                <span class="value">{{item.createTime}}</span>
-              </p>
-            </p>
-            <p class="detail">
-              <p class="">
-                <span class="label">客服邮箱:</span>
-                <span class="value">{{item.email}}</span>
-              </p>
-              <p class="">
-                <span class="label">备注:</span>
-                <span class="value">{{item.description}}</span>
-              </p>
-            </p>
-            <p class="detail">
-              <p class="">
-                <span class="label">建立时间:</span>
-                <span class="value">{{item.createTime}}</span>
-              </p>
-              <p class="">
-                <span class="label">更新时间:</span>
-                <span class="value">{{item.updateTime}}</span>
-              </p>
-            </p>
-          </view>
-          <view slot="footer" class="float-right">
-            <van-button v-if="isSuperAdmin || isCompanyAdmin" size="small" @tap="handleEdit(item)">编辑</van-button>
-            <van-button v-if="isSuperAdmin" size="small" type="danger"  @tap="handleDelete(item.id)">删除</van-button>
-          </view>
-        </van-panel> -->
       <div class="company_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
         <div class="item_header">
           <p class="item_name">
@@ -367,7 +308,7 @@
   }
   .company_item{
     padding: 10px;
-    width: 90%;
+    width: 88%;
     margin: 0 auto;
     background: $--background-color-base;
     border-radius: 8px;
@@ -398,7 +339,11 @@
         border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
+        font-size: 14px;
         color: $--color-text-regular;
+      }
+      .button:hover{
+        background-color: $--color-border-white;
       }
       .delete{
         color: $--color-danger;

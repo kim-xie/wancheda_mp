@@ -130,8 +130,8 @@
         this.spinShow = true
         // 分发数据到vuex
         this.$store.dispatch('updateInpartFormParam', this.form).then(() => {
+          this.spinShow = false
           setTimeout(function(){
-            this.spinShow = false
             wx.navigateTo({
               url: '/pages/inpart/main'
             })

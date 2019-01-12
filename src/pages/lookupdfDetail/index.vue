@@ -40,15 +40,14 @@
         form: {},
         id: '',
         spinShow: true,
-        type: 0
+        type: ''
       }
     },
     onLoad(){
       this.id = ''
-      this.type = 0
+      this.type = ''
       this.form = {}
       this.spinShow = false
-      console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -110,7 +109,7 @@
         }else if(!this.form.code){
           globe.message('代码不能为空', 'warning')
           return false
-        }else if(!this.form.type){
+        }else if(!this.type){
           globe.message('类型不能为空', 'warning')
           return false
         }

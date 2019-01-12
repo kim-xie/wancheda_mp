@@ -1,14 +1,12 @@
 <template>
   <div class="container">
     <div class="outpart">
-      <div class="outpart_header">
-        <span class="search">
+      <div class="outpart_header clearfix">
+        <div class="search">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按订单编号搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
-        </span>
-        <!-- <span class="add_button float-left mr10">公司</span>
-        <span class="add_button float-left">出库类型</span> -->
+        </div>
       </div>
 
       <!-- iview 全局提示组件 -->
@@ -235,6 +233,8 @@
         search: {
           workOrderNo: ''
         },
+        deleteIndex: '',
+        deleteSubtotal: '',
         actions: [
             {
                 name: '取消'
@@ -265,32 +265,26 @@
       // 获取公司
       this.usercompany = this.userInfo.company
     },
+    onLoad(){
+      this.deleteIndex = ''
+      this.deleteSubtotal = ''
+      this.spinShow = false
+    },
     computed: {
       ...mapGetters([
         'outpartCount',
         'userInfo'
       ])
     },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.pageNo)
-      if(this.pageNo > 1){
-        this.pageNo = this.pageNo-1
-        this.getList(this.pageNo, this.pageSize, function(){
-          wx.stopPullDownRefresh()
-        })
-      }
-    },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.pageNo < this.totalData/this.pageSize){
+      if(this.pageSize < this.totalData){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.pageNo = this.pageNo+1
+        this.pageSize = this.pageSize+10
         this.getList(this.pageNo, this.pageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -300,7 +294,6 @@
     methods: {
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.workOrderNo = ''
         this.search.workOrderNo = searchVal
@@ -333,7 +326,7 @@
                 if(i === tableData.length - 1){
                   //_this.isLocked = true
                   _this.listData = tableData
-                  console.log(_this.listData)
+                  //console.log(_this.listData)
                   if(callback && typeof callback == 'function'){
                     callback()
                   }
@@ -355,7 +348,7 @@
         this.$http.get(api.company_list, params).then( res => {
           if(res.success){
             const data = res.data.page.content
-            console.log(data)
+            //console.log(data)
             let dataArry = []
             let idArry = []
             for(let i=0; i<data.length; i++){
@@ -461,7 +454,7 @@
           let totals = 0
           let _this = this
           this.selectTableData = this.$store.state.outpartFormParam
-          console.log(this.selectTableData)
+          //console.log(this.selectTableData)
           this.selectTotal = this.selectTableData.length
           for(var i=0;i<_this.selectTableData.length;i++){
             _this.selectTableData[i].subtotal = Number(_this.selectTableData[i].sale) * Number(_this.selectTableData[i].count)
@@ -474,12 +467,31 @@
       handleChange(data){
         this.currentTab = data.mp.detail.key
       },
-      // 删除
-      handleDelete(index, subtotal) {
+      // 删除确认
+      handleClick(data){
+        const type = data.mp._relatedInfo.anchorTargetText
+        const that = this
+        if(type === '删除'){
+          that.deleteApi(that.deleteIndex,that.deleteSubtotal)
+          that.modalVisible = false
+        }else{
+          that.modalVisible = false
+        }
+      },
+      deleteApi(index, subtotal){
+        this.spinShow = true
         let Len = this.selectTableData.length
         this.selectTableData.splice(index,1)
         this.outpartsTotal = this.outpartsTotal-subtotal
-        this.$store.dispatch('updateOutPartCount', Len - 1)
+        this.$store.dispatch('updateOutPartCount', Len - 1).then(() => {
+          this.spinShow = false
+        })
+      },
+      // 删除
+      handleDelete(index, subtotal) {
+        this.deleteIndex = index
+        this.deleteSubtotal = subtotal
+        this.modalVisible = true
       },
       // 结算
       saveProduction(){
@@ -576,31 +588,29 @@
 .outpart{
   width: 100%;
   .outpart_header{
-    width: 90%;
-    padding: 6px;
-    background-color: #f2f4fb;
-    height: 80rpx;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin-top:4px;
+      margin: 10px 10px 10px 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
@@ -666,6 +676,9 @@
         height: 26px;
         line-height: 26px;
         text-align: center;
+      }
+      .delete{
+        color: '#ed3f14';
       }
     }
   }

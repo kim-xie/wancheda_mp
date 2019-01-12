@@ -6,129 +6,125 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
-      <div class="client_header">
-        <span class="search">
+      <div class="client_header clearfix">
+        <div class="search">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按车牌号搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
-        </span>
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+        </div>
+        <van-button size="small" plain type="primary" class="add_button float-right" @tap="handleAdd">新增</van-button>
       </div>
 
-      <div class="client_item" v-if="listData.length>0" v-for="(item,index) in listData" :key="index">
-        <div class="item_header">
-          <p class="item_name">
-            <span class="name">{{item.carNo}}</span>
-            <span class="code float-right">{{item.name}}</span>
-          </p>
-        </div>
-        <div class="item_detail">
-          <p class="detail">
-            <p class="">
-              <span class="label">所属门店:</span>
-              <span class="value" v-if="item.company">{{item.company}}</span>
+      <van-collapse custom-class="client_wrap" :value="activeName" accordion v-if="listData.length>0">
+        <van-collapse-item content-class="client_item" v-for="(item,index) in listData" :key="index" :title="item.carNo" :value="item.name" :name="index" @tap="onChange($event,index)">
+          <div class="item_detail">
+            <p class="detail">
+              <p class="">
+                <span class="label">所属门店:</span>
+                <span class="value" v-if="item.company">{{item.company}}</span>
+              </p>
+              <p class="">
+                <span class="label">手机号码:</span>
+                <span class="value">{{item.mobile}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">手机号码:</span>
-              <span class="value">{{item.mobile}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">客户级别:</span>
+                <span class="value">{{item.date.level.value}}</span>
+              </p>
+              <p class="">
+                <span class="label">客户类型:</span>
+                <span class="value">{{item.date.type.value}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">客户级别:</span>
-              <span class="value">{{item.date.level.value}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">汽车品牌:</span>
+                <span class="value">{{item.date.carBrand.value}}</span>
+              </p>
+              <p class="">
+                <span class="label">汽车车型:</span>
+                <span class="value">{{item.carModel}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">客户类型:</span>
-              <span class="value">{{item.date.type.value}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">车身颜色:</span>
+                <span class="value">{{item.carColor}}</span>
+              </p>
+              <p class="">
+                <span class="label">车架号:</span>
+                <span class="value">{{item.carVIN}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">汽车品牌:</span>
-              <span class="value">{{item.date.carBrand.value}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">发动机号:</span>
+                <span class="value">{{item.engineNo}}</span>
+              </p>
+              <p class="">
+                <span class="label">证件号:</span>
+                <span class="value">{{item.idcard}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">汽车车型:</span>
-              <span class="value">{{item.carModel}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">性别:</span>
+                <span class="value" v-if="item.sex">男</span>
+                <span class="value" v-if="!item.sex">女</span>
+              </p>
+              <p class="">
+                <span class="label">邮箱:</span>
+                <span class="value">{{item.email}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">车身颜色:</span>
-              <span class="value">{{item.carColor}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">客户地址:</span>
+                <span class="value">{{item.address}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">车架号:</span>
-              <span class="value">{{item.carVIN}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">保险公司:</span>
+                <span class="value">{{item.insurer}}</span>
+              </p>
+              <p class="">
+                <span class="label">保险到期时间:</span>
+                <span class="value">{{item.insuranceEndtime}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">发动机号:</span>
-              <span class="value">{{item.engineNo}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">上牌日期:</span>
+                <span class="value">{{item.registrationDate}}</span>
+              </p>
+              <p class="">
+                <span class="label">备注:</span>
+                <span class="value">{{item.description}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">证件号:</span>
-              <span class="value">{{item.idcard}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">创建时间:</span>
+                <span class="value">{{item.createTime}}</span>
+              </p>
+              <p class="">
+                <span class="label">更新时间:</span>
+                <span class="value">{{item.updateTime}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">性别:</span>
-              <span class="value" v-if="item.sex">男</span>
-              <span class="value" v-if="!item.sex">女</span>
+          </div>
+          <div class="item_footer">
+            <p class="item_edit">
+              <span class="button" @tap="handleCoupon(item)">优惠券</span>
+              <span class="button edit" @tap="handleEdit(item)">编辑</span>
+              <span class="button delete" @tap="handleDelete(item.id)">删除</span>
             </p>
-            <p class="">
-              <span class="label">邮箱:</span>
-              <span class="value">{{item.email}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">客户地址:</span>
-              <span class="value">{{item.address}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">保险公司:</span>
-              <span class="value">{{item.insurer}}</span>
-            </p>
-            <p class="">
-              <span class="label">保险到期时间:</span>
-              <span class="value">{{item.insuranceEndtime}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">上牌日期:</span>
-              <span class="value">{{item.registrationDate}}</span>
-            </p>
-            <p class="">
-              <span class="label">备注:</span>
-              <span class="value">{{item.description}}</span>
-            </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">创建时间:</span>
-              <span class="value">{{item.createTime}}</span>
-            </p>
-            <p class="">
-              <span class="label">更新时间:</span>
-              <span class="value">{{item.updateTime}}</span>
-            </p>
-          </p>
-        </div>
-        <div class="item_footer">
-          <p class="item_edit">
-            <span class="button" @tap="handleCoupon(item)">优惠券</span>
-            <span class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
-          </p>
-        </div>
-      </div>
+          </div>
+        </van-collapse-item>
+      </van-collapse>
 
       <!-- 暂无数据 -->
       <i-divider v-if="totalData===0 && firstLoad" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
@@ -150,6 +146,7 @@
   export default {
     data () {
       return {
+        activeName: -1,
         modalVisible: false,
         firstLoad: false,
         spinShow: true,
@@ -213,9 +210,16 @@
       }
     },
     methods: {
+      // 切换手风琴
+      onChange(data,index){
+        if(this.activeName == index){
+          this.activeName = -1
+        }else{
+          this.activeName = index
+        }
+      },
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.carNo = searchVal
         this.getList(this.pageNo, this.pageSize)
@@ -227,7 +231,6 @@
       },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
-        console.log(2)
         const that = this
         that.spinShow = true
         const params = {
@@ -358,67 +361,73 @@
 .client{
   width: 100%;
   .client_header{
-    width: 90%;
-    padding: 6px;
-    background-color: #f2f4fb;
-    height: 140rpx;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin-top:4px;
+      margin: 10px 10px 10px 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
+  .client_wrap{
+    padding: 10px;
+    width: 88%;
+    margin: 0 auto;
+    margin-top: 20px;
+  }
   .client_item{
-    width: 90%;
-    background-color: #f2f4fb;
-    margin: 20px auto;
-    border: 1px solid #f2f4fb;
-    border-radius: 6px;
-    padding: 6px;
+    box-shadow: $--box-shadow-light;
     .item_header{
-      border-bottom: 1px solid $--color-info;
-      padding: 0 0 4px 0;
+      border-bottom: 1px solid $--color-border-white;
+      padding: 0 0 6px 0;
       .code{
-        color: $--color-info;
+        color: $--color-text-placeholder;
       }
     }
     .item_detail{
-      padding: 6px 0;
+      padding: 10px 0;
       .label{
         display: inline-block;
-        width: 240rpx;
+        width: 200rpx;
         color: $--color-text-regular;
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
-      padding-top: 6px;
+      padding-top: 8px;
       .button{
         display: inline-block;
         padding: 2px 10px;
-        border: 1px solid $--color-info;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
+        font-size: 14px;
         color: $--color-text-regular;
+      }
+      .button:hover{
+        background-color: $--color-border-white;
+      }
+      .delete{
+        color: $--color-danger;
       }
     }
   }

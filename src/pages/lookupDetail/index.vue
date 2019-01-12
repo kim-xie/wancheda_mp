@@ -14,9 +14,16 @@
         <input v-model="form.code" v-if="isEdit" readonly disabled/>
         <input v-model="form.code" v-else placeholder="请输入代码"/>
       </p>
+      <p class="input_wrap" v-if="form.additional">
+        <span class="input_label">折扣</span>
+        <input type="number" v-model="form.additional" placeholder="请输入折扣"/>
+      </p>
       <p class="input_wrap" v-if="form.parentId">
         <span class="input_label">父节点</span>
-        <input v-model="form.parentId" placeholder="请输入父节点"/>
+        <picker @change="bindPickerChange($event, 'form', 'parentId')" :range="parentIds">
+          <span v-if="parentId===''" class="input placeholder">请选择父节点</span>
+          <span v-else class="input">{{parentId}}</span>
+        </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">描述</span>
@@ -39,14 +46,17 @@
         form: {},
         id: '',
         isEdit: false,
+        parentId: '',
+        parentIds: [],
+        parentIdIds: []
       }
     },
     onLoad() {
       this.form = {}
       this.spinShow = false
       this.id = ''
+      this.parentId = ''
       this.isEdit = false
-      console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -54,6 +64,7 @@
           this.getDetail(this.id)
         }
       }
+      this.getLookupByCodeAndPicker('repair_type','parentId')
     },
     methods: {
       // 获取详情
@@ -61,10 +72,55 @@
         let item = this.$store.getters.editItem
         if(item.id){
           this.isEdit = true
-          this.form = item
+          this.parentId = item.parentVal
         }else{
           this.isEdit = false
         }
+        this.form = item
+      },
+      // 普通选择器
+      bindPickerChange(data, formName, type){
+        const index = data.mp.detail.value
+        // 显示的值
+        this[type] = this[type+'s'][index]
+        // 对应的id
+        this[formName][type] = this[type+'Ids'][index]
+      },
+      // 获取数据字典并且弹出选择框
+      getLookupByCodeAndPicker(code, type, successBack){
+        const _this = this
+        this.getLookupByCode(code, 1, 1000, function(data, total){
+          let dataArry = []
+          let idArry = []
+          for(let i=0; i<data.length; i++){
+            dataArry.push(data[i].value)
+            idArry.push(data[i].id)
+          }
+
+          _this[type+'s'] = dataArry
+          _this[type+'Ids'] = idArry
+
+          if(successBack && typeof successBack == 'function'){
+            successBack(dataArry, idArry)
+          }
+        })
+      },
+      // 根据数据字典code获取数据字典
+      getLookupByCode(code, pageNo, pageSize, callback){
+        const params = {
+          pageNo,
+          pageSize
+        }
+        this.spinShow = true
+        this.$http.get(api.getLookupByCode + code, params).then( res => {
+          if(res.success){
+            this.spinShow = false
+            if(callback && typeof callback == 'function'){
+              callback(res.data.page.content, res.data.page.totalElements)
+            }
+          }
+          this.spinShow = false
+        })
       },
       // 保存
       handleSave(callback){
@@ -80,6 +136,9 @@
           return false
         }else if(!this.form.code){
           globe.message('代码不能为空', 'warning')
+          return false
+        }else if(this.form.parentId===this.form.id){
+          globe.message('当前节点不可以作为自己的父节点', 'warning')
           return false
         }
         this.spinShow = true

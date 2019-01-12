@@ -1,8 +1,13 @@
 <template>
   <div class="container">
     <div class="lookup">
-      <div class="lookup_header">
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+      <div class="lookup_header clearfix">
+        <!-- <div class="search">
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或代码搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
+        </div> -->
+        <van-button size="small" plain type="primary" class="add_button float-right" @tap="handleAdd">新增</van-button>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -18,6 +23,14 @@
         </div>
         <div class="item_detail">
           <p class="detail">
+            <p class="" v-if="item.discountVal">
+              <span class="label">折扣:</span>
+              <span class="value">{{item.discountVal}}</span>
+            </p>
+            <p class="" v-if="item.zzLevel>1">
+              <span class="label">父节点:</span>
+              <span class="value">{{item.parentVal}}</span>
+            </p>
             <p class="">
               <span class="label">描述:</span>
               <span class="value">{{item.description}}</span>
@@ -33,7 +46,7 @@
       </div>
 
       <!-- 暂无数据 -->
-      <i-divider v-if="totalData===0 && firstLoad" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
+      <i-divider v-if="totalData===0" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
 
       <!-- 页底加载 -->
       <i-load-more v-if="totalData>pageSize" :tip="tipmessage" :loading="loading" />
@@ -54,6 +67,12 @@
   export default {
     data () {
       return {
+        search: {
+          name: '',
+          code: ''
+        },
+        isParent: false,
+        isDiscount: false,
         isCompanyAdmin: false,
         isSuperAdmin: false,
         lookupdfCode: '',
@@ -90,7 +109,8 @@
       this.spinShow = false
       this.definitionId = ''
       this.deleteId = ''
-      console.log(globe.getCurrentPageUrlArgs())
+      this.isDiscount = false
+      this.isParent = false
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.lookupdfCode = urlParams.split('=')[1]
@@ -103,26 +123,15 @@
         this.getList(this.pageNo, this.pageSize)
       }
     },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.pageNo)
-      if(this.pageNo > 1){
-        this.pageNo = this.pageNo-1
-        this.getList(this.pageNo, this.pageSize, function(){
-          wx.stopPullDownRefresh()
-        })
-      }
-    },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.pageNo < this.totalData/this.pageSize){
+      if(this.pageSize < this.totalData){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.pageNo = this.pageNo+1
+        this.pageSize = this.pageSize+10
         this.getList(this.pageNo, this.pageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -130,6 +139,24 @@
       }
     },
     methods: {
+      // 搜索
+      goSearch(data){
+        const searchVal = this.searchVal
+        this.search.name = ''
+        this.search.code = ''
+        if(utils.isChinese(searchVal)){
+          this.search.name = searchVal
+        }else{
+          this.search.code = searchVal
+        }
+        this.getList(this.pageNo, this.pageSize)
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.name = ''
+        this.search.code = ''
+        this.getList(this.pageNo, this.pageSize)
+      },
       // 获取列表数据
       getList(pageNo, pageSize, callback){
         if(isSuperAdmin(this.userInfo.date.role.code)){
@@ -145,7 +172,18 @@
         this.$http.get(api.lookup_list + this.lookupdfCode, params).then( res => {
           if(res.success){
             this.spinShow = false
-            this.listData = res.data.page.content
+            const datas = res.data.page.content
+            for(let i=0; i<datas.length; i++){
+              datas[i].parentVal = datas[i].parentId ? this.getParentNameById(datas,datas[i].parentId):''
+              datas[i].discountVal = datas[i].additional ? datas[i].additional+"折":''
+              if(datas[i].discountVal){
+                this.isDiscount = true
+              }
+              if(datas[i].parentVal){
+                this.isParent = true
+              }
+            }
+            this.listData = datas
             this.definitionId = this.listData[0].definitionId
             this.totalData = res.data.page.totalElements
             if(callback && typeof callback == 'function'){
@@ -155,9 +193,23 @@
           this.firstLoad = true
         })
       },
+      // 根据id获取父节点
+      getParentNameById(datas,parentId){
+        for(let i=0;i<datas.length;i++){
+          if(datas[i].id == parentId){
+            return datas[i].value
+          }
+        }
+      },
       // 新增
       handleAdd(){
-        this.$store.dispatch('saveEditItem', '').then(() => {
+        let item = {}
+        if(this.isDiscount){
+          item.additional = 10
+        }else if(this.isParent){
+          item.parentId = true
+        }
+        this.$store.dispatch('saveEditItem', item).then(() => {
           wx.navigateTo({
             url: '/pages/lookupDetail/main?id='+this.definitionId
           })
@@ -218,66 +270,78 @@
 .lookup{
   width: 100%;
   .lookup_header{
-    width: 90%;
-    padding: 6px;
-    height: 22px;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin: 4px 0;
+      margin: 10px 10px 0px 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
   .lookup_item{
-    width: 90%;
-    background-color: #f2f4fb;
-    margin: 20px auto;
-    border: 1px solid #f2f4fb;
-    border-radius: 6px;
-    padding: 6px;
+    padding: 10px;
+    width: 89%;
+    margin: 0 auto;
+    background: $--background-color-base;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: $--box-shadow-light;
     .item_header{
-      border-bottom: 1px solid $--color-info;
-      padding: 0 0 4px 0;
+      border-bottom: 1px solid $--color-border-white;
+      padding: 0 0 6px 0;
       .code{
-        color: $--color-info;
+        color: $--color-text-placeholder;
       }
     }
     .item_detail{
-      padding: 6px 0;
+      padding: 10px 0;
       .label{
         display: inline-block;
         width: 200rpx;
+        font-size: 14px;
+        color: $--color-text-placeholder;
+      }
+      .value{
+        font-size: 14px;
         color: $--color-text-regular;
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
-      padding-top: 6px;
+      padding-top: 8px;
       .button{
         display: inline-block;
         padding: 2px 10px;
-        border: 1px solid $--color-info;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
+        font-size: 14px;
         color: $--color-text-regular;
+      }
+      .button:hover{
+        background-color: $--color-border-white;
+      }
+      .delete{
+        color: $--color-danger;
       }
     }
   }

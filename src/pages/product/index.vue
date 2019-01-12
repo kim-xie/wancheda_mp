@@ -6,78 +6,75 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
-      <div class="product_header">
-        <span class="search">
+      <div class="product_header clearfix">
+        <div class="search">
           <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按名称或编号搜索">
           <i v-if="searchVal === ''" class="iconfont icon-search"></i>
           <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
-        </span>
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+        </div>
+        <van-button size="small" plain type="primary" class="add_button float-right" @tap="handleAdd">新增</van-button>
       </div>
-      <div class="product_item" v-for="(item,index) in listData" :key="index">
-        <div class="item_header">
-          <p class="item_name">
-            <span class="name">{{item.name}}</span>
-            <span class="code float-right">{{item.code}}</span>
-          </p>
-        </div>
-        <div class="item_detail">
-          <p class="detail">
-            <p class="">
-              <span class="label">批发价:</span>
-              <span class="value">{{item.wholeSale}}</span>
+
+      <van-collapse custom-class="item_wrap" :value="activeName" accordion v-if="listData.length>0">
+        <van-collapse-item content-class="product_item" custom-class="product_item" v-for="(item,index) in listData" :key="index" :title="item.name" :value="item.code" :name="index" @tap="onChange($event,index)">
+          <div class="item_detail">
+            <p class="detail">
+              <p class="">
+                <span class="label">批发价:</span>
+                <span class="value">{{item.wholeSale}}</span>
+              </p>
+              <p class="">
+                <span class="label">销售价:</span>
+                <span class="value">{{item.sale}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">销售价:</span>
-              <span class="value">{{item.sale}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">单位:</span>
+                <span class="value" v-if="item.date.unitLK">{{item.date.unitLK.value}}</span>
+              </p>
+              <p class="">
+                <span class="label">产地:</span>
+                <span class="value">{{item.produceArea}}</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">单位:</span>
-              <span class="value" v-if="item.date.unitLK">{{item.date.unitLK.value}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">适用车型:</span>
+                <span class="value">{{item.carModel}}</span>
+              </p>
+              <p class="">
+                <span class="label">配件规格:</span>
+                <span class="value" v-if="item.date.specificationLK">{{item.date.specificationLK.value}}</span>
+              </p>
             </p>
-            <p class="">
-              <span class="label">产地:</span>
-              <span class="value">{{item.produceArea}}</span>
+            <p class="detail">
+              <p class="">
+                <span class="label">所属分类:</span>
+                <span class="value" v-if="item.date.pCategoryLK">{{item.date.pCategoryLK.value}}</span>
+              </p>
+              <p class="">
+                <span class="label">状态:</span>
+                <span v-if="item.isDisable == false" class="value undisable">启用</span>
+                <span v-if="item.isDisable == true" class="value disable">禁用</span>
+              </p>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">适用车型:</span>
-              <span class="value">{{item.carModel}}</span>
+            <p class="detail">
+              <span class="label">备注:</span>
+              <span class="value">{{item.description}}</span>
             </p>
-            <p class="">
-              <span class="label">配件规格:</span>
-              <span class="value" v-if="item.date.specificationLK">{{item.date.specificationLK.value}}</span>
+          </div>
+          <div class="item_footer">
+            <p class="item_edit">
+              <span v-if="item.isDisable == false" class="button disable" @tap="handleStatus(item)">禁用</span>
+              <span v-if="item.isDisable == true" class="button undisable" @tap="handleStatus(item)">启用</span>
+              <span v-if="item.isDisable == false" class="button edit" @tap="handleEdit(item)">编辑</span>
+              <span v-if="item.isDisable == false" class="button" @tap="handleInpart(item)">入库</span>
+              <span class="button delete" @tap="handleDelete(item.id)">删除</span>
             </p>
-          </p>
-          <p class="detail">
-            <p class="">
-              <span class="label">所属分类:</span>
-              <span class="value" v-if="item.date.pCategoryLK">{{item.date.pCategoryLK.value}}</span>
-            </p>
-            <p class="">
-              <span class="label">状态:</span>
-              <span v-if="item.isDisable == false" class="value undisable">启用</span>
-              <span v-if="item.isDisable == true" class="value disable">禁用</span>
-            </p>
-          </p>
-          <p class="detail">
-            <span class="label">备注:</span>
-            <span class="value">{{item.description}}</span>
-          </p>
-        </div>
-        <div class="item_footer">
-          <p class="item_edit">
-            <span v-if="item.isDisable == false" class="button disable" @tap="handleStatus(item)">禁用</span>
-            <span v-if="item.isDisable == true" class="button undisable" @tap="handleStatus(item)">启用</span>
-            <span v-if="item.isDisable == false" class="button edit" @tap="handleEdit(item)">编辑</span>
-            <span v-if="item.isDisable == false" class="button" @tap="handleInpart(item)">入库</span>
-            <span class="button delete" @tap="handleDelete(item.id)">删除</span>
-          </p>
-        </div>
-      </div>
+          </div>
+        </van-collapse-item>
+      </van-collapse>
 
       <!-- 暂无数据 -->
       <i-divider v-if="totalData===0 && firstLoad" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
@@ -99,6 +96,7 @@
   export default {
     data () {
       return {
+        activeName: -1,
         modalVisible: false,
         firstLoad: false,
         spinShow: true,
@@ -132,26 +130,15 @@
       this.listData = []
       this.getList(this.pageNo, this.pageSize)
     },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.pageNo)
-      if(this.pageNo > 1){
-        this.pageNo = this.pageNo-1
-        this.getList(this.pageNo, this.pageSize, function(){
-          wx.stopPullDownRefresh()
-        })
-      }
-    },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.pageNo < this.totalData/this.pageSize){
+      if(this.pageSize < this.totalData){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.pageNo = this.pageNo+1
+        this.pageSize = this.pageSize+10
         this.getList(this.pageNo, this.pageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -159,9 +146,16 @@
       }
     },
     methods: {
+      // 切换手风琴
+      onChange(data,index){
+        if(this.activeName == index){
+          this.activeName = -1
+        }else{
+          this.activeName = index
+        }
+      },
       // 搜索
       goSearch(){
-        console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.name = ''
         this.search.code = ''
@@ -223,7 +217,6 @@
         }
         this.spinShow = true
         this.$http.post(api.product_edit, params).then( res => {
-          console.log(res.success)
           if(res.success){
             globe.message(res.errorMsg, 'success')
             this.getList(this.pageNo, this.pageSize)
@@ -299,50 +292,49 @@
 .product{
   width: 100%;
   .product_header{
-    width: 90%;
-    padding: 6px;
-    background-color: #f2f4fb;
-    height: 140rpx;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin-top:4px;
+      margin: 10px 10px 10px 0;
     }
     .search{
       display: block;
       position: relative;
+      width: 95%;
+      margin: 0 auto;
       input{
-        border: 1px solid #ccc;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         padding: 3rpx 80rpx 6rpx 12rpx;
       }
       .iconfont{
         position: absolute;
         right: 12rpx;
-        top: 8rpx;
+        top: 14rpx;
         font-size: 22px;
-
+        color: $--color-text-placeholder;
       }
     }
   }
+  .item_wrap{
+    padding: 10px;
+    width: 88%;
+    margin: 0 auto;
+    margin-top: 20px;
+  }
   .product_item{
-    width: 90%;
-    background-color: #f2f4fb;
-    margin: 20px auto;
-    border: 1px solid #f2f4fb;
-    border-radius: 6px;
-    padding: 6px;
+    box-shadow: $--box-shadow-light;
     .item_header{
-      border-bottom: 1px solid $--color-info;
-      padding: 0 0 4px 0;
+      border-bottom: 1px solid $--color-border-white;
+      padding: 0 0 6px 0;
       .code{
-        color: $--color-info;
+        color: $--color-text-placeholder;
       }
     }
     .item_detail{
-      padding: 6px 0;
+      padding: 10px 0;
       .label{
         display: inline-block;
         width: 200rpx;
@@ -350,16 +342,23 @@
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
-      padding-top: 6px;
+      padding-top: 8px;
       .button{
         display: inline-block;
         padding: 2px 10px;
-        border: 1px solid $--color-info;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
+        font-size: 14px;
         color: $--color-text-regular;
+      }
+      .button:hover{
+        background-color: $--color-border-white;
+      }
+      .delete{
+        color: $--color-danger;
       }
     }
   }

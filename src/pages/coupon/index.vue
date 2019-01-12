@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="coupon">
-      <div class="coupon_header">
-        <span class="add_button float-right" @tap="handleAdd">新增</span>
+      <div class="coupon_header clearfix">
+        <!-- <span class="add_button float-right" @tap="handleAdd">新增</span> -->
+        <van-button size="small" plain type="primary" class="add_button float-right" @tap="handleAdd">新增</van-button>
       </div>
       <!-- iview 全局提示组件 -->
       <i-message id="message"/>
@@ -72,7 +73,6 @@
     },
     onLoad(){
       this.firstLoad = false
-      console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.clientId = urlParams.split('=')[1]
@@ -187,15 +187,10 @@
 .coupon{
   width: 100%;
   .coupon_header{
-    width: 90%;
-    padding: 6px;
-    height: 22px;
+    height: 100%;
     margin: 0 auto;
     .add_button{
-      padding: 3px 10px;
-      border: 1px solid $--color-info;
-      border-radius: 4px;
-      margin: 4px 0;
+      margin: 10px 10px 0 0;
     }
     .search{
       display: block;
@@ -215,21 +210,22 @@
     }
   }
   .coupon_item{
-    width: 90%;
-    background-color: #f2f4fb;
-    margin: 20px auto;
-    border: 1px solid #f2f4fb;
-    border-radius: 6px;
-    padding: 6px;
+    padding: 10px;
+    width: 88%;
+    margin: 0 auto;
+    background: $--background-color-base;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: $--box-shadow-light;
     .item_header{
-      border-bottom: 1px solid $--color-info;
-      padding: 0 0 4px 0;
+      border-bottom: 1px solid $--color-border-white;
+      padding: 0 0 6px 0;
       .code{
-        color: $--color-info;
+        color: $--color-text-placeholder;
       }
     }
     .item_detail{
-      padding: 6px 0;
+      padding: 10px 0;
       .label{
         display: inline-block;
         width: 200rpx;
@@ -237,16 +233,23 @@
       }
     }
     .item_footer{
-      border-top: 1px solid $--color-info;
+      border-top: 1px solid $--color-border-white;
       text-align: center;
-      padding-top: 6px;
+      padding-top: 8px;
       .button{
         display: inline-block;
         padding: 2px 10px;
-        border: 1px solid $--color-info;
+        border: 1px solid $--color-text-placeholder;
         border-radius: 4px;
         margin: 0 8px;
+        font-size: 14px;
         color: $--color-text-regular;
+      }
+      .button:hover{
+        background-color: $--color-border-white;
+      }
+      .delete{
+        color: $--color-danger;
       }
     }
   }
