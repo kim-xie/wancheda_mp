@@ -7,6 +7,11 @@
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
 
+      <!-- 弹窗 -->
+      <i-modal title="温馨提示" :visible="modalVisible" @ok="handleOk" @cancel="handleClose">
+        <view>{{modalMessage}}</view>
+      </i-modal>
+
       <div v-if="current === 'index'" class="transition tab_index">
         <div>
           <i-steps :current="stepCurrent">
@@ -293,11 +298,6 @@
             </div>
           </div>
 
-          <!-- 弹窗 -->
-          <i-modal title="温馨提示" :visible="modalVisible" @ok="handleOk" @cancel="handleClose">
-            <view>{{modalMessage}}</view>
-          </i-modal>
-
           <!-- 按钮 -->
           <div class="step_button">
             <i-button v-if="stepCurrent<3" @tap="handleNext" type="primary" inline shape="circle" size="small">下一步</i-button>
@@ -309,21 +309,21 @@
       <div v-if="current === 'order'" class="transition tab_order">
         <div>
           <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
-            <i-tab key="tab1" title="维修中" :count="repairWorkorderTotal"></i-tab>
-            <!-- <i-tab key="tab2" title="待付款" :count="repairWorkorderTotal"></i-tab> -->
-            <i-tab key="tab3" :title="'已完成('+repairWorkorderAllTotal+')'"></i-tab>
+            <i-tab key="tab1" :title="'待付款('+repairWorkorderTotal+')'"></i-tab>
+            <i-tab key="tab2" :title="'已完成('+repairPayedWorderTotal+')'"></i-tab>
+            <i-tab key="tab3" :title="'全部订单('+repairWorkorderAllTotal+')'"></i-tab>
           </i-tabs>
           <!-- 待完成订单 -->
-          <div class="tab_repaire" v-if="tab_current!=='tab3'">
+          <div class="tab_repaire" v-if="tab_current==='tab1'">
             <div class="tab_list" v-for="(item, index) in repairWorkorders" :key="index">
               <ul>
                 <li class="ellipsis">
                   <span>{{item.date.clientId.carNo}}</span>
+                  <van-button size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
                 </li>
                 <li class="ellipsis">
                   <span>{{item.date.clientId.carModel}}</span>
                 </li>
-                <li class="line"></li>
                 <li class="ellipsis">
                   <span>工单号: {{item.workorderNo}}</span>
                   <span class="float-right">{{item.workorderState}}</span>
@@ -332,20 +332,51 @@
                   <span>进厂时间: {{item.sendTime}}</span>
                   <span class="float-right">{{item.sendMan}}</span>
                 </li>
+                <li class="ellipsis">
+                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
+                </li>
               </ul>
             </div>
           </div>
+
           <!-- 已完成订单 -->
+          <div class="tab_repaire" v-if="tab_current==='tab2'">
+            <div class="tab_list" v-for="(item, index) in repairPayedWorders" :key="index">
+              <ul>
+                <li class="ellipsis" v-if="item.date.clientId">
+                  <span>{{item.date.clientId.carNo}}</span>
+                </li>
+                <li class="ellipsis" v-if="item.date.clientId">
+                  <span>{{item.date.clientId.carModel}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="float-right">{{item.workorderState}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>进厂时间: {{item.sendTime}}</span>
+                  <span class="float-right">{{item.sendMan}}</span>
+                </li>
+                <li class="ellipsis">
+                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 全部订单 -->
           <div class="tab_repaire" v-if="tab_current==='tab3'">
             <div class="tab_list" v-for="(item, index) in repairWorkorderAlls" :key="index">
               <ul>
                 <li class="ellipsis" v-if="item.date.clientId">
                   <span>{{item.date.clientId.carNo}}</span>
+                  <van-button v-if="item.workorderState==='维修中'" size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
                 </li>
                 <li class="ellipsis" v-if="item.date.clientId">
                   <span>{{item.date.clientId.carModel}}</span>
                 </li>
-                <li class="line"></li>
                 <li class="ellipsis">
                   <span>工单号: {{item.workorderNo}}</span>
                   <span class="float-right">{{item.workorderState}}</span>
@@ -354,9 +385,14 @@
                   <span>进厂时间: {{item.sendTime}}</span>
                   <span class="float-right">{{item.sendMan}}</span>
                 </li>
+                <li class="ellipsis">
+                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
+                </li>
               </ul>
             </div>
           </div>
+
           <!-- 暂无数据 -->
           <i-divider v-if="repairWorkorderAllTotal===0" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
 
@@ -472,6 +508,8 @@
         modalSuccess: true,
         modalVisible: false,
         modalMessage: '',
+        payModal: false,
+        payId: '',
         repairtotal: 0,
         repairsubtotal: 0,
         inventorytotal: 0,
@@ -514,8 +552,10 @@
         current: 'index',
         tab_current: 'tab1',
         repairWorkorders: [],
+        repairPayedWorders: [],
         repairWorkorderAlls: [],
         repairWorkorderTotal: 0,
+        repairPayedWorderTotal: 0,
         repairWorkorderAllTotal: 0,
         allPageNo: 1,
         allPageSize: 10,
@@ -569,26 +609,15 @@
         'client'
       ])
     },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.allPageNo)
-      if(this.allPageNo > 1){
-        this.allPageNo = this.allPageNo-1
-        this.getRepairWorkorder(this.allPageNo, this.allPageSize,function(){
-          wx.stopPullDownRefresh()
-        })
-      }
-    },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.allPageNo < this.repairWorkorderAllTotal/this.allPageSize){
+      if(this.allPageSize < this.repairWorkorderAllTotal){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.allPageNo = this.allPageNo+1
+        this.allPageSize = this.allPageSize+10
         this.getRepairWorkorder(this.allPageNo, this.allPageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -743,6 +772,41 @@
           that.spinShow = false
         })
       },
+      // 结账
+      handlePay(id){
+        this.payId = id
+        this.modalMessage = '确认收到账款了吗？此操作后将无法撤销, 是否继续?'
+        this.modalVisible = true
+        this.modalSuccess = false
+        this.payModal = true
+      },
+      payApi(id){
+        const that = this
+        return new Promise((resolve,reject) => {
+          let editFormObj = {
+            "repairWorkorder": {
+              "id": id,
+              "workorderState": '已结账',//工单状态
+            }
+          }
+          that.spinShow = true
+          that.$http.post(api.editRepairOrder, editFormObj, true).then((res) => {
+            if(res.success){
+              globe.message('结账成功!','success')
+              that.getRepairWorkorder(that.allPageNo,that.allPageSize)
+            }else{
+              globe.message(res.errMsg,'wraning')
+            }
+            that.spinShow = false
+          })
+        })
+      },
+      // 获取订单详情
+      getOrderDetail(orderNo){
+        wx.navigateTo({
+          url: '/pages/orderDetail/main?id='+orderNo
+        })
+      },
       // 提交订单
       billing(formName){
         const _this = this
@@ -840,6 +904,9 @@
           this.modalVisible = false
           this.current = 'order'
           this.getRepairWorkorder(this.allPageNo,this.allPageSize)
+        }else if(this.payModal){
+          this.modalVisible = false
+          this.payApi(this.payId)
         }else{
           this.modalVisible = false
         }
@@ -1082,7 +1149,11 @@
             this.repairWorkorders = this.repairWorkorderAlls.filter(item => {
               return item.workorderState === '维修中'
             })
-            this.repairWorkorderTotal = this.unpayTableData.length
+            this.repairPayedWorders = this.repairWorkorderAlls.filter(item => {
+              return item.workorderState === '已结账'
+            })
+            this.repairWorkorderTotal = this.repairWorkorders.length
+            this.repairPayedWorderTotal = this.repairPayedWorders.length
             if(callback && typeof callback === 'function'){
               callback()
             }
@@ -1149,6 +1220,11 @@
   font-size: 30rpx;
   padding: 20rpx 20rpx;
   margin-bottom: 30rpx;
+  .pay-btn{
+    padding: 3px 6px;
+    border: 1px solid $--color-text-secondary;
+    color: $--color-success;
+  }
   ul {
     li{
       margin: 10rpx 0;

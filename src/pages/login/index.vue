@@ -59,7 +59,7 @@ export default {
                     const userinfo = res.data.entity
                     this.$store.dispatch('setUserInfo', userinfo)
                     setTimeout(() => {
-                        wx.navigateTo({
+                        wx.redirectTo({
                             url: '../../pages/index/main'
                         })
                     }, 1000)

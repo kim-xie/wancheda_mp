@@ -2,6 +2,7 @@
   "pages": [
     "pages/login/main",
     "pages/index/main",
+    "pages/orderDetail/main",
     "pages/repair/main",
     "pages/selectRepair/main",
     "pages/selectInventory/main",
