@@ -147,26 +147,15 @@
       this.listData = []
       this.getCompanyList(this.pageNo, this.pageSize)
     },
-    // 下拉刷新
-    onPullDownRefresh() {
-      console.log('下拉刷新')
-      console.log(this.pageNo)
-      if(this.pageNo > 1){
-        this.pageNo = this.pageNo-1
-        this.getCompanyList(this.pageNo, this.pageSize, function(){
-          wx.stopPullDownRefresh()
-        })
-      }
-    },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
-      console.log('上拉加载')
+      //console.log('上拉加载')
       const that = this
-      if(this.pageNo < this.totalData/this.pageSize){
+      if(this.pageSize < this.totalData){
         this.loading = true
         this.tipmessage = '玩命加载中'
-        this.pageNo = this.pageNo+1
+        this.pageSize = this.pageSize+10
         this.getCompanyList(this.pageNo, this.pageSize, function(){
           that.loading = false
           that.tipmessage = '我也是有底线的'
@@ -176,8 +165,8 @@
     methods: {
       // 搜索
       goSearch(data){
-        console.log(data)
-        console.log(this.searchVal)
+        //console.log(data)
+        //console.log(this.searchVal)
         const searchVal = this.searchVal
         this.search.name = ''
         this.search.code = ''

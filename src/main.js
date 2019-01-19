@@ -13,14 +13,14 @@ Vue.directive('has', {
         console.log(binding.value)
         // 获取页面按钮权限
         let userPermission = vnode.context.$store.state.userInfo.date.role.code
-        console.log(userPermission)
+        //console.log(userPermission)
         if (!Vue.prototype.$_has(userPermission ? userPermission : binding.value)) {
         el.parentNode.removeChild(el)
         }
     },
     update: function (newValue, oldValue) {
-        console.log(newValue)
-        console.log(oldValue)
+        //console.log(newValue)
+        //console.log(oldValue)
     }
 })
 // 权限检查方法

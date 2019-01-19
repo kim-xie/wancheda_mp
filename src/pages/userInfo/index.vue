@@ -49,7 +49,7 @@
     methods: {
       // 修改用户信息
       handleSave(){
-        console.log(JSON.stringify(this.userInfo))
+        //console.log(JSON.stringify(this.userInfo))
       }
     }
   }

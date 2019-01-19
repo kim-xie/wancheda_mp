@@ -41,7 +41,8 @@ const api = {
   getLookupById: '/lookup/getById',
   addRepairOrder: '/repairWorkorder/newRepairWorkorder',
   editRepairOrder: '/repairWorkorder/editRepairWorkOrder',
-  repairOrderDetail: '/repairWorkorder/getItemsAndParts?repairWorkOrderNo='
+  repairOrderDetail: '/repairWorkorder/getItemsAndParts?repairWorkOrderNo=',
+  loginout: '/user/loginout'
 }
 
 export default api

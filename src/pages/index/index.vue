@@ -36,6 +36,13 @@
                 </view>
             </i-step>
           </i-steps>
+
+          <!-- 弹层 -->
+          <van-popup :show="showArea" @close="onClose" position="bottom" :overlay="true">
+            <van-area v-if="pupType === 'area'" :area-list="areaList" @confirm="selectedArea" @cancel="cancelArea"/>
+            <van-datetime-picker v-if="pupType === 'dateTime'" type="datetime" :minDate="minDate" @confirm="selectedDate" @cancel="cancelDate"/>
+          </van-popup>
+
           <!-- 客户信息 -->
           <div class="clientForm" v-if="stepCurrent===0">
             <div class="item">
@@ -94,7 +101,12 @@
             </div>
             <div class="item" v-if="showMore">
               <span class="label">客户地址:</span>
-              <input class="input" v-model="clientForm.address" type="text" placeholder="请输入客户地址">
+              <span v-if="!clientForm.address" class="input placeholder" @tap="selectArea">请选择客户地址</span>
+              <span v-else class="input" @tap="selectArea">{{clientForm.address}}</span>
+            </div>
+            <div class="item" v-if="showMore">
+              <span class="label">客户详细地址:</span>
+              <input class="input" v-model="clientForm.address" type="text" placeholder="请输入客户详细地址">
             </div>
             <div class="item" v-if="showMore">
               <span class="label">发动机号:</span>
@@ -110,23 +122,27 @@
             </div>
             <div class="item" v-if="showMore">
               <span class="label">保险到期日期:</span>
-              <picker
+              <span v-if="!clientForm.insuranceEndtime" class="input placeholder" @tap="selectDate('clientForm','insuranceEndtime')">请选择保险到期时间</span>
+              <span v-else class="input" @tap="selectDate('clientForm','insuranceEndtime')">{{clientForm.insuranceEndtime}}</span>
+              <!-- <picker
                 mode="date"
                 :value="insuranceEndtime"
                 @change="handleDateChange($event, 'insur')">
                 <span v-if="insuranceEndtime===''" class="input placeholder">请选择保险到期时间</span>
                 <span v-else class="input">{{insuranceEndtime}}</span>
-              </picker>
+              </picker> -->
             </div>
             <div class="item" v-if="showMore">
               <span class="label">上牌日期:</span>
-              <picker
+              <span v-if="!clientForm.registrationDate" class="input placeholder" @tap="selectDate('clientForm','registrationDate')">请选择上牌日期</span>
+              <span v-else class="input" @tap="selectDate('clientForm','registrationDate')">{{clientForm.registrationDate}}</span>
+              <!-- <picker
                 mode="date"
                 :value="registrationDate"
                 @change="handleDateChange($event, 'reg')">
                 <span v-if="registrationDate===''" class="input placeholder">请选择上牌日期</span>
                 <span v-else class="input">{{registrationDate}}</span>
-              </picker>
+              </picker> -->
             </div>
             <div class="item" v-if="showMore">
               <span class="label">备注:</span>
@@ -166,13 +182,15 @@
             </div>
             <div class="item">
               <span class="label">交车时间:</span>
-              <picker
+              <span v-if="!repairForm.endTime" class="input placeholder" @tap="selectDate('repairForm','endTime')">请选择保险到期时间</span>
+              <span v-else class="input" @tap="selectDate('repairForm','endTime')">{{repairForm.endTime}}</span>
+              <!-- <picker
                 mode="date"
                 :value="endTimeVal"
                 @change="handleDateChange($event, 'endTime')">
                 <span v-if="endTimeVal===''" class="input placeholder">请选择交车时间</span>
                 <span v-else class="input">{{endTimeVal}}</span>
-              </picker>
+              </picker> -->
             </div>
             <div class="item">
               <span class="label">服务顾问:</span>
@@ -326,14 +344,14 @@
                 </li>
                 <li class="ellipsis">
                   <span>工单号: {{item.workorderNo}}</span>
-                  <span class="float-right">{{item.workorderState}}</span>
+                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
+                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进厂时间: {{item.sendTime}}</span>
-                  <span class="float-right">{{item.sendMan}}</span>
+                  <span>进店时间: {{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <span>消费金额: ￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -352,14 +370,14 @@
                 </li>
                 <li class="ellipsis">
                   <span>工单号: {{item.workorderNo}}</span>
-                  <span class="float-right">{{item.workorderState}}</span>
+                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
+                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进厂时间: {{item.sendTime}}</span>
-                  <span class="float-right">{{item.sendMan}}</span>
+                  <span>进店时间: {{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <span>消费金额: ￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -379,14 +397,14 @@
                 </li>
                 <li class="ellipsis">
                   <span>工单号: {{item.workorderNo}}</span>
-                  <span class="float-right">{{item.workorderState}}</span>
+                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
+                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进厂时间: {{item.sendTime}}</span>
-                  <span class="float-right">{{item.sendMan}}</span>
+                  <span>进店时间: {{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥ {{item.sum}}</span>
+                  <span>消费金额: ￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -423,7 +441,7 @@
             </div>
             <div class="menu">
               <navigator url="/pages/lookupdf/main" hover-class="navigator-hover">
-                <i class="iconfont icon-shujuzidian"></i>
+                <i class="iconfont icon-shuju"></i>
                 <span>字典管理</span>
               </navigator>
             </div>
@@ -447,14 +465,14 @@
             </div>
             <div class="menu">
               <navigator url="/pages/inventory/main" hover-class="navigator-hover">
-                <i class="iconfont icon-qichepeijian"></i>
+                <i class="iconfont icon-kucun"></i>
                 <span>库存管理</span>
               </navigator>
             </div>
             <div class="menu">
               <i-badge :count="inpartCount">
                 <navigator url="/pages/inpart/main" hover-class="navigator-hover">
-                  <i class="iconfont icon-qichepeijian"></i>
+                  <i class="iconfont icon-rukuliucheng"></i>
                   <span>配件入库</span>
                 </navigator>
               </i-badge>
@@ -462,7 +480,7 @@
             <div class="menu">
               <i-badge :count="outpartCount">
                 <navigator url="/pages/outpart/main" hover-class="navigator-hover">
-                  <i class="iconfont icon-qichepeijian"></i>
+                  <i class="iconfont icon-chukuliucheng"></i>
                   <span>配件出库</span>
                 </navigator>
               </i-badge>
@@ -481,7 +499,7 @@
           <i-cell-group>
             <i-cell title="个人信息" is-link link-type="navigateTo" url="/pages/userInfo/main"></i-cell>
             <i-cell title="修改密码" is-link link-type="navigateTo" url="/pages/changePwd/main"></i-cell>
-            <i-cell i-class="logout" title="退出当前账号"></i-cell>
+            <i-cell i-class="logout" title="退出当前账号" @tap="logout"></i-cell>
           </i-cell-group>
         </div>
       </div>
@@ -501,6 +519,8 @@
   import globe from '../../utils/globe'
   import {isSuperAdmin} from '../../utils/permission'
   import api from '../../api/api'
+  import {formatDatetime} from '../../utils/index'
+  import areaLists from '../../utils/area'
   import { mapGetters } from 'vuex'
   export default {
     data () {
@@ -567,7 +587,13 @@
         couponNames: [],
         couponVals: [],
         usercompany: '',
-        outpartType: ''
+        outpartType: '',
+        showArea: false,
+        pupType: 'area',
+        areaList: areaLists,
+        formName: '',
+        currentName: '',
+        minDate: new Date().getTime()
       }
     },
     mounted() {
@@ -625,6 +651,72 @@
       }
     },
     methods: {
+      onClose(){
+        this.showArea = false
+      },
+      // 选择地址
+      selectArea(){
+        this.pupType = 'area'
+        this.showArea = true
+      },
+      // 选择地址
+      selectedArea(data){
+        const areas = data.mp.detail.values
+        let area = ''
+        areas.forEach(element => {
+          area += element.name
+        })
+        //console.log(area)
+        this.clientForm.address = area
+        this.onClose()
+      },
+      cancelArea(){
+        this.onClose()
+      },
+      // 选择时间
+      selectDate(formName,name){
+        this.pupType = 'dateTime'
+        this.formName = formName
+        this.currentName = name
+        this.showArea = true
+      },
+      // 选择时间
+      selectedDate(data){
+        const timestamp = data.mp.detail
+        let date = new Date(timestamp)
+        let fmtDate = formatDatetime(date, 'yyyy-MM-dd hh:mm:ss')
+        this[this.formName][this.currentName] = fmtDate
+        this.onClose()
+      },
+      cancelDate(){
+        this.onClose()
+      },
+      logout() {
+        const that = this
+        //删除cookie并跳到登录页
+        const params = {company: this.userInfo.company, username: this.userInfo.username}
+        //请求后端
+        this.spinShow = true
+        this.$http.get(api.loginout,params,true).then((response) => {
+          if(response.success){
+            //成功后删除cookie
+            this.$store.dispatch('setUserInfo', {})
+            globe.message(res.errorMsg,'success')
+            //跳转到登录页
+            setTimeout(() => {
+              that.spinShow = false
+              wx.redirectTo({
+                  url: '../../pages/login/main'
+              })
+            }, 1000)
+          }else{
+            globe.message(res.errorMsg,'warning')
+            that.spinShow = false
+          }
+        }, (response) => {
+          //Error
+        })
+      },
       // 转化为两位数价格
       toDecimal2(x) {
         let f = parseFloat(x)
@@ -641,7 +733,7 @@
         while (s.length <= rs + 2) {
           s += '0'
         }
-        console.log(s)
+        //console.log(s)
         return s
       },
       // 搜索客户信息

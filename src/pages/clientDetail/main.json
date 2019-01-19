@@ -1,6 +1,9 @@
 {
     "usingComponents": {
         "i-spin": "../../dist/spin/index",
-        "i-message": "../../dist/message/index"
+        "i-message": "../../dist/message/index",
+        "van-datetime-picker": "../../vant-weapp/datetime-picker/index",
+        "van-area": "../../vant-weapp/area/index",
+        "van-popup": "../../vant-weapp/popup/index"
     }
 }

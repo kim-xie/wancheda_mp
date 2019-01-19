@@ -121,14 +121,14 @@
         const urlParams = global.getCurrentPageUrlArgs()
         const types = urlParams.split('?')[1]
         this.select = types.split('=')[1]
-        console.log(this.select)
+        //console.log(this.select)
       }
       this.getList(this.pageNo, this.pageSize)
     },
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
-      console.log('上拉加载')
+      //console.log('上拉加载')
       const that = this
       if(this.pageSize < this.totalData){
         this.loading = true

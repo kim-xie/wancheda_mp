@@ -5,6 +5,12 @@
       <i-message id="message"/>
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
+      <!-- 弹层 -->
+      <van-popup :show="showArea" @close="onClose" position="bottom" :overlay="true">
+        <van-area v-if="pupType === 'area'" :area-list="areaList" @confirm="selectedArea" @cancel="cancelArea"/>
+        <van-datetime-picker v-if="pupType === 'dateTime'" type="datetime" :minDate="minDate" @confirm="selectedDate" @cancel="cancelDate"/>
+      </van-popup>
+
       <p class="input_wrap">
         <span class="input_label">所属品牌</span>
         <input v-model="form.brand" placeholder="请输入所属品牌"/>
@@ -26,7 +32,12 @@
       </p>
       <p class="input_wrap">
         <span class="input_label">门店地址</span>
-        <input v-model="form.address" placeholder="请输入门店地址"/>
+        <span v-if="!form.address" class="input placeholder" @tap="selectArea">请选择门店地址</span>
+        <span v-else class="input" @tap="selectArea">{{form.address}}</span>
+      </p>
+      <p class="input_wrap">
+        <span class="input_label">补充详细地址</span>
+        <input v-model="form.address" placeholder="请输入门店详细地址"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">客服邮箱</span>
@@ -52,6 +63,8 @@
 <script>
   import globe from '../../utils/globe'
   import api from '../../api/api'
+  import {formatDatetime} from '../../utils/index'
+  import areaLists from '../../utils/area'
   import { setTimeout } from 'timers'
   import { mapGetters } from 'vuex'
   export default {
@@ -62,7 +75,13 @@
         types: [],
         typeIds: [],
         type: '',
-        spinShow: true
+        spinShow: true,
+        showArea: false,
+        pupType: 'area',
+        areaList: areaLists,
+        formName: '',
+        currentName: '',
+        minDate: new Date().getTime()
       }
     },
     onLoad() {
@@ -70,7 +89,6 @@
       this.type = ''
       this.id = ''
       this.spinShow = false
-      console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -82,6 +100,46 @@
       this.getLookupByCodeAndPicker('company_type', 'type')
     },
     methods: {
+      onClose(){
+        this.showArea = false
+      },
+      // 选择地址
+      selectArea(){
+        this.pupType = 'area'
+        this.showArea = true
+      },
+      // 选择地址
+      selectedArea(data){
+        const areas = data.mp.detail.values
+        let area = ''
+        areas.forEach(element => {
+          area += element.name
+        })
+        //console.log(area)
+        this.form.address = area
+        this.onClose()
+      },
+      cancelArea(){
+        this.onClose()
+      },
+      // 选择时间
+      selectDate(formName,name){
+        this.pupType = 'dateTime'
+        this.formName = formName
+        this.currentName = name
+        this.showArea = true
+      },
+      // 选择时间
+      selectedDate(data){
+        const timestamp = data.mp.detail
+        let date = new Date(timestamp)
+        let fmtDate = formatDatetime(date, 'yyyy-MM-dd hh:mm:ss')
+        this[this.formName][this.currentName] = fmtDate
+        this.onClose()
+      },
+      cancelDate(){
+        this.onClose()
+      },
       // 获取公司详情
       getCompanyDetail(id){
         let item = this.$store.getters.editItem

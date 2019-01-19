@@ -40,7 +40,7 @@
       }
     },
     mounted(data) {
-      console.log(globe.getCurrentPageUrlArgs())
+      //console.log(globe.getCurrentPageUrlArgs())
       const urlParams = globe.getCurrentPageUrlArgs()
       this.companyId = urlParams.split('=')[1]
       this.getCompanyDetail(this.companyId)
@@ -48,7 +48,7 @@
     methods: {
       // 获取公司详情
       getCompanyDetail(id){
-        console.log(id)
+        //console.log(id)
       }
     }
   }

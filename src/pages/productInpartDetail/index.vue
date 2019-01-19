@@ -52,7 +52,7 @@
       this.spinShow = false
       this.id = ''
       this.repCodeLK = ''
-      console.log(globe.getCurrentPageUrlArgs())
+      //console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]

@@ -76,7 +76,7 @@
       this.form = {}
       this.spinShow = false
       this.id = ''
-      console.log(globe.getCurrentPageUrlArgs())
+      //console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -137,7 +137,7 @@
         this.$http.get(api.company_list, params).then( res => {
           if(res.success){
             const data = res.data.page.content
-            console.log(data)
+            //console.log(data)
             let dataArry = []
             let idArry = []
             for(let i=0; i<data.length; i++){

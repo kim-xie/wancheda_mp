@@ -2,6 +2,8 @@
     <div class="container">
         <!-- iview 全局提示组件 -->
         <i-message id="message"/>
+        <!-- 加载中组件 -->
+        <i-spin size="large" fix v-if="spinShow"></i-spin>
         <div class="login_box">
             <div class="login_logo">
                 <p class="logo"><h3>万车达</h3></p>
@@ -16,12 +18,12 @@
                         <i class="iconfont icon-password"></i>
                         <input v-model="form.password" class="form-input" type="password"  @keyup.enter.native="login" placeholder="请输入密码">
                     </div>
-                    <div class="form_btn mt60">
+                    <div class="form_btn mt60" hover-class="hoverClass">
                         <div @tap="login">登 录</div>
                     </div>
                     <div class="form_other">
-                        <a href="javascript:;" class="text-left">立即注册</a>
-                        <a href="javascript:;" class="text-right">忘记密码?</a>
+                        <span class="text-left">立即注册</span>
+                        <span class="text-right">忘记密码?</span>
                     </div>
                 </form>
             </div>
@@ -37,44 +39,59 @@ import MD5 from 'crypto-js/md5'
 export default {
     data () {
         return {
+            spinShow: true,
             form: {
                 username: '',
                 password: ''
             }
         }
     },
-    created () {
-
+    onLoad () {
+        this.spinShow = false
     },
     methods: {
         // 登录
         login(){
+            const that = this
             const username = this.form.username
             const password = this.form.password
             const hashPwd = CryptoJS.MD5(password).toString()
-            this.$http.get(api.login, {username,password: hashPwd}).then(res => {
-                //console.log(res)
-                if(res.success){
-                    globe.message(res.errorMsg,'success')
-                    const userinfo = res.data.entity
-                    this.$store.dispatch('setUserInfo', userinfo)
-                    setTimeout(() => {
-                        wx.redirectTo({
-                            url: '../../pages/index/main'
-                        })
-                    }, 1000)
-                }else{
-                    globe.message(res.errorMsg,'warning')
-                }
-            }).catch(err => {
-                globe.message('网络请求错误，请稍后重试!','error')
-            })
+            if(!username){
+                globe.message('请输入用户名','warning')
+            }else if(!password){
+                globe.message('请输入密码','warning')
+            }else{
+                this.spinShow = true
+                this.$http.get(api.login, {username,password: hashPwd}).then(res => {
+                    //console.log(res)
+                    if(res.success){
+                        globe.message(res.errorMsg,'success')
+                        const userinfo = res.data.entity
+                        this.$store.dispatch('setUserInfo', userinfo)
+                        setTimeout(() => {
+                            that.spinShow = false
+                            wx.redirectTo({
+                                url: '../../pages/index/main'
+                            })
+                        }, 1000)
+                    }else{
+                        globe.message(res.errorMsg,'warning')
+                        this.spinShow = false
+                    }
+                }).catch(err => {
+                    globe.message('网络请求错误，请稍后重试!','error')
+                })
+            }
         }
     },
 }
 </script>
 
 <style lang="scss" scoped>
+    .hoverClass{
+        background-color: $--link-hover-color;
+        box-shadow:0 0 10rpx $--link-hover-color;
+    }
     .form-item{
         display: flex;
         height: 84rpx;
@@ -92,12 +109,13 @@ export default {
         font-size: 32rpx;
     }
     .login_box{
-        height: 100%;
+        height: 100vh;
         width: 50vh;
         .login_logo{
             height: 200rpx;
             line-height: 200rpx;
             text-align: center;
+            font-family: Arial,Helvetica,sans-serif;
             font-size: 60rpx;
             color: $--color-primary;
         }
@@ -116,12 +134,16 @@ export default {
                     font-size: 36rpx;
                 }
             }
+            .form_btn:hover{
+                background-color: $--link-hover-color;
+                box-shadow:0 0 10rpx $--link-hover-color;
+            }
             .form_other{
                 display: flex;
                 flex-direction: row;
                 height: 100rpx;
                 line-height: 100rpx;
-                a{
+                span{
                     display: block;
                     width: 50%;
                     font-size: 32rpx;

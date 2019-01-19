@@ -24,7 +24,7 @@
 // 校验超级管理员角色
 function isSuperAdmin(role) {
   if (role) {
-    console.log(role)
+    //console.log(role)
     if (role === 'super_admin') {
       return true
     } else {
@@ -36,7 +36,7 @@ function isSuperAdmin(role) {
 // 校验门店管理员角色
 function isCompanyAdmin(role) {
   if (role) {
-    console.log(role)
+    //console.log(role)
     if (role === 'company_admin') {
       return true
     } else {

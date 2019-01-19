@@ -5,6 +5,12 @@
       <i-message id="message"/>
       <!-- 加载中组件 -->
       <i-spin size="large" fix v-if="spinShow"></i-spin>
+      <!-- 弹层 -->
+      <van-popup :show="showArea" @close="onClose" position="bottom" :overlay="true">
+        <van-area v-if="pupType === 'area'" :area-list="areaList" @confirm="selectedArea" @cancel="cancelArea"/>
+        <van-datetime-picker v-if="pupType === 'dateTime'" type="datetime" :minDate="minDate" @confirm="selectedDate" @cancel="cancelDate"/>
+      </van-popup>
+
       <p class="input_wrap">
         <span class="input_label">客户姓名</span>
         <input v-model="form.name" placeholder="请输入客户姓名"/>
@@ -45,9 +51,15 @@
           <input v-model="company" readonly/>
         </picker>
       </p> -->
+
       <p class="input_wrap">
         <span class="input_label">客户地址</span>
-        <input v-model="form.address" placeholder="请输入客户地址"/>
+        <span v-if="!form.address" class="input placeholder" @tap="selectArea">请选择客户地址</span>
+        <span v-else class="input" @tap="selectArea">{{form.address}}</span>
+      </p>
+      <p class="input_wrap">
+        <span class="input_label">补充详细地址</span>
+        <input v-model="form.address" placeholder="请输入客户详细地址"/>
       </p>
       <p class="input_wrap">
         <span class="input_label">证件号</span>
@@ -63,13 +75,15 @@
       </p>
       <p class="input_wrap">
         <span class="input_label">上牌日期</span>
-        <picker
+        <span v-if="!form.registrationDate" class="input placeholder" @tap="selectDate('form','registrationDate')">请选择上牌日期</span>
+        <span v-else class="input" @tap="selectDate('form','registrationDate')">{{form.registrationDate}}</span>
+        <!-- <picker
           mode="date"
           :value="registrationDate"
           @change="handleDateChange($event, 'reg')">
           <span v-if="registrationDate===''" class="input placeholder">请选择上牌日期</span>
           <span v-else class="input">{{registrationDate}}</span>
-        </picker>
+        </picker> -->
       </p>
       <p class="input_wrap">
         <span class="input_label">客户邮箱</span>
@@ -93,13 +107,15 @@
       </p>
       <p class="input_wrap">
         <span class="input_label">保险到期时间</span>
-        <picker
+        <span v-if="!form.insuranceEndtime" class="input placeholder" @tap="selectDate('form','insuranceEndtime')">请选择保险到期时间</span>
+        <span v-else class="input" @tap="selectDate('form','insuranceEndtime')">{{form.insuranceEndtime}}</span>
+        <!-- <picker
           mode="date"
           :value="insuranceEndtime"
           @change="handleDateChange($event, 'insur')">
           <span v-if="insuranceEndtime===''" class="input placeholder">请选择保险到期时间</span>
           <span v-else class="input">{{insuranceEndtime}}</span>
-        </picker>
+        </picker> -->
       </p>
       <p class="input_wrap">
         <span class="input_label">备注</span>
@@ -113,6 +129,8 @@
 <script>
   import globe from '../../utils/globe'
   import api from '../../api/api'
+  import {formatDatetime} from '../../utils/index'
+  import areaLists from '../../utils/area'
   import { setTimeout } from 'timers'
   import { mapGetters } from 'vuex'
   export default {
@@ -135,7 +153,13 @@
         registrationDate: '',
         insuranceEndtime: '',
         spinShow: true,
-        clientSex: ''
+        clientSex: '',
+        showArea: false,
+        pupType: 'area',
+        areaList: areaLists,
+        formName: '',
+        currentName: '',
+        minDate: new Date().getTime()
       }
     },
     onLoad() {
@@ -145,7 +169,7 @@
       this.carBrand = ''
       this.form = {}
       this.id = ''
-      console.log(globe.getCurrentPageUrlArgs())
+      //console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -166,6 +190,46 @@
       // this.getCompanyList('company')
     },
     methods: {
+      onClose(){
+        this.showArea = false
+      },
+      // 选择地址
+      selectArea(){
+        this.pupType = 'area'
+        this.showArea = true
+      },
+      // 选择地址
+      selectedArea(data){
+        const areas = data.mp.detail.values
+        let area = ''
+        areas.forEach(element => {
+          area += element.name
+        })
+        //console.log(area)
+        this.form.address = area
+        this.onClose()
+      },
+      cancelArea(){
+        this.onClose()
+      },
+      // 选择时间
+      selectDate(formName,name){
+        this.pupType = 'dateTime'
+        this.formName = formName
+        this.currentName = name
+        this.showArea = true
+      },
+      // 选择时间
+      selectedDate(data){
+        const timestamp = data.mp.detail
+        let date = new Date(timestamp)
+        let fmtDate = formatDatetime(date, 'yyyy-MM-dd hh:mm:ss')
+        this[this.formName][this.currentName] = fmtDate
+        this.onClose()
+      },
+      cancelDate(){
+        this.onClose()
+      },
       // 获取详情
       getDetail(){
         const that = this

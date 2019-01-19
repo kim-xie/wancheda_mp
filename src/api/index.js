@@ -36,7 +36,7 @@ fly.config = {
 //添加请求拦截器
 fly.interceptors.request.use((request) => {
   //打印出请求体
-  console.log(request)
+  //console.log(request)
   //终止请求
   //var err = new Error("xxx")
   //err.request = request
@@ -107,8 +107,12 @@ function apiFly(method, url, params, json) {
 
 // 返回在vue模板中的调用接口
 export default {
-  get: (url, params) => {
-    return apiFly('GET', url, params)
+  get: (url, params, json) => {
+    if (json) {
+      return apiFly('GET', url, params, json)
+    } else {
+      return apiFly('GET', url, params)
+    }
   },
   post: (url, params, json) => {
     if (json) {
