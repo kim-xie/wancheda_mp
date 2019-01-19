@@ -701,7 +701,7 @@
           if(response.success){
             //成功后删除cookie
             this.$store.dispatch('setUserInfo', {})
-            globe.message(res.errorMsg,'success')
+            globe.message(response.errorMsg,'success')
             //跳转到登录页
             setTimeout(() => {
               that.spinShow = false
@@ -710,7 +710,7 @@
               })
             }, 1000)
           }else{
-            globe.message(res.errorMsg,'warning')
+            globe.message(response.errorMsg,'warning')
             that.spinShow = false
           }
         }, (response) => {
