@@ -11,6 +11,5 @@
         "van-datetime-picker": "../../vant-weapp/datetime-picker/index",
         "van-area": "../../vant-weapp/area/index",
         "van-popup": "../../vant-weapp/popup/index"
-    },
-    "enablePullDownRefresh": true
+    }
 }

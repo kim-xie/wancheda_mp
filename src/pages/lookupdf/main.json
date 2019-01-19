@@ -13,6 +13,5 @@
         "i-divider": "../../dist/divider/index",
         "van-swipe-cell": "../../vant-weapp/swipe-cell/index",
         "van-button": "../../vant-weapp/button/index"
-    },
-    "enablePullDownRefresh": true
+    }
 }

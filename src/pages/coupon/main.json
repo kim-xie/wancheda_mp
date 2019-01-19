@@ -9,6 +9,5 @@
         "i-modal": "../../dist/modal/index",
         "i-divider": "../../dist/divider/index",
         "van-button": "../../vant-weapp/button/index"
-    },
-    "enablePullDownRefresh": true
+    }
 }
