@@ -19,41 +19,41 @@
         <van-collapse-item content-class="product_item" custom-class="product_item" v-for="(item,index) in listData" :key="index" :title="item.name" :value="item.code" :name="index" @tap="onChange($event,index)">
           <div class="item_detail">
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">批发价:</span>
                 <span class="value">{{item.wholeSale}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">销售价:</span>
                 <span class="value">{{item.sale}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">单位:</span>
                 <span class="value" v-if="item.date.unitLK">{{item.date.unitLK.value}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">产地:</span>
                 <span class="value">{{item.produceArea}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">适用车型:</span>
                 <span class="value">{{item.carModel}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">配件规格:</span>
                 <span class="value" v-if="item.date.specificationLK">{{item.date.specificationLK.value}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">所属分类:</span>
                 <span class="value" v-if="item.date.pCategoryLK">{{item.date.pCategoryLK.value}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">状态:</span>
                 <span v-if="item.isDisable == false" class="value undisable">启用</span>
                 <span v-if="item.isDisable == true" class="value disable">禁用</span>
@@ -66,11 +66,11 @@
           </div>
           <div class="item_footer">
             <p class="item_edit">
-              <span v-if="item.isDisable == false" class="button disable" @tap="handleStatus(item)">禁用</span>
-              <span v-if="item.isDisable == true" class="button undisable" @tap="handleStatus(item)">启用</span>
-              <span v-if="item.isDisable == false" class="button edit" @tap="handleEdit(item)">编辑</span>
-              <span v-if="item.isDisable == false" class="button" @tap="handleInpart(item)">入库</span>
-              <span class="button delete" @tap="handleDelete(item.id)">删除</span>
+              <span v-if="item.isDisable == false" class="button disable" @tap.stop="handleStatus(item)">禁用</span>
+              <span v-if="item.isDisable == true" class="button undisable" @tap.stop="handleStatus(item)">启用</span>
+              <span v-if="item.isDisable == false" class="button edit" @tap.stop="handleEdit(item)">编辑</span>
+              <span v-if="item.isDisable == false" class="button" @tap.stop="handleInpart(item)">入库</span>
+              <span class="button delete" @tap.stop="handleDelete(item.id)">删除</span>
             </p>
           </div>
         </van-collapse-item>
@@ -182,7 +182,7 @@
         }
         this.spinShow = true
         this.$http.get(api.product_list, params).then( res => {
-          console.log(res)
+          //console.log(res)
           if(res.success){
             this.listData = res.data.page.content
             this.totalData = res.data.page.totalElements
@@ -334,7 +334,10 @@
       }
     }
     .item_detail{
-      padding: 10px 0;
+      padding: 0 0 10px 4px;
+      .items{
+        padding: 2px 0;
+      }
       .label{
         display: inline-block;
         width: 200rpx;

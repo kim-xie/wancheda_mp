@@ -4,7 +4,7 @@ import Store from './store/store'
 import Api from './api/index'
 
 import './assets/style/common.scss'
-import './assets/iconfont/iconfont.css'
+import '../static/iconfont/iconfont.css'
 
 //import has from './utils/permission'
 

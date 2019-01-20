@@ -19,37 +19,37 @@
         <van-collapse-item content-class="client_item" v-for="(item,index) in listData" :key="index" :title="item.carNo" :value="item.name" :name="index" @tap="onChange($event,index)">
           <div class="item_detail">
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">所属门店:</span>
                 <span class="value" v-if="item.company">{{item.company}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">手机号码:</span>
                 <span class="value">{{item.mobile}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">客户级别:</span>
                 <span class="value">{{item.date.level.value}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">客户类型:</span>
                 <span class="value">{{item.date.type.value}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">汽车品牌:</span>
                 <span class="value">{{item.date.carBrand.value}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">汽车车型:</span>
                 <span class="value">{{item.carModel}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">车身颜色:</span>
                 <span class="value">{{item.carColor}}</span>
               </p>
@@ -59,58 +59,58 @@
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">发动机号:</span>
                 <span class="value">{{item.engineNo}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">证件号:</span>
                 <span class="value">{{item.idcard}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">性别:</span>
                 <span class="value" v-if="item.sex">男</span>
                 <span class="value" v-if="!item.sex">女</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">邮箱:</span>
                 <span class="value">{{item.email}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">客户地址:</span>
                 <span class="value">{{item.address}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">保险公司:</span>
                 <span class="value">{{item.insurer}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">保险到期时间:</span>
                 <span class="value">{{item.insuranceEndtime}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">上牌日期:</span>
                 <span class="value">{{item.registrationDate}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">备注:</span>
                 <span class="value">{{item.description}}</span>
               </p>
             </p>
             <p class="detail">
-              <p class="">
+              <p class="items">
                 <span class="label">创建时间:</span>
                 <span class="value">{{item.createTime}}</span>
               </p>
-              <p class="">
+              <p class="items">
                 <span class="label">更新时间:</span>
                 <span class="value">{{item.updateTime}}</span>
               </p>
@@ -118,9 +118,9 @@
           </div>
           <div class="item_footer">
             <p class="item_edit">
-              <span class="button" @tap="handleCoupon(item)">优惠券</span>
-              <span class="button edit" @tap="handleEdit(item)">编辑</span>
-              <span class="button delete" @tap="handleDelete(item.id)">删除</span>
+              <span class="button" @tap.stop="handleCoupon(item)">优惠券</span>
+              <span class="button edit" @tap.stop="handleEdit(item)">编辑</span>
+              <span class="button delete" @tap.stop="handleDelete(item.id)">删除</span>
             </p>
           </div>
         </van-collapse-item>
@@ -392,7 +392,10 @@
       }
     }
     .item_detail{
-      padding: 10px 0;
+      padding: 0 0 10px 4px;
+      .items{
+        padding: 2px 0;
+      }
       .label{
         display: inline-block;
         width: 200rpx;
