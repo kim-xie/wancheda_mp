@@ -1,4 +1,5 @@
 {
+    "navigationBarTitleText": "万车达 - 账号管理",
     "usingComponents": {
         "i-panel": "../../dist/panel/index",
         "i-cell-group": "../../dist/cell-group/index",

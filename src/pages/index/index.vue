@@ -328,202 +328,14 @@
           </div>
         </div>
       </div>
-      <div v-if="current === 'order'" class="transition tab_order">
-        <div>
-          <i-tabs :current="tab_current" color="#f759ab" @change="handleChangeTab($event)">
-            <i-tab key="tab1" :title="'待付款('+repairWorkorderTotal+')'"></i-tab>
-            <i-tab key="tab2" :title="'已完成('+repairPayedWorderTotal+')'"></i-tab>
-            <i-tab key="tab3" :title="'全部订单('+repairWorkorderAllTotal+')'"></i-tab>
-          </i-tabs>
-          <!-- 待完成订单 -->
-          <div class="tab_repaire" v-if="tab_current==='tab1'">
-            <div class="tab_list" v-for="(item, index) in repairWorkorders" :key="index">
-              <ul>
-                <li class="ellipsis">
-                  <span>{{item.date.clientId.carNo}}</span>
-                  <van-button size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
-                </li>
-                <li class="ellipsis">
-                  <span>{{item.date.clientId.carModel}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">维修工单: </span>
-                  <span class="value">{{item.workorderNo}}</span>
-                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
-                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">到店时间: </span>
-                  <span class="value">{{item.sendTime}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">消费金额: </span>
-                  <span class="value">￥{{item.sum}}</span>
-                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 已完成订单 -->
-          <div class="tab_repaire" v-if="tab_current==='tab2'">
-            <div class="tab_list" v-for="(item, index) in repairPayedWorders" :key="index">
-              <ul>
-                <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carNo}}</span>
-                </li>
-                <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carModel}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">维修工单: </span>
-                  <span class="value">{{item.workorderNo}}</span>
-                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
-                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">到店时间: </span>
-                  <span class="value">{{item.sendTime}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">消费金额: </span>
-                  <span class="value">￥{{item.sum}}</span>
-                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 全部订单 -->
-          <div class="tab_repaire" v-if="tab_current==='tab3'">
-            <div class="tab_list" v-for="(item, index) in repairWorkorderAlls" :key="index">
-              <ul>
-                <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carNo}}</span>
-                  <van-button v-if="item.workorderState==='维修中'" size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
-                </li>
-                <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carModel}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">维修工单: </span>
-                  <span class="value">{{item.workorderNo}}</span>
-                  <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
-                  <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">到店时间: </span>
-                  <span class="value">{{item.sendTime}}</span>
-                </li>
-                <li class="ellipsis">
-                  <span class="label">消费金额: </span>
-                  <span class="value">￥{{item.sum}}</span>
-                  <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 暂无数据 -->
-          <i-divider v-if="repairWorkorderAllTotal===0" color="#2d8cf0" lineColor="#2d8cf0">抱歉，暂无数据</i-divider>
-
-          <!-- 页底加载 -->
-          <i-load-more v-if="repairWorkorderAllTotal>allPageSize" :tip="tipmessage" :loading="loading" />
-        </div>
-      </div>
-      <div v-if="current === 'workplace'" class="transition tab_workplace">
-        <div class="workplace">
-          <div class="menu_list">
-            <div class="menu">
-              <navigator url="/pages/client/main" hover-class="navigator-hover">
-                <i class="iconfont icon-kehu"></i>
-                <span>客户管理</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/company/main" hover-class="navigator-hover">
-                <i class="iconfont icon-gongsimingcheng"></i>
-                <span>公司管理</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/account/main" hover-class="navigator-hover">
-                <i class="iconfont icon-zhanghao"></i>
-                <span>账号管理</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/lookupdf/main" hover-class="navigator-hover">
-                <i class="iconfont icon-shuju"></i>
-                <span>字典管理</span>
-              </navigator>
-            </div>
-            <!-- <div class="menu">
-              <navigator url="/pages/finance/main" hover-class="navigator-hover">
-                <i class="iconfont icon-finance"></i>
-                <span>财务管理</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/role/main" hover-class="navigator-hover">
-                <i class="iconfont icon-wode"></i>
-                <span>角色管理</span>
-              </navigator>
-            </div> -->
-            <div class="menu">
-              <navigator url="/pages/product/main" hover-class="navigator-hover">
-                <i class="iconfont icon-qichepeijian"></i>
-                <span>配件维护</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/inventory/main" hover-class="navigator-hover">
-                <i class="iconfont icon-kucun"></i>
-                <span>库存管理</span>
-              </navigator>
-            </div>
-            <div class="menu">
-              <i-badge :count="inpartCount">
-                <navigator url="/pages/inpart/main" hover-class="navigator-hover">
-                  <i class="iconfont icon-rukuliucheng"></i>
-                  <span>配件入库</span>
-                </navigator>
-              </i-badge>
-            </div>
-            <div class="menu">
-              <i-badge :count="outpartCount">
-                <navigator url="/pages/outpart/main" hover-class="navigator-hover">
-                  <i class="iconfont icon-chukuliucheng"></i>
-                  <span>配件出库</span>
-                </navigator>
-              </i-badge>
-            </div>
-            <div class="menu">
-              <navigator url="/pages/repair/main" hover-class="navigator-hover">
-                <i class="iconfont icon-weixiu"></i>
-                <span>维修项目</span>
-              </navigator>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="current === 'mine'" class="transition tab_mine">
-        <div>
-          <i-cell-group>
-            <i-cell title="个人信息" is-link link-type="navigateTo" url="/pages/userInfo/main"></i-cell>
-            <i-cell title="修改密码" is-link link-type="navigateTo" url="/pages/changePwd/main"></i-cell>
-            <i-cell i-class="logout" title="退出当前账号" @tap="logout"></i-cell>
-          </i-cell-group>
-        </div>
-      </div>
     </div>
-    <div class="tab_bar">
+    <!-- <div class="tab_bar">
       <i-tab-bar fixed :current="current" color="#f759ab" @change="handleChangeTabBar($event)">
         <i-tab-bar-item key="index" icon="financial_fill" current-icon="financial_fill" title="接车"></i-tab-bar-item>
         <i-tab-bar-item key="order" icon="createtask" current-icon="createtask_fill" title="工单"></i-tab-bar-item>
         <i-tab-bar-item key="workplace" icon="shop_fill" current-icon="shop_fill" title="工作台"></i-tab-bar-item>
         <i-tab-bar-item key="mine" icon="mine" current-icon="mine_fill" title="我的"></i-tab-bar-item>
-      </i-tab-bar>
+      </i-tab-bar> -->
     </div>
   </div>
 </template>
@@ -541,8 +353,6 @@
         modalSuccess: true,
         modalVisible: false,
         modalMessage: '',
-        payModal: false,
-        payId: '',
         repairtotal: 0,
         repairsubtotal: 0,
         inventorytotal: 0,
@@ -552,9 +362,6 @@
         discountPrice: '',
         consumPrice: '',
         couponPrice: '',
-        tipmessage: '我也是有底线的',
-        loading: false,
-        showMore: false,
         clientForm: {},
         level: '',
         type: '',
@@ -569,6 +376,7 @@
         clerk: '',
         stepCurrent: 0,
         spinShow: true,
+        showMore: false,
         levels: [],
         levelIds: [],
         types: [],
@@ -583,19 +391,10 @@
         clerkIds: [],
         hasPermission: false,
         current: 'index',
-        tab_current: 'tab1',
-        repairWorkorders: [],
-        repairPayedWorders: [],
-        repairWorkorderAlls: [],
-        repairWorkorderTotal: 0,
-        repairPayedWorderTotal: 0,
-        repairWorkorderAllTotal: 0,
-        allPageNo: 1,
-        allPageSize: 10,
         clientCouponTableData: [],
         ownCoupon: false,
         couponForm: {
-          couponVal: 0,
+          couponVal: 0
         },
         couponNames: [],
         couponVals: [],
@@ -651,17 +450,6 @@
     // 上拉加载，拉到底部触发
     onReachBottom() {
       // 到这底部在这里需要做什么事情
-      console.log('上拉加载')
-      const that = this
-      if(this.allPageSize < this.repairWorkorderAllTotal){
-        this.loading = true
-        this.tipmessage = '玩命加载中'
-        this.allPageSize = this.allPageSize+10
-        this.getRepairWorkorder(this.allPageNo, this.allPageSize, function(){
-          that.loading = false
-          that.tipmessage = '我也是有底线的'
-        })
-      }
     },
     methods: {
       onClose(){
@@ -703,32 +491,6 @@
       },
       cancelDate(){
         this.onClose()
-      },
-      logout() {
-        const that = this
-        //删除cookie并跳到登录页
-        const params = {company: this.userInfo.company, username: this.userInfo.username}
-        //请求后端
-        this.spinShow = true
-        this.$http.get(api.loginout,params,true).then((response) => {
-          if(response.success){
-            //成功后删除cookie
-            this.$store.dispatch('setUserInfo', {})
-            globe.message(response.errorMsg,'success')
-            //跳转到登录页
-            setTimeout(() => {
-              that.spinShow = false
-              wx.redirectTo({
-                  url: '../../pages/login/main'
-              })
-            }, 1000)
-          }else{
-            globe.message(response.errorMsg,'warning')
-            that.spinShow = false
-          }
-        }, (response) => {
-          //Error
-        })
       },
       // 转化为两位数价格
       toDecimal2(x) {
@@ -792,13 +554,9 @@
       // 切换tab-bar
       handleChangeTabBar (data) {
         this.current = data.mp.detail.key
-        if(this.current === 'order'){
-          this.getRepairWorkorder(this.allPageNo,this.allPageSize)
-        }
-      },
-      // 切换tab
-      handleChangeTab (data) {
-        this.tab_current = data.mp.detail.key
+        wx.switchTab({
+          url: '../../pages/'+this.current+'/main'
+        })
       },
       // 普通选择器
       bindPickerChange(data, formName, type){
@@ -875,41 +633,6 @@
         that.$store.dispatch('updateInventoryItem', item).then(() => {
           globe.message('删除成功','success')
           that.spinShow = false
-        })
-      },
-      // 结账
-      handlePay(id){
-        this.payId = id
-        this.modalMessage = '确认收到账款了吗？此操作后将无法撤销, 是否继续?'
-        this.modalVisible = true
-        this.modalSuccess = false
-        this.payModal = true
-      },
-      payApi(id){
-        const that = this
-        return new Promise((resolve,reject) => {
-          let editFormObj = {
-            "repairWorkorder": {
-              "id": id,
-              "workorderState": '已结账',//工单状态
-            }
-          }
-          that.spinShow = true
-          that.$http.post(api.editRepairOrder, editFormObj, true).then((res) => {
-            if(res.success){
-              globe.message('结账成功!','success')
-              that.getRepairWorkorder(that.allPageNo,that.allPageSize)
-            }else{
-              globe.message(res.errMsg,'wraning')
-            }
-            that.spinShow = false
-          })
-        })
-      },
-      // 获取订单详情
-      getOrderDetail(orderNo){
-        wx.navigateTo({
-          url: '/pages/orderDetail/main?id='+orderNo
         })
       },
       // 提交订单
@@ -1011,11 +734,9 @@
       handleOk(){
         if(this.modalSuccess){
           this.modalVisible = false
-          this.current = 'order'
-          this.getRepairWorkorder(this.allPageNo,this.allPageSize)
-        }else if(this.payModal){
-          this.modalVisible = false
-          this.payApi(this.payId)
+          wx.navigateTo({
+            url: '../../pages/order/main'
+          })
         }else{
           this.modalVisible = false
         }
@@ -1024,7 +745,6 @@
       handleClose(){
         if(this.modalSuccess){
           this.modalVisible = false
-          this.current = 'index'
           this.stepCurrent = 0
           this.clientForm = {}
           this.repairForm = {}

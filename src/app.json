@@ -2,6 +2,9 @@
   "pages": [
     "pages/login/main",
     "pages/index/main",
+    "pages/order/main",
+    "pages/workplace/main",
+    "pages/mine/main",
     "pages/orderDetail/main",
     "pages/repair/main",
     "pages/selectRepair/main",
@@ -38,6 +41,36 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "万车达",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "borderStyle": "black",
+    "backgroundColor": "#fff",
+    "selectedColor": "#1296db",
+    "list": [{
+        "pagePath": "pages/index/main",
+        "iconPath": "static/imgs/car.png",
+        "selectedIconPath": "static/imgs/car_active.png",
+        "text": "接车"
+      },
+      {
+        "pagePath": "pages/order/main",
+        "iconPath": "static/imgs/order.png",
+        "selectedIconPath": "static/imgs/order_active.png",
+        "text": "工单"
+      },
+      {
+        "pagePath": "pages/workplace/main",
+        "iconPath": "static/imgs/work.png",
+        "selectedIconPath": "static/imgs/work_active.png",
+        "text": "工作台"
+      },
+      {
+        "pagePath": "pages/mine/main",
+        "iconPath": "static/imgs/user.png",
+        "selectedIconPath": "static/imgs/user_active.png",
+        "text": "我的"
+      }
+    ]
   },
   "debug": false
 }

@@ -1,4 +1,5 @@
 {
+    "navigationBarTitleText": "万车达 - 数据字典定义",
     "usingComponents": {
         "i-icon": "../../dist/icon/index",
         "i-swipeout": "../../dist/swipeout/index",

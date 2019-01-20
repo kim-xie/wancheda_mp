@@ -70,7 +70,7 @@ export default {
                         this.$store.dispatch('setUserInfo', userinfo)
                         setTimeout(() => {
                             that.spinShow = false
-                            wx.redirectTo({
+                            wx.switchTab({
                                 url: '../../pages/index/main'
                             })
                         }, 1000)

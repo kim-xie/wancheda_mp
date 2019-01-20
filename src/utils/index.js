@@ -45,8 +45,19 @@ function padLeftZero(str) {
   return ("00" + str).substr(str.length)
 }
 
+export function cloneObj(myObj) {
+  if (typeof (myObj) !== 'object') return myObj
+  if (myObj === null) return myObj
+  var myNewObj = new Object()
+  for (var i in myObj){
+    myNewObj[i] = cloneObj(myObj[i])
+  }
+  return myNewObj
+}
+
 export default {
   formatNumber,
   formatTime,
-  formatDatetime
+  formatDatetime,
+  cloneObj
 }

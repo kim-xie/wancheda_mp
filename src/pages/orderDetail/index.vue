@@ -155,10 +155,11 @@
       },
       // 获取详情
       getDetail(orderNo){
+        const _this = this
         this.spinShow = true
         this.$http.get(api.repairOrderDetail + orderNo).then((res) => {
-          const _this = this
           if(res.success){
+            _this.spinShow = false
             if(res.data.client){
               this.client = res.data.client
             }
@@ -192,11 +193,12 @@
                 _this.outpartDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.outpartDetails[i].sale))
               }
             }
+            _this.spinShow = false
           }else{
             globe.message(res.errorMsg,'warning')
+            _this.spinShow = false
             // 返回页面
             setTimeout(function(){
-              _this.spinShow = false
               wx.navigateBack({
                 delta: 1
               })

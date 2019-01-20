@@ -129,7 +129,7 @@
 <script>
   import globe from '../../utils/globe'
   import api from '../../api/api'
-  import {formatDatetime} from '../../utils/index'
+  import {formatDatetime,cloneObj} from '../../utils/index'
   import areaLists from '../../utils/area'
   import { setTimeout } from 'timers'
   import { mapGetters } from 'vuex'
@@ -172,6 +172,9 @@
       this.type = ''
       this.level = ''
       this.carBrand = ''
+      this.registrationDate = ''
+      this.insuranceEndtime = ''
+      this.clientSex = ''
       this.form = {}
       this.id = ''
       //console.log(globe.getCurrentPageUrlArgs())
@@ -244,10 +247,13 @@
         //     that.company = that.companys[i]
         //   }
         // }
+        console.log(item)
         this.level = item.date.level.value
         this.type = item.date.type.value
         this.carBrand = item.date.carBrand.value
         this.clientSex = item.sex === true ? '男':'女'
+        this.registrationDate = item.registrationDate
+        this.insuranceEndtime = item.insuranceEndtime
         this.form = item
       },
       // 选择性别
@@ -367,40 +373,47 @@
       },
       // 保存
       handleSave(callback){
+        const clientForm = cloneObj(this.form)
         let url = ''
         if(this.id){
           url = api.client_edit
-          delete this.form.date
-          delete this.form.createTime
-          delete this.form.updateTime
-          delete this.form.isDeleted
+          delete clientForm.date
+          delete clientForm.createTime
+          delete clientForm.updateTime
+          delete clientForm.isDeleted
+          delete clientForm.company
         }else{
           url = api.client_add
+          clientForm.company = this.userInfo.company
         }
-        if(!this.form.name){
+        if(!clientForm.name){
           globe.message('客户名不能为空', 'warning')
           return false
-        }else if(!this.form.level){
+        }else if(!clientForm.level){
           globe.message('客户级别不能为空', 'warning')
           return false
-        }else if(!this.form.type){
+        }else if(!clientForm.type){
           globe.message('客户类型不能为空', 'warning')
           return false
-        }else if(!this.form.mobile){
+        }else if(!clientForm.mobile){
           globe.message('手机号不能为空', 'warning')
           return false
-        }else if(!this.form.carNo){
+        }else if(!clientForm.carNo){
           globe.message('车牌号不能为空', 'warning')
           return false
-        }else if(!this.form.carBrand){
+        }else if(!clientForm.carBrand){
           globe.message('汽车品牌不能为空', 'warning')
           return false
         }
-        this.form.registrationDate = this.form.registrationDate ? new Date(this.form.registrationDate):''
-        this.form.insuranceEndtime = this.form.insuranceEndtime ? new Date(this.form.insuranceEndtime):''
-        this.form.company = this.userInfo.company
+        if(clientForm.registrationDate){
+          clientForm.registrationDate = new Date(clientForm.registrationDate)
+        }
+        if(clientForm.insuranceEndtime){
+          clientForm.insuranceEndtime = new Date(clientForm.insuranceEndtime)
+        }
+
         this.spinShow = true
-        this.$http.post(url, this.form).then( res => {
+        this.$http.post(url, clientForm).then( res => {
           if(res.success){
             globe.message(res.errorMsg, 'success')
             setTimeout(function(){
