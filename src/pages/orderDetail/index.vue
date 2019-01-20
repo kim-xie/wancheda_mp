@@ -11,7 +11,7 @@
         <view>{{modalMessage}}</view>
       </i-modal>
 
-      <div class="orderInfo">
+      <div class="orderInfo" v-if="repairItemDetails.length>0">
         <div class="order_header">
           <span class="order_no">工单号：{{repairWorkorder.workorderNo}}</span>
           <span class="float-right" v-if="repairWorkorder.workorderState==='维修中'" style="color:#ed3f14;">{{repairWorkorder.workorderState}}</span>
@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="orderInfo">
+      <div class="orderInfo" v-if="repairItemDetails.length>0">
         <div class="order_header">
           <span class="order_no">车牌号：{{client.carNo}}</span>
           <span class="float-right">{{client.name}}</span>
@@ -57,7 +57,7 @@
         </div>
       </div>
 
-      <div class="orderInfo">
+      <div class="orderInfo" v-if="repairItemDetails.length>0">
         <div class="order_header text-center">
           <span>服务项目</span>
         </div>
@@ -157,43 +157,54 @@
       getDetail(orderNo){
         this.spinShow = true
         this.$http.get(api.repairOrderDetail + orderNo).then((res) => {
-          let _this = this
-          if(res.data.client){
-            this.client = res.data.client
-          }
-          if(res.extendInfo){
-            this.discount = Number(res.extendInfo.level[res.data.client.level].additional)
-            this.client.carBrandVal = res.extendInfo.type[res.data.client.carBrand].value
-          }
-          if(res.data.items){
-            this.repairItemDetails = res.data.items
-            for(let i=0;i<_this.repairItemDetails.length;i++){
-              _this.repairItemDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.repairItemDetails[i].date.itemId.sum))
-              _this.repairItemDetails[i].sum = _this.toDecimal2(Number(_this.repairItemDetails[i].date.itemId.sum))
-              _this.repairItemDetails[i].mechanicVal = res.extendInfo.mechanic[_this.repairItemDetails[i].mechanic].fullname
+          const _this = this
+          if(res.success){
+            if(res.data.client){
+              this.client = res.data.client
             }
-            //console.log(_this.repairItemDetails)
-          }
-          if(res.data.repairWorkorder){
-            this.repairWorkorder = res.data.repairWorkorder
-            this.repairWorkorder.sum = _this.toDecimal2(this.repairWorkorder.sum)
-            this.repairWorkorder.clerkVal = res.extendInfo.clerk[this.repairWorkorder.clerk]?res.extendInfo.clerk[this.repairWorkorder.clerk].fullname:''
-          }
-          if(res.data.repairWorkorder.company){
-            this.repairCompany = res.extendInfo.company[res.data.repairWorkorder.company].name
-          }
-          if(res.data.outPartComposite != null){
-            this.outpartDetails = res.data.outPartComposite.outPartInfos
-            let outPartInfos = res.data.outPartComposite.outPartInfos
-            let partExtendInfo = res.extendInfo.partId
-            for(var i=0;i<outPartInfos.length;i++){
-              _this.outpartDetails[i].partName = partExtendInfo[outPartInfos[i].date.inventoryId.partId].name
-              _this.outpartDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.outpartDetails[i].sale))
+            if(res.extendInfo){
+              this.discount = Number(res.extendInfo.level[res.data.client.level].additional)
+              this.client.carBrandVal = res.extendInfo.type[res.data.client.carBrand].value
             }
+            if(res.data.items){
+              this.repairItemDetails = res.data.items
+              for(let i=0;i<_this.repairItemDetails.length;i++){
+                _this.repairItemDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.repairItemDetails[i].date.itemId.sum))
+                _this.repairItemDetails[i].sum = _this.toDecimal2(Number(_this.repairItemDetails[i].date.itemId.sum))
+                _this.repairItemDetails[i].mechanicVal = res.extendInfo.mechanic[_this.repairItemDetails[i].mechanic].fullname
+              }
+              //console.log(_this.repairItemDetails)
+            }
+            if(res.data.repairWorkorder){
+              this.repairWorkorder = res.data.repairWorkorder
+              this.repairWorkorder.sum = _this.toDecimal2(this.repairWorkorder.sum)
+              this.repairWorkorder.clerkVal = res.extendInfo.clerk[this.repairWorkorder.clerk]?res.extendInfo.clerk[this.repairWorkorder.clerk].fullname:''
+            }
+            if(res.data.repairWorkorder.company){
+              this.repairCompany = res.extendInfo.company[res.data.repairWorkorder.company].name
+            }
+            if(res.data.outPartComposite != null){
+              this.outpartDetails = res.data.outPartComposite.outPartInfos
+              let outPartInfos = res.data.outPartComposite.outPartInfos
+              let partExtendInfo = res.extendInfo.partId
+              for(var i=0;i<outPartInfos.length;i++){
+                _this.outpartDetails[i].partName = partExtendInfo[outPartInfos[i].date.inventoryId.partId].name
+                _this.outpartDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.outpartDetails[i].sale))
+              }
+            }
+          }else{
+            globe.message(res.errorMsg,'warning')
+            // 返回页面
+            setTimeout(function(){
+              _this.spinShow = false
+              wx.navigateBack({
+                delta: 1
+              })
+            },2000)
           }
           this.spinShow = false
         }, err => {
-
+          this.spinShow = false
         })
       },
       // 弹窗确定按钮

@@ -16,6 +16,7 @@ export default {
 
 <style lang="scss">
 .container {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -23,7 +24,7 @@ export default {
   justify-content: space-between;
   box-sizing: border-box;
   font-size: $--size-base;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family:  "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
   color: $--color-text-primary;
 }
 /* this rule will be remove */
