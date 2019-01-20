@@ -29,7 +29,6 @@
     "pages/inventoryDetail/main",
     "pages/inpart/main",
     "pages/outpart/main",
-    
     "pages/repairDetail/main",
     "pages/finance/main",
     "pages/logs/main"

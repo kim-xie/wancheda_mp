@@ -9,7 +9,7 @@
                 <p class="logo"><h3>万车达</h3></p>
             </div>
             <div class="login_form">
-                <form>
+                <form action="javascript:;">
                     <div class="form-item form_username">
                         <i class="iconfont icon-user"></i>
                         <input v-model="form.username" class="form-input" type="text" @keyup.enter.native="login" placeholder="请输入用户名">

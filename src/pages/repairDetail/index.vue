@@ -228,7 +228,6 @@
         float: left;
         display: block;
         width: 100px;
-        font-size: 18px;
         color: $--color-info;
       }
       input{

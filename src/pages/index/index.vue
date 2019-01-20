@@ -223,13 +223,14 @@
                     小计(元)：￥{{item.subtotal}} <br/>
                     技师：{{item.mechanicVal}} <br/>
                     备注：{{item.description}} <br/>
+                    折扣：{{item.discount}} 折 <br/>
                     <div class="item_button">
                       <div class="button" @tap="handleEditRepair(item,index)">编辑</div>
                       <div class="button delete_button" @tap="handleDeleteRepair(item,index)">删除</div>
                     </div>
                     <hr style="border:1px dashed #ccc;"/>
                   </view>
-                  <view slot="footer">折扣：{{repairItems[0].discount}} 折</view>
+                  <view slot="footer"></view>
                 </i-card>
               </div>
             </div>
@@ -245,13 +246,14 @@
                     小计(元)：￥{{item.subtotal}} <br/>
                     领料人：{{item.receiverVal}} <br/>
                     备注：{{item.description}} <br/>
+                    折扣：{{item.discount}} 折 <br/>
                     <div class="item_button">
                       <div class="button" @tap="handleEditInventory(item, index)">编辑</div>
                       <div class="button delete_button" @tap="handleDeleteInventory(item, index)">删除</div>
                     </div>
                     <hr style="border:1px dashed #ccc;"/>
                   </view>
-                  <view slot="footer">折扣：{{inventoryItems[0].discount}} 折</view>
+                  <view slot="footer"></view>
                 </i-card>
               </div>
             </div>
@@ -286,9 +288,10 @@
                     项目名称：{{item.name}} <br/>
                     单价：￥{{item.sum}} <br/>
                     工时/数量：{{item.workHour}} <br/>
+                    折扣：{{item.discount}} 折 <br/>
                     <hr style="margin-top:4px;border:1px dashed #ccc;"/>
                   </view>
-                  <view slot="footer">折扣：{{repairItems[0].discount}} 折</view>
+                  <view slot="footer"></view>
                 </i-card>
               </div>
               <div class="billing_card" v-if="inventoryItems.length>0">
@@ -297,9 +300,10 @@
                     配件名称：{{item.name}} <br/>
                     单价：￥{{item.sale}} <br/>
                     数量：{{item.count}} <br/>
+                    折扣：{{item.discount}} 折 <br/>
                     <hr style="margin-top:4px;border:1px dashed #ccc;"/>
                   </view>
-                  <view slot="footer">折扣：{{inventoryItems[0].discount}} 折</view>
+                  <view slot="footer"></view>
                 </i-card>
               </div>
               <div class="billing_card">
@@ -343,15 +347,18 @@
                   <span>{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="label">维修工单: </span>
+                  <span class="value">{{item.workorderNo}}</span>
                   <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
                   <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进店时间: {{item.sendTime}}</span>
+                  <span class="label">到店时间: </span>
+                  <span class="value">{{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥{{item.sum}}</span>
+                  <span class="label">消费金额: </span>
+                  <span class="value">￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -369,15 +376,18 @@
                   <span>{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="label">维修工单: </span>
+                  <span class="value">{{item.workorderNo}}</span>
                   <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
                   <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进店时间: {{item.sendTime}}</span>
+                  <span class="label">到店时间: </span>
+                  <span class="value">{{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥{{item.sum}}</span>
+                  <span class="label">消费金额: </span>
+                  <span class="value">￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -396,15 +406,18 @@
                   <span>{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>工单号: {{item.workorderNo}}</span>
+                  <span class="label">维修工单: </span>
+                  <span class="value">{{item.workorderNo}}</span>
                   <span class="float-right" v-if="item.workorderState==='维修中'" style="color:#ed3f14;">{{item.workorderState}}</span>
                   <span class="float-right" v-else style="color:#07c160;">{{item.workorderState}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>进店时间: {{item.sendTime}}</span>
+                  <span class="label">到店时间: </span>
+                  <span class="value">{{item.sendTime}}</span>
                 </li>
                 <li class="ellipsis">
-                  <span>消费金额: ￥{{item.sum}}</span>
+                  <span class="label">消费金额: </span>
+                  <span class="value">￥{{item.sum}}</span>
                   <van-button size="small" plain type="primary" class="float-right" @tap="getOrderDetail(item.workorderNo)">订单详情</van-button>
                 </li>
               </ul>
@@ -932,7 +945,11 @@
           delete _this.clientForm.registrationDate
           delete _this.clientForm.createTime
           delete _this.clientForm.updateTime
-          //_this.clientForm.company = _this.userInfo.company
+          _this.clientForm.company = _this.clientForm.company?_this.clientForm.company:_this.userInfo.company
+        }else{
+          _this.clientForm.registrationDate = _this.clientForm.registrationDate ? new Date(_this.clientForm.registrationDate):''
+          _this.clientForm.insuranceEndtime = _this.clientForm.insuranceEndtime ? new Date(_this.clientForm.insuranceEndtime):''
+          _this.clientForm.company = _this.clientForm.company?_this.clientForm.company:_this.userInfo.company
         }
 
         // 订单详情
@@ -946,9 +963,9 @@
             "sum": Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponForm.couponVal) <=0?'':Number(_this.inventorysubtotal) + Number(_this.repairsubtotal) - Number(_this.couponForm.couponVal),//消费金额
             "clerk": _this.repairForm.clerk,//服务顾问
             "carMileage": _this.repairForm.carMileage,//进店里程
-            "carOilmeter": _this.repairForm.carOilmeter,//进店油表
+            "carOilmeter": _this.carOilmeter,//进店油表
             "sendMan": _this.repairForm.sendMan,//送修人
-            "endTime": _this.repairForm.endTime,//离店时间
+            "endTime": new Date(_this.repairForm.endTime),//离店时间
             "clentRemind": _this.repairForm.clentRemind,//客户嘱咐
             "company": _this.userInfo.company//公司
           },
@@ -1085,6 +1102,10 @@
             globe.message('请添加服务项目', 'warning')
             return false
           }
+          that.repairtotal = 0
+          that.repairsubtotal = 0
+          that.inventorytotal = 0
+          that.inventorysubtotal = 0
           for(let i=0; i<that.repairItems.length;i++){
             that.repairtotal += Number(that.repairItems[i].total)
             that.repairsubtotal += Number(that.repairItems[i].subtotal)
@@ -1309,9 +1330,8 @@
 }
 .tab_list{
   background-color: $--background-color-base;
-  font-size: 30rpx;
-  padding: 20rpx 20rpx;
-  margin-bottom: 30rpx;
+  padding: 10px;
+  margin-bottom: 14px;
   .pay-btn{
     padding: 3px 6px;
     border: 1px solid $--color-text-secondary;
@@ -1319,8 +1339,19 @@
   }
   ul {
     li{
-      margin: 10rpx 0;
-      color: $--color-text-secondary;
+      height: 34px;
+      line-height: 34px;
+      color: $--color-text-primary;
+      .label{
+        display: inline-block;
+        text-align: right;
+        margin-right: 6px;
+        color: $--color-text-secondary;
+      }
+      .value{
+        display: inline-block;
+        color: $--color-text-secondary;
+      }
     }
     .line{
       height: 3rpx;
@@ -1352,20 +1383,20 @@
 }
 .item{
   width: 90%;
-  margin: 10px auto;
-  height: 30px;
-  line-height: 30px;
+  margin: 6px auto;
+  height: 28px;
+  line-height: 28px;
   border: 1px solid #ccc;
   overflow: hidden;
   padding: 3px 6px;
   .label{
     float: left;
-    width: 40%;
+    width: 30%;
     display: block;
   }
   .input{
     display: inline-block;
-    width: 60%;
+    width: 70%;
     height: 100%;
     line-height: 30px;
   }
@@ -1397,7 +1428,6 @@
     overflow: hidden;
     margin: 0 auto;
     margin-top: 10px;
-    width: 90%;
     .item_button{
       overflow: hidden;
       height: 50px;

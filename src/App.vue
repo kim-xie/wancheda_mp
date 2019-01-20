@@ -14,7 +14,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .container {
   height: 100%;
   display: flex;
@@ -22,6 +22,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
+  font-size: $--size-base;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  color: $--color-text-primary;
 }
 /* this rule will be remove */
 * {

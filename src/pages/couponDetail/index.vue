@@ -42,7 +42,7 @@
       this.form = {}
       this.spinShow = false
       this.id = ''
-      console.log(globe.getCurrentPageUrlArgs())
+      //console.log(globe.getCurrentPageUrlArgs())
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
         this.id = urlParams.split('=')[1]
@@ -153,7 +153,6 @@
         float: left;
         display: block;
         width: 100px;
-        font-size: 18px;
         color: $--color-info;
       }
       input{

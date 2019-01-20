@@ -62,6 +62,7 @@
         addRepair: false,
         repairIndex: '',
         discount: 10,
+        getDiscounted: false,
         id: '',
         form: {},
         workTypeLKs: [],
@@ -77,6 +78,7 @@
       }
     },
     onLoad() {
+      const that = this
       this.addRepair = false
       this.workTypeLK = ''
       this.typeLK = ''
@@ -84,7 +86,6 @@
       this.form = {}
       this.spinShow = false
       this.id = ''
-      this.discount = 10
       this.repairIndex = ''
       if(globe.getCurrentPageUrlArgs()){
         const urlParams = globe.getCurrentPageUrlArgs()
@@ -102,9 +103,9 @@
         that.mechanics = valueArray
         that.mechanicIds = idArray
       })
-      const that = this
       this.getLookUpById(this.client.level).then(data => {
-        that.discount = number(data.additional)
+        that.discount = Number(data.additional)
+        that.getDiscounted = true
       })
     },
     computed: {
@@ -247,59 +248,63 @@
         let delta = 1
         let message = '维修项目添加成功!'
         const _this = this
-        if(!this.form.code){
-          globe.message('维修项目代码不能为空', 'warning')
-          return false
-        }else if(!this.form.name){
-          globe.message('维修项目名称不能为空', 'warning')
-          return false
-        }else if(!this.form.typeLK){
-          globe.message('所属分类不能为空', 'warning')
-          return false
-        }else if(!this.form.workTypeLK){
-          globe.message('维修工种不能为空', 'warning')
-          return false
-        }else if(!this.form.workHour){
-          globe.message('数量/工时不能为空', 'warning')
-          return false
-        }else if(!this.form.sum){
-          globe.message('单价不能为空', 'warning')
-          return false
-        }else if(!this.form.mechanic){
-          globe.message('维修工不能为空', 'warning')
-          return false
-        }
-        // 新增
-        if(this.addRepair){
-          delta = 2
-          this.form.mechanicVal = this.mechanic
-          // 用户折扣信息
-          this.form.discount = this.discount
-          const total = globe.accMul(Number(_this.form.workHour),Number(_this.form.sum))
-          this.form.total = total
-          this.form.subtotal = globe.accMul(total,Number(_this.form.discount/10))
+        if(this.getDiscounted){
+          if(!this.form.code){
+            globe.message('维修项目代码不能为空', 'warning')
+            return false
+          }else if(!this.form.name){
+            globe.message('维修项目名称不能为空', 'warning')
+            return false
+          }else if(!this.form.typeLK){
+            globe.message('所属分类不能为空', 'warning')
+            return false
+          }else if(!this.form.workTypeLK){
+            globe.message('维修工种不能为空', 'warning')
+            return false
+          }else if(!this.form.workHour){
+            globe.message('数量/工时不能为空', 'warning')
+            return false
+          }else if(!this.form.sum){
+            globe.message('单价不能为空', 'warning')
+            return false
+          }else if(!this.form.mechanic){
+            globe.message('维修工不能为空', 'warning')
+            return false
+          }
+          // 新增
+          if(this.addRepair){
+            delta = 2
+            _this.form.mechanicVal = _this.mechanic
+            // 用户折扣信息
+            _this.form.discount = _this.discount
+            const total = globe.accMul(Number(_this.form.workHour),Number(_this.form.sum))
+            _this.form.total = total
+            _this.form.subtotal = globe.accMul(total,Number(_this.form.discount/10))
+          }else{
+            message = '维修项目编辑成功!'
+            // 编辑
+            _this.form.mechanicVal = _this.mechanic
+            // 用户折扣信息
+            _this.form.discount = _this.discount
+            const total = globe.accMul(Number(_this.form.workHour),Number(_this.form.sum))
+            _this.form.total = total
+            _this.form.subtotal = globe.accMul(total,Number(_this.form.discount/10))
+          }
+          this.spinShow = true
+          // 将数据添加至vuex
+          this.$store.dispatch('updateRepairItem', this.form).then(() => {
+            globe.message(message, 'success')
+            // 返回页面
+            setTimeout(function(){
+              _this.spinShow = false
+              wx.navigateBack({
+                delta: delta
+              })
+            },2000)
+          })
         }else{
-          message = '维修项目编辑成功!'
-          // 编辑
-          this.form.mechanicVal = this.mechanic
-          // 用户折扣信息
-          this.form.discount = this.discount
-          const total = globe.accMul(Number(_this.form.workHour),Number(_this.form.sum))
-          this.form.total = total
-          this.form.subtotal = globe.accMul(total,Number(_this.form.discount/10))
+          globe.message('还未获取到客户优惠券，请刷新重试', 'warning')
         }
-        this.spinShow = true
-        // 将数据添加至vuex
-        this.$store.dispatch('updateRepairItem', this.form).then(() => {
-          globe.message(message, 'success')
-          // 返回页面
-          setTimeout(function(){
-            _this.spinShow = false
-            wx.navigateBack({
-              delta: delta
-            })
-          },2000)
-        })
       }
     }
   }
@@ -319,7 +324,6 @@
         float: left;
         display: block;
         width: 100px;
-        font-size: 18px;
         color: $--color-info;
       }
       input{

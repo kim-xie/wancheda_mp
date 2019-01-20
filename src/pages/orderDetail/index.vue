@@ -35,11 +35,11 @@
         <div class="order_count">
           <!-- {{client.date.carBrand.value}} -  -->
           <div class="order_counts">
-            <span class="label">车型：</span>
-            <span class="value">{{client.carModel}}</span>
+            <span class="label">客户车型：</span>
+            <span class="value">{{client.carBrandVal}}{{client.carModel}}</span>
           </div>
           <div class="order_counts">
-            <span class="label">手机：</span>
+            <span class="label">客户手机：</span>
             <span class="value">{{client.mobile}}</span>
           </div>
           <div class="order_counts" v-if="repairWorkorder.sendTime">
@@ -82,18 +82,18 @@
           <span>服务领料</span>
         </div>
         <div class="order_detail">
-          <!-- <van-card
+          <van-card
             v-for="(item, index) in outpartDetails" :key="index"
-            :num="item.date.itemId.count"
-            :price="item.date.itemId.sale"
-            :origin-price="item.sum"
-            :desc="'领料人：'+item.mechanicVal"
+            :num="item.count"
+            :price="item.discountVal"
+            :origin-price="item.sale"
+            :desc="'领料人：'"
             :tag="discount+'折'"
-            :title="item.date.itemId.name">
+            :title="item.partName">
             <view slot="tags">
-              <van-tag plain type="success">{{item.date.itemId.description}}</van-tag>
+              <van-tag plain type="success">{{item.partName}}</van-tag>
             </view>
-          </van-card> -->
+          </van-card>
         </div>
       </div>
 
@@ -155,6 +155,7 @@
       },
       // 获取详情
       getDetail(orderNo){
+        this.spinShow = true
         this.$http.get(api.repairOrderDetail + orderNo).then((res) => {
           let _this = this
           if(res.data.client){
@@ -162,6 +163,7 @@
           }
           if(res.extendInfo){
             this.discount = Number(res.extendInfo.level[res.data.client.level].additional)
+            this.client.carBrandVal = res.extendInfo.type[res.data.client.carBrand].value
           }
           if(res.data.items){
             this.repairItemDetails = res.data.items
@@ -186,8 +188,10 @@
             let partExtendInfo = res.extendInfo.partId
             for(var i=0;i<outPartInfos.length;i++){
               _this.outpartDetails[i].partName = partExtendInfo[outPartInfos[i].date.inventoryId.partId].name
+              _this.outpartDetails[i].discountVal = _this.toDecimal2(_this.discount/10 * Number(_this.outpartDetails[i].sale))
             }
           }
+          this.spinShow = false
         }, err => {
 
         })

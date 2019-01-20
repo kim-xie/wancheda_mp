@@ -35,15 +35,22 @@
         <input v-model="form.carModel" placeholder="请输入车型"/>
       </p>
       <p class="input_wrap">
-        <span class="input_label">车身颜色</span>
-        <input v-model="form.carColor" placeholder="请输入车身颜色"/>
-      </p>
-      <p class="input_wrap">
         <span class="input_label">客户级别</span>
         <picker @change="bindPickerChange($event, 'form', 'level')" :range="levels">
           <span v-if="level===''" class="input placeholder">请选择客户级别</span>
           <span v-else class="input">{{level}}</span>
         </picker>
+      </p>
+      <p class="input_wrap">
+        <span class="input_label">客户类型</span>
+        <picker @change="bindPickerChange($event, 'form', 'type')" :range="types">
+          <span v-if="type===''" class="input placeholder">请选择客户类型</span>
+          <span v-else class="input">{{type}}</span>
+        </picker>
+      </p>
+      <p class="input_wrap">
+        <span class="input_label">车身颜色</span>
+        <input v-model="form.carColor" placeholder="请输入车身颜色"/>
       </p>
       <!-- <p class="input_wrap">
         <span class="input_label">所属公司</span>
@@ -93,13 +100,6 @@
         <span class="input_label">客户性别</span>
         <span v-if="clientSex===''" class="input placeholder" @tap="selectSex">请选择客户性别</span>
         <span v-else class="input" @tap="selectSex">{{clientSex}}</span>
-      </p>
-      <p class="input_wrap">
-        <span class="input_label">客户类型</span>
-        <picker @change="bindPickerChange($event, 'form', 'type')" :range="types">
-          <span v-if="type===''" class="input placeholder">请选择客户类型</span>
-          <span v-else class="input">{{type}}</span>
-        </picker>
       </p>
       <p class="input_wrap">
         <span class="input_label">保险公司</span>
@@ -161,6 +161,11 @@
         currentName: '',
         minDate: new Date().getTime()
       }
+    },
+    computed: {
+      ...mapGetters([
+        'userInfo'
+      ])
     },
     onLoad() {
       //this.company = ''
@@ -391,6 +396,9 @@
           globe.message('汽车品牌不能为空', 'warning')
           return false
         }
+        this.form.registrationDate = this.form.registrationDate ? new Date(this.form.registrationDate):''
+        this.form.insuranceEndtime = this.form.insuranceEndtime ? new Date(this.form.insuranceEndtime):''
+        this.form.company = this.userInfo.company
         this.spinShow = true
         this.$http.post(url, this.form).then( res => {
           if(res.success){
@@ -426,7 +434,6 @@
         float: left;
         display: block;
         width: 120px;
-        font-size: 18px;
         color: $--color-info;
       }
       input{
