@@ -1043,7 +1043,6 @@
 }
 .tab_content{
   width: 100%;
-  padding-bottom: 46px;
 }
 .tab_bar{
   width: 100vw;
