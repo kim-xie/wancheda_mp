@@ -137,7 +137,7 @@
         }else if(!this.form.code){
           globe.message('代码不能为空', 'warning')
           return false
-        }else if(this.form.parentId===this.form.id){
+        }else if(this.form.parentId && (this.form.parentId===this.form.id)){
           globe.message('当前节点不可以作为自己的父节点', 'warning')
           return false
         }

@@ -31,6 +31,8 @@
         "van-button": "../../vant-weapp/button/index",
         "van-datetime-picker": "../../vant-weapp/datetime-picker/index",
         "van-area": "../../vant-weapp/area/index",
-        "van-popup": "../../vant-weapp/popup/index"
+        "van-popup": "../../vant-weapp/popup/index",
+        "i-sticky": "../../dist/sticky/index",
+        "i-sticky-item": "../../dist/sticky-item/index"
     }
 }

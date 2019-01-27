@@ -16,56 +16,56 @@
         <div class="workplace">
           <div class="menu_list">
             <div class="menu">
-              <navigator url="/pages/client/main" hover-class="navigator-hover">
+              <navigator url="/pages/client/main">
                 <i class="iconfont icon-kehu"></i>
                 <span>客户管理</span>
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/company/main" hover-class="navigator-hover">
+              <navigator url="/pages/company/main">
                 <i class="iconfont icon-gongsimingcheng"></i>
                 <span>公司管理</span>
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/account/main" hover-class="navigator-hover">
+              <navigator url="/pages/account/main">
                 <i class="iconfont icon-zhanghao"></i>
                 <span>账号管理</span>
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/lookupdf/main" hover-class="navigator-hover">
+              <navigator url="/pages/lookupdf/main">
                 <i class="iconfont icon-shuju"></i>
                 <span>字典管理</span>
               </navigator>
             </div>
             <!-- <div class="menu">
-              <navigator url="/pages/finance/main" hover-class="navigator-hover">
+              <navigator url="/pages/finance/main">
                 <i class="iconfont icon-finance"></i>
                 <span>财务管理</span>
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/role/main" hover-class="navigator-hover">
+              <navigator url="/pages/role/main">
                 <i class="iconfont icon-wode"></i>
                 <span>角色管理</span>
               </navigator>
             </div> -->
             <div class="menu">
-              <navigator url="/pages/product/main" hover-class="navigator-hover">
+              <navigator url="/pages/product/main">
                 <i class="iconfont icon-qichepeijian"></i>
                 <span>配件维护</span>
               </navigator>
             </div>
             <div class="menu">
-              <navigator url="/pages/inventory/main" hover-class="navigator-hover">
+              <navigator url="/pages/inventory/main">
                 <i class="iconfont icon-kucun"></i>
                 <span>库存管理</span>
               </navigator>
             </div>
             <div class="menu">
               <i-badge :count="inpartCount">
-                <navigator url="/pages/inpart/main" hover-class="navigator-hover">
+                <navigator url="/pages/inpart/main">
                   <i class="iconfont icon-rukuliucheng"></i>
                   <span>配件入库</span>
                 </navigator>
@@ -73,14 +73,14 @@
             </div>
             <div class="menu">
               <i-badge :count="outpartCount">
-                <navigator url="/pages/outpart/main" hover-class="navigator-hover">
+                <navigator url="/pages/outpart/main">
                   <i class="iconfont icon-chukuliucheng"></i>
                   <span>配件出库</span>
                 </navigator>
               </i-badge>
             </div>
             <div class="menu">
-              <navigator url="/pages/repair/main" hover-class="navigator-hover">
+              <navigator url="/pages/repair/main">
                 <i class="iconfont icon-weixiu"></i>
                 <span>维修项目</span>
               </navigator>

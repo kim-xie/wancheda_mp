@@ -12,6 +12,15 @@
         <view>{{modalMessage}}</view>
       </i-modal>
 
+      <div class="tab_header clearfix">
+        <div class="search">
+          <input type="text" v-model="searchVal" @blur="goSearch" placeholder="按车牌号搜索">
+          <i v-if="searchVal === ''" class="iconfont icon-search"></i>
+          <i v-if="searchVal !== ''" class="iconfont icon-delete" style="color:red" @tap="clear"></i>
+        </div>
+      </div>
+
+
       <div class="transition tab_order">
         <div>
           <i-tabs :current="tab_current" color="#1296db" @change="handleChangeTab($event)">
@@ -28,7 +37,7 @@
                   <van-button size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
                 </li>
                 <li class="ellipsis">
-                  <span>{{item.date.clientId.carModel}}</span>
+                  <span>{{item.carBrandVal}}{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
                   <span class="label">维修工单: </span>
@@ -57,7 +66,7 @@
                   <span>{{item.date.clientId.carNo}}</span>
                 </li>
                 <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carModel}}</span>
+                  <span>{{item.carBrandVal}}{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
                   <span class="label">维修工单: </span>
@@ -87,7 +96,7 @@
                   <van-button v-if="item.workorderState==='维修中'" size="small" plain type="danger" class="float-right" @tap="handlePay(item.id)">结账</van-button>
                 </li>
                 <li class="ellipsis" v-if="item.date.clientId">
-                  <span>{{item.date.clientId.carModel}}</span>
+                  <span>{{item.carBrandVal}}{{item.date.clientId.carModel}}</span>
                 </li>
                 <li class="ellipsis">
                   <span class="label">维修工单: </span>
@@ -135,6 +144,11 @@
   export default {
     data () {
       return {
+        searchVal: '',
+        search: {
+          carNo: '',
+          clientId: []
+        },
         loading: false,
         tipmessage: '我也是有底线',
         modalSuccess: true,
@@ -158,9 +172,13 @@
       }
     },
     mounted() {
+    },
+    onLoad(){
       this.spinShow = false
       const that = this
-      this.getRepairWorkorder(this.allPageNo, this.allPageSize)
+      this.getRepairWorkorder(that.allPageNo, that.allPageSize, '维修中')
+      this.getRepairWorkorder(this.allPageNo, this.allPageSize, '已结账')
+      this.getRepairWorkorder(this.allPageNo, this.allPageSize, '')
     },
     computed: {
       ...mapGetters([
@@ -173,14 +191,36 @@
       // 到这底部在这里需要做什么事情
       console.log('上拉加载')
       const that = this
-      if(this.allPageSize < this.repairWorkorderAllTotal){
-        this.loading = true
-        this.tipmessage = '玩命加载中'
-        this.allPageSize = this.allPageSize+10
-        this.getRepairWorkorder(this.allPageNo, this.allPageSize, function(){
-          that.loading = false
-          that.tipmessage = '我也是有底线的'
-        })
+      if(this.tab_current === 'tab1'){
+        if(this.allPageSize < this.repairWorkorderTotal){
+          this.loading = true
+          this.tipmessage = '玩命加载中'
+          this.allPageSize = this.allPageSize+10
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '维修中', function(){
+            that.loading = false
+            that.tipmessage = '我也是有底线的'
+          })
+        }
+      }else if(this.tab_current === 'tab2'){
+        if(this.allPageSize < this.repairPayedWorderTotal){
+          this.loading = true
+          this.tipmessage = '玩命加载中'
+          this.allPageSize = this.allPageSize+10
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '已结账', function(){
+            that.loading = false
+            that.tipmessage = '我也是有底线的'
+          })
+        }
+      }else{
+        if(this.allPageSize < this.repairWorkorderAllTotal){
+          this.loading = true
+          this.tipmessage = '玩命加载中'
+          this.allPageSize = this.allPageSize+10
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, null, function(){
+            that.loading = false
+            that.tipmessage = '我也是有底线的'
+          })
+        }
       }
     },
     methods: {
@@ -213,11 +253,78 @@
       // 切换tab
       handleChangeTab (data) {
         this.tab_current = data.mp.detail.key
+        if(this.tab_current === 'tab1'){
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '维修中')
+        }else if(this.tab_current === 'tab2'){
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '已结账')
+        }else{
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '')
+        }
+      },
+      // 搜索
+      goSearch(){
+        const that = this
+        const searchVal = this.searchVal
+        this.search.carNo = searchVal
+        if(this.tab_current === 'tab1'){
+          that.getClientIds(()=>{
+            that.getRepairWorkorder(that.allPageNo, that.allPageSize, '维修中')
+          })
+        }else if(this.tab_current === 'tab2'){
+          that.getClientIds(()=>{
+            that.getRepairWorkorder(that.allPageNo, that.allPageSize, '已结账')
+          })
+        }else{
+          that.getClientIds(()=>{
+            that.getRepairWorkorder(that.allPageNo, that.allPageSize, '')
+          })
+        }
+      },
+      clear(){
+        this.searchVal = ''
+        this.search.carNo = ''
+        this.search.clientId = ''
+        if(this.tab_current === 'tab1'){
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '维修中')
+        }else if(this.tab_current === 'tab2'){
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '已结账')
+        }else{
+          this.getRepairWorkorder(this.allPageNo, this.allPageSize, '')
+        }
+      },
+      // 根据车牌号找对客户
+      getClientIds(callback){
+        const that = this
+        that.spinShow = true
+        const params = {
+          'search.carNo_like': that.search.carNo,
+          'search.isDeleted_eq': false,
+          'page.pn': 1,
+          'page.size': 1000
+        }
+        that.$http.get(api.client_list, params).then( res => {
+          if(res.success){
+            const datas = res.data.page.content
+            for(let i=0;i<datas.length;i++){
+              that.search.clientId.push(datas[i].id)
+            }
+            that.spinShow = false
+            if(callback && typeof callback == 'function'){
+              callback()
+            }
+          }else{
+            that.spinShow = false
+          }
+          this.firstLoad = true
+        }).catch(err => {
+          console.log(err)
+          that.spinShow = false
+        })
       },
       // 结账
       handlePay(id){
         this.payId = id
-        this.modalMessage = '确认收到账款了吗？此操作后将无法撤销, 是否继续?'
+        this.modalMessage = '确认收到账款了吗？'
         this.modalVisible = true
         this.modalSuccess = false
         this.payModal = true
@@ -249,6 +356,19 @@
           url: '/pages/orderDetail/main?id='+orderNo
         })
       },
+      // 获取数据字典
+      getLookUpByIds(id){
+        return new Promise((resolve,reject) => {
+          const params = {
+            id
+          }
+          this.$http.get(api.getLookupById, params).then( res => {
+            if(res.success){
+              resolve(res.data.entity.value)
+            }
+          })
+        })
+      },
       // 弹窗确定按钮
       handleOk(){
         if(this.modalSuccess){
@@ -265,38 +385,55 @@
       handleClose(){
         if(this.modalSuccess){
           this.modalVisible = false
-          this.current = 'index'
           this.stepCurrent = 0
-          this.clientForm = {}
-          this.repairForm = {}
         }else{
           this.modalVisible = false
         }
       },
       // 获取维修记录
-      getRepairWorkorder(pageNo,pageSize,callback){
+      getRepairWorkorder(pageNo,pageSize,status,callback){
+        const that = this
         const params = {
           'search.company_eq': '',
-          //'search.workorderState_eq': status,
+          'search.workorderState_eq': status?status:'',
+          'search.clientId_in': this.search.clientId.length>0 ? this.search.clientId.join(',') : '',
           'page.pn': pageNo,
           'page.size': pageSize
         }
         this.spinShow = true
         this.$http.get(api.repairWorkorder, params).then( res => {
           if(res.success){
+            let locked = true
             this.spinShow = false
-            this.repairWorkorderAlls = res.data.page.content
-            this.repairWorkorderAllTotal = res.data.page.totalElements
-            this.repairWorkorders = this.repairWorkorderAlls.filter(item => {
-              return item.workorderState === '维修中'
-            })
-            this.repairPayedWorders = this.repairWorkorderAlls.filter(item => {
-              return item.workorderState === '已结账'
-            })
-            this.repairWorkorderTotal = this.repairWorkorders.length
-            this.repairPayedWorderTotal = this.repairPayedWorders.length
-            if(callback && typeof callback === 'function'){
-              callback()
+            let datas = res.data.page.content
+            const total = res.data.page.totalElements
+            for(let i=0;i<datas.length;i++){
+              if(datas[i].date.clientId){
+                that.getLookUpByIds(datas[i].date.clientId.carBrand).then(data => {
+                  datas[i].carBrandVal = data
+                  if(!status){
+                    this.repairWorkorderAlls = datas
+                    this.repairWorkorderAllTotal = total
+                    // this.repairWorkorders = this.repairWorkorderAlls.filter(item => {
+                    //   return item.workorderState === '维修中'
+                    // })
+                    // this.repairPayedWorders = this.repairWorkorderAlls.filter(item => {
+                    //   return item.workorderState === '已结账'
+                    // })
+                    // this.repairWorkorderTotal = this.repairWorkorders.length
+                    // this.repairPayedWorderTotal = this.repairPayedWorders.length
+                  }else if(status === '维修中'){
+                    this.repairWorkorders = datas
+                    this.repairWorkorderTotal = this.repairWorkorders.length
+                  }else if(status === '已结账'){
+                    this.repairPayedWorders = datas
+                    this.repairPayedWorderTotal = this.repairPayedWorders.length
+                  }
+                  if(callback && typeof callback === 'function'){
+                    callback()
+                  }
+                })
+              }
             }
           }
           this.spinShow = false
@@ -305,27 +442,9 @@
     }
   }
 </script>
-
-<style>
-
-.i-noticebar-content-wrap{
-  text-align: center!important;
-}
-.grid-item{
-  height: 185rpx;
-}
-.grid-label{
-  margin-top: 0!important;
-}
-.logout{
-  text-align: center;
-  color: brown;
-}
-.navigator-hover {
-  color:blue;
-}
-.placeholder{
-  color: #777;
+<style lang="scss">
+.i-grid-item{
+  padding: 0px!important;
 }
 </style>
 
@@ -335,6 +454,33 @@
 }
 .tab_content{
   width: 100%;
+  .tab_header{
+    height: 100%;
+    margin: 0 auto;
+    .add_button{
+      margin: 10px 10px 10px 0;
+    }
+    .search{
+      display: block;
+      position: relative;
+      width: 95%;
+      margin: 0 auto;
+      input{
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $--color-text-placeholder;
+        border-radius: 4px;
+        padding: 3rpx 80rpx 6rpx 12rpx;
+      }
+      .iconfont{
+        position: absolute;
+        right: 12rpx;
+        top: 14rpx;
+        font-size: 22px;
+        color: $--color-text-placeholder;
+      }
+    }
+  }
 }
 .tab_bar{
   width: 100vw;
@@ -350,8 +496,8 @@
   }
   ul {
     li{
-      height: 34px;
-      line-height: 34px;
+      height: 38px;
+      line-height: 38px;
       color: $--color-text-primary;
       .label{
         display: inline-block;

@@ -31,17 +31,17 @@
             <p class="detail">
               <p class="items">
                 <span class="label">客户级别:</span>
-                <span class="value">{{item.date.level.value}}</span>
+                <span class="value" v-if="item.date.level">{{item.date.level.value}}</span>
               </p>
               <p class="items">
                 <span class="label">客户类型:</span>
-                <span class="value">{{item.date.type.value}}</span>
+                <span class="value" v-if="item.date.type">{{item.date.type.value}}</span>
               </p>
             </p>
             <p class="detail">
               <p class="items">
                 <span class="label">汽车品牌:</span>
-                <span class="value">{{item.date.carBrand.value}}</span>
+                <span class="value" v-if="item.date.carBrand">{{item.date.carBrand.value}}</span>
               </p>
               <p class="items">
                 <span class="label">汽车车型:</span>
@@ -155,7 +155,7 @@
         listData: [],
         totalData: 0,
         pageNo: 1,
-        pageSize: 4,
+        pageSize: 10,
         form: {},
         search: {
           carNo: ''

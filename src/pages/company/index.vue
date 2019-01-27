@@ -114,7 +114,7 @@
         listData: [],
         totalData: 0,
         pageNo: 1,
-        pageSize: 8,
+        pageSize: 10,
         form: {},
         search: {
           name: '',

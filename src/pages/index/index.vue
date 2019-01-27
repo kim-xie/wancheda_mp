@@ -150,8 +150,8 @@
             </div>
 
             <div class="button_wrap">
-              <span class="item_button" v-if="showMore === false" @tap="showMore = true">更多</span>
-              <span class="item_button" v-if="showMore" @tap="showMore = false">收起</span>
+              <span class="item_button" v-if="!showMore" @tap="showMore = true">更多</span>
+              <span class="item_button" v-else @tap="showMore = false">收起</span>
               <span class="item_button" @tap="resetInput">重置</span>
             </div>
           </div>
@@ -734,7 +734,7 @@
       handleOk(){
         if(this.modalSuccess){
           this.modalVisible = false
-          wx.navigateTo({
+          wx.switchTab({
             url: '../../pages/order/main'
           })
         }else{
@@ -943,7 +943,7 @@
       getUserList(callback){
         const _this = this
         const params = {
-          'search.company_eq': '',
+          'search.company_eq': this.userInfo.company,
           'page.pn': 1,
           'page.size': 1000
         }
@@ -960,35 +960,6 @@
             }
             if(callback && typeof callback == 'function'){
               callback(dataArry, idArry)
-            }
-          }
-          this.spinShow = false
-        })
-      },
-      // 获取维修记录
-      getRepairWorkorder(pageNo,pageSize,callback){
-        const params = {
-          'search.company_eq': '',
-          //'search.workorderState_eq': status,
-          'page.pn': pageNo,
-          'page.size': pageSize
-        }
-        this.spinShow = true
-        this.$http.get(api.repairWorkorder, params).then( res => {
-          if(res.success){
-            this.spinShow = false
-            this.repairWorkorderAlls = res.data.page.content
-            this.repairWorkorderAllTotal = res.data.page.totalElements
-            this.repairWorkorders = this.repairWorkorderAlls.filter(item => {
-              return item.workorderState === '维修中'
-            })
-            this.repairPayedWorders = this.repairWorkorderAlls.filter(item => {
-              return item.workorderState === '已结账'
-            })
-            this.repairWorkorderTotal = this.repairWorkorders.length
-            this.repairPayedWorderTotal = this.repairPayedWorders.length
-            if(callback && typeof callback === 'function'){
-              callback()
             }
           }
           this.spinShow = false

@@ -110,6 +110,7 @@
     },
     computed: {
       ...mapGetters([
+        'userInfo',
         'client'
       ])
     },
@@ -220,7 +221,7 @@
       getUserList(callback){
         const _this = this
         const params = {
-          'search.company_eq': '',
+          'search.company_eq': this.userInfo.company,
           'page.pn': 1,
           'page.size': 1000
         }

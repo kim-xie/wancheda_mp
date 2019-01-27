@@ -35,11 +35,11 @@
           <p class="detail">
             <p class="">
               <span class="label">所属分类:</span>
-              <span class="value">{{item.date.typeLK.value}}</span>
+              <span class="value" v-if="item.date.typeLK">{{item.date.typeLK.value}}</span>
             </p>
             <p class="">
               <span class="label">所属工种:</span>
-              <span class="value">{{item.date.workTypeLK.value}}</span>
+              <span class="value" v-if="item.date.workTypeLK">{{item.date.workTypeLK.value}}</span>
             </p>
           </p>
           <p class="detail">
